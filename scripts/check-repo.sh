@@ -144,18 +144,21 @@ echo "== prose is en-US =="
 # authors who never compared notes. The list is a data file for the same reason
 # leak-patterns.txt is -- a check that searches the tree is in the tree, and a
 # list inside the scanned set matches itself.
-gb=0; words=0
-while read -r p; do
-  case "$p" in ''|'#'*) continue;; esac
-  words=$((words+1))
-  while IFS= read -r f; do
-    if grep -nE -- "$p" "$f" >/dev/null 2>&1; then
-      note "en-GB spelling in $f: $(grep -onE -- "$p" "$f" | head -1)"
-      gb=$((gb+1))
-    fi
-  done < <(git ls-files '*.md' '*.yml')
-done < scripts/en-gb-spellings.txt
-[ "$gb" = "0" ] && echo "  $words spellings checked, none present"
+# One grep over every file, not one per pattern per file: the readable nested
+# loop spawned ~1200 processes and cost 3.3s of a 4.5s gate, on the pre-commit
+# path. Comments and blank lines are stripped first -- grep -f treats a blank
+# line as a pattern matching everything.
+pat="$(mktemp)"
+grep -vE '^[[:space:]]*(#|$)' scripts/en-gb-spellings.txt > "$pat"
+words=$(grep -c . "$pat")
+hits="$(git ls-files -z '*.md' '*.yml' | xargs -0 grep -onE -f "$pat" 2>/dev/null)"
+rm -f "$pat"
+if [ -z "$hits" ]; then
+  echo "  $words spellings checked, none present"
+else
+  printf '%s\n' "$hits" | while IFS= read -r h; do echo "  !! en-GB spelling at $h"; done
+  fail=1
+fi
 
 echo "== prose stays wrapped =="
 # The prose wraps at about 100 columns by hand. The ceiling here is 105, not

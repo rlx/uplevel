@@ -12,9 +12,10 @@ in the same way a wrong line of code is. Most of what follows exists to keep tha
 ```
 
 `check-install.sh` extracts the install commands from `README.md` and runs them against a clean
-`HOME`. It takes about two seconds, so CI runs it on every change and the commit hook does not.
+`HOME`. It clones this repository four times, so it runs about five seconds — CI runs it on every
+change and the commit hook does not.
 
-The gate takes well under a second. If it fails it names what to fix. Bypass it with
+The gate runs in about a second. If it fails it names what to fix. Bypass it with
 `git commit --no-verify` only when you know why, and say so in the pull request.
 
 ## The rules the gate enforces
