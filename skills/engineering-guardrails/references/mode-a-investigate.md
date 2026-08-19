@@ -134,7 +134,7 @@ Rules for the plan itself:
 
 ### Execute — only what was chosen
 
-When the user picks items: branch first (see *Before the first change*), do the selected items and
+When the user picks items: branch first (`SKILL.md` → *Before the first change*), do the selected items and
 nothing adjacent, land them one reviewable change at a time, and report back what passed, what did not,
 and what you did not touch. Scope creep here is the fastest way to make the next proposal unwelcome.
 

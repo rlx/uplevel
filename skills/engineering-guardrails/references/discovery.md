@@ -66,6 +66,27 @@ the one to design for: the checkout is there, the runtimes are installed, the ga
 the preflight anyway, because when the assumption is false, everything downstream silently degrades
 to `unverified` and the report quietly stops being worth reading.
 
+**Look in every component, not just the root.** A polyglot or monorepo declares per part, and a
+root-only check silently finds nothing: memos has *no root `package.json` at all* — Go in `go.mod`,
+pnpm in `web/package.json`. Enumerate before reading:
+
+```sh
+find . -maxdepth 3 \( -name package.json -o -name go.mod -o -name pyproject.toml \
+  -o -name Gemfile -o -name Cargo.toml -o -name '.tool-versions' -o -name '.nvmrc' \) \
+  -not -path '*/node_modules/*' -not -path '*/vendor/*'
+```
+
+On a monorepo this lists every workspace (22 in cal.com), and most declare nothing. Only the manifests
+carrying `packageManager`, `engines`, or a language version matter — filter to those:
+
+```sh
+grep -l '"packageManager"\|"engines"' $(find . -maxdepth 3 -name package.json \
+  -not -path '*/node_modules/*') 2>/dev/null
+```
+
+Each component can pin a different toolchain, and the gate may need all of them. "No JS toolchain
+declared" is a claim about the root directory, not about the repository.
+
 Read the repo's own declarations — never guess a version:
 
 | source | declares |
