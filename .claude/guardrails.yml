@@ -36,10 +36,10 @@ checks:
     by: .github/workflows/check.yml -> scripts/check-repo.sh
 
   - id: ci-on-pull-request
-    status: present, unverified
+    status: enforced
     by: .github/workflows/check.yml -> scripts/check-repo.sh
-    note: the pull_request trigger is configured but has never fired; every run
-      so far was a push. Verified when a pull request first runs it.
+    note: verified on PR #1, which ran the real checks rather than passing
+      vacuously; the CI guard correctly skipped the local hook check.
 
   - id: branch-protection-required-checks
     status: unsupported here
