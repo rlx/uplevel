@@ -233,13 +233,19 @@ checks:
 
   - id: new-check-recorded-in-checklist
     status: enforced
-    by: scripts/check-repo.sh; commit time, gate scripts only
+    by: >-
+      scripts/check-repo.sh; commit time, against check-repo.sh, check-install.sh
+      and selfcheck.sh
     note: >-
       the date check proves the checklist was looked at, not that it is true - it
-      passed while four controls were in place and unrecorded. This fires when a
-      gate script gains a heading, which is the moment the file goes stale.
-      Renames net to zero. Origin: the re-audit of 2026-08-19. Verified
-      red-then-green.
+      passed while four controls were in place and unrecorded. Counts assertions
+      rather than section headings: a check added inside an existing section
+      netted zero, which is how the entry for this rule came to be written by
+      hand after PR #40. check-install.sh defines its own checks and was not
+      watched at all. The signals live in scripts/gate-check-signals.txt because
+      written inline they match their own source line - observed on the first
+      attempt. Renames net to zero, a removal nets negative. Verified
+      red-then-green across five cases.
 
   - id: changelog
     status: present

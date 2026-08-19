@@ -1,0 +1,16 @@
+# What counts as "a check was added" in a gate script, for the rule that a new
+# check must be recorded in .claude/guardrails.yml.
+#
+# Extended regexes, one per line, matched against added and removed diff lines.
+# Blank lines and # comments ignored.
+#
+# Kept in a data file because these patterns describe gate-script source, and a
+# gate script is where they would otherwise live -- written inline they match
+# their own source line and report checks that were never added. That happened
+# on the first attempt.
+#
+# A section heading. Catches a whole new group of checks.
+^echo "== 
+# A single assertion. A check is a thing that can fail, so this is the real
+# signal: headings alone missed a check added inside an existing section.
+[^a-zA-Z_]note "
