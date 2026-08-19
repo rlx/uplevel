@@ -21,7 +21,9 @@ done
 
 echo "== load cost =="
 w=$(wc -w < SKILL.md); tok=$((w * 4 / 3))
-echo "  SKILL.md ≈ $tok tokens (loaded whenever the skill triggers)"
+# Print the headroom, not just the number. The ceiling is a wall you hit without
+# warning; the remainder is what tells you a change is nearly the last one that fits.
+echo "  SKILL.md ≈ $tok tokens of 4000 ($((4000 - tok)) left; loaded whenever the skill triggers)"
 [ "$tok" -gt 4000 ] && note "SKILL.md is over the 4k budget — it loads on every trigger; move detail into references/"
 
 echo "== shipped commands parse =="

@@ -58,6 +58,33 @@ else
   note "~/.claude/skills/uplevel exists but does not resolve; rerun the install step"
 fi
 
+echo "== the checklist parses =="
+# It shipped unparseable: an unquoted "PR #1" started a YAML comment mid-value.
+# A checklist nothing reads is a checklist nothing notices is wrong.
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "  no python3, skipping"
+elif ! python3 -c 'import yaml' >/dev/null 2>&1; then
+  echo "  no pyyaml, skipping"
+elif python3 -c 'import yaml,sys; yaml.safe_load(open(".claude/guardrails.yml"))' 2>/dev/null; then
+  echo "  .claude/guardrails.yml is valid YAML"
+else
+  note ".claude/guardrails.yml does not parse as YAML"
+fi
+
+echo "== gate scripts stay portable =="
+# CI runs ubuntu-latest (bash 5, GNU coreutils). A maintainer's macOS runs bash 3.2
+# with BSD or ugrep tools, and the commit hook gates on that one. A GNU-only flag
+# would pass for whoever wrote it and fail for the other, so the scripts avoid them.
+gnuisms=0; checked=0
+while read -r p; do
+  case "$p" in ''|'#'*) continue;; esac
+  checked=$((checked+1))
+  if grep -rnF -- "$p" scripts/*.sh skills/uplevel/*.sh 2>/dev/null; then
+    note "GNU-only construct in a gate script: $p"; gnuisms=$((gnuisms+1))
+  fi
+done < scripts/gnu-only-constructs.txt
+[ "$gnuisms" = "0" ] && echo "  $checked GNU-only constructs checked for, none present"
+
 echo "== the skill's own gate =="
 skills/uplevel/selfcheck.sh | sed 's/^/  /' || fail=1
 

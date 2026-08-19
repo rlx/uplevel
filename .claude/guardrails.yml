@@ -1,6 +1,10 @@
 # Repository checklist. Re-audit as a diff against this file.
 # status: present | absent | unsupported here | unknown | enforced
 audited: 2026-08-19
+last_audit_scope: >
+  Re-audit as a diff. Verified this pass: gate, workflow triggers and
+  permissions, action pinning, ruleset, repository security settings,
+  code scanning, toolchain portability.
 visibility: public
 
 checks:
@@ -39,13 +43,15 @@ checks:
   - id: ci-on-pull-request
     status: enforced
     by: .github/workflows/check.yml -> scripts/check-repo.sh
-    note: verified on PR #1, which ran the real checks rather than passing
+    note: >-
+      verified on PR #1, which ran the real checks rather than passing
       vacuously; the CI guard correctly skipped the local hook check.
 
   - id: branch-protection-required-checks
     status: enforced
     by: ruleset "Protect main" (21026886), active, no bypass actors
-    note: requires a pull request, the "Repo gate" check, and branches up to
+    note: >-
+      requires a pull request, the "Repo gate" check, and branches up to
       date; blocks force-push and deletion. Verified behaviourally on
       2026-08-19 - a direct push to main was rejected with both the
       pull-request and required-status-check rules cited.
@@ -57,7 +63,8 @@ checks:
   - id: push-protection
     status: present, unverified
     by: repository security settings
-    note: reported enabled by the API. A behavioural test was attempted and was
+    note: >-
+      reported enabled by the API. A behavioural test was attempted and was
       inconclusive - the credential values used were vendor-published example
       keys, which scanners allowlist. Not retried, because any string that would
       prove the control also looks like a real secret in a public repository.
@@ -77,6 +84,63 @@ checks:
   - id: licence
     status: present
     by: LICENSE (MIT)
+
+  - id: code-scanning
+    status: enforced
+    by: CodeQL default setup, query suite "default", weekly
+    note: >-
+      languages ["actions"] - the workflow is the analysable surface here.
+      Enabled 2026-08-19; setup run 32231629098 completed successfully. The
+      previous audit recorded this as unknown because the token lacked
+      security_events; the code-scanning/default-setup endpoint answers without
+      that scope and reported not-configured.
+    last_checked: 2026-08-19
+
+  - id: branch-deleted-on-merge
+    status: enforced
+    by: repository setting delete_branch_on_merge
+    last_checked: 2026-08-19
+
+  - id: secret-scanning-non-provider-patterns
+    status: absent
+    note: >-
+      NOT settable through PATCH /repos/{owner}/{repo}. The endpoint returns
+      200 and silently discards the field - confirmed by sending a bogus value,
+      which was also accepted. Not a permissions problem: the same token changed
+      an unrelated setting on the same endpoint and the change was observed on
+      re-read. Needs the web UI, Settings > Advanced Security.
+    last_checked: 2026-08-19
+
+  - id: secret-scanning-validity-checks
+    status: absent
+    note: same endpoint behaviour as non-provider-patterns above.
+    last_checked: 2026-08-19
+
+  - id: gate-scripts-portable
+    status: enforced
+    by: scripts/check-repo.sh against scripts/gnu-only-constructs.txt
+    note: >-
+      CI is ubuntu-latest (bash 5, GNU coreutils); a maintainer here runs
+      bash 3.2.57 with ugrep 7.5.0 and BSD sed, and the commit hook gates on
+      that one. 9 GNU-only constructs are checked for. Verified red-then-green.
+    last_checked: 2026-08-19
+
+  - id: skill-md-headroom-visible
+    status: enforced
+    by: selfcheck.sh prints tokens used, budget, and remainder
+    note: >-
+      3582 of 4000 at v0.24.0, 418 left. Was 3265 at v0.21.0 and v0.22.0,
+      so one merge consumed roughly 10 percent of the budget.
+    last_checked: 2026-08-19
+
+  - id: checklist-parses
+    status: enforced
+    by: scripts/check-repo.sh; python3 + pyyaml, skipped when absent
+    note: >-
+      this file shipped unparseable - an unquoted "PR #1" started a YAML comment
+      mid-value and truncated the block. Nothing read the file, so nothing
+      noticed. Multi-line notes now use block scalars. Verified red-then-green.
+    last_checked: 2026-08-19
 
   - id: codeowners
     status: absent

@@ -25,3 +25,10 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. Hooks are not track
   commit time.
 - Every reference file must be linked from `SKILL.md`, and every link must resolve. Both directions
   are enforced.
+- CI is `ubuntu-latest` (bash 5, GNU coreutils); a maintainer may be on bash 3.2 with BSD or ugrep
+  tools, and the commit hook gates on that one. Gate scripts therefore avoid GNU-only constructs,
+  listed in `scripts/gnu-only-constructs.txt` and enforced. Add to that file rather than working
+  around it.
+- `.claude/guardrails.yml` is the per-repo checklist and must parse as YAML — enforced where
+  `python3` and `pyyaml` are available, skipped where they are not. Quote or use a block scalar for
+  any value containing `#` or `: `.
