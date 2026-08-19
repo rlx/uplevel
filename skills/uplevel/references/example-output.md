@@ -1,85 +1,106 @@
 # What good output looks like
 
-One worked example, invented. Read it for **shape and tone**, not content: findings before
-recommendations, their numbers rather than our standards, absences named, uncertainty marked, and a
-plan short enough to act on. Do not reuse its items — they belong to a repo that does not exist.
+One worked example, **real**: an audit of `hashicorp/terraform` run on 2026-08-19 by an agent with no
+prior context, trimmed to the parts that teach the shape. Every claim was verified against the file or
+API response it rests on. The repository may well have changed since — **read this for shape and tone,
+not as current fact about that project**, and never reuse its items.
+
+The shape: findings before recommendations, their numbers rather than your standards, absences named
+with the right word, uncertainty marked, deliberate design recognised as such, and a plan short enough
+to be acted on.
 
 ---
 
-## Report — `acme/billing-api`
+## Report — `hashicorp/terraform`
 
-**What validates a change before it reaches `main`:** nothing. `.github/workflows/test.yml` triggers
-on `push` to `main` only, so pull requests run no checks; the branch is where breakage is found.
-*(Evidence: the workflow's `on:` block.)*
+**Nothing security-urgent.** I looked specifically: no `pull_request_target` with a head checkout, no
+unpinned third-party action, no `curl | bash`, no `@latest` installs, no secret values read.
 
-**What validates a change before it reaches production:** a manual deploy from a laptop
-(`scripts/deploy.sh`). No approval gate, no smoke test. Which commit is live is not recorded anywhere
-I could find — I asked, and nobody was certain. *(Evidence: the script; confirmed in conversation.)*
+**The premise needs correcting.** The request said the process "isn't written down anywhere." Most of
+it is — this repo has a mature, genuinely enforced process. What is *not* written down is the one
+command a contributor needs, and it is hiding inside a CI file.
 
-**The gate as it exists:** `make test` — 218 tests, 41s, green on a clean tree. It does **not** cover:
-integration tests (they need Postgres and skip silently when it is absent — 34 of the 218 skipped on
-my run and the suite still reported success), migrations, or any config validation.
+**Toolchain preflight.** Declared `1.26.4` (`.go-version`, `go.mod`); resolved `go1.26.6` **in the
+repository directory** — same minor, patch ahead, **satisfied**. The gate is runnable here, so the
+commands below were actually run.
 
-**Their numbers, last 50 merges:** 14 reached `main` with no approving review; `main`'s own CI was red
-on 6 of the last 30 days, twice for more than 24h; 4 commits since March are reverts, 3 of them
-touching `app/billing/invoice.py`. *(Evidence: `gh pr list`, `gh run list`, `git log`.)*
+**The gate as it exists.** `.github/workflows/checks.yml`, on `pull_request` and `push`: Unit Tests,
+Race Tests, End-to-end Tests, Code Consistency Checks. What I ran and observed:
 
-**Absences** — present / absent / unknown:
+- `go build ./...` → **exit 0, 69s** (whole tree, both modules)
+- `go test -cover ./internal/addrs/... ./internal/tfdiags/...` → **ok, 2.6s**, 54.6% / 69.8%
+- `gofmt -l .` → clean apart from a `testdata/` file the Go tool ignores anyway. Not a defect.
+- Full `go test ./...` — **not run, unverified.** Tens of minutes on this machine; I judged the cost
+  not worth it for an audit, and I will not report a runtime I did not observe.
+
+**What validates a change before `main`.** Ruleset 2007970, `enforcement: active`, requiring Code
+Consistency Checks, End-to-end Tests, Race Tests, Unit Tests and `license/cla`, with
+`current_user_can_bypass: never`. An org ruleset adds a required PR, one approving review and code-owner
+review.
+
+**Their own numbers.** 0 of the last 40 merged PRs merged without an approving review. `Quick Checks`
+13/13 green on `main` over the last week. **5 subject-line reverts in the last 1000 commits — 0.5%.**
+*This is not a repo that keeps breaking things through process failure*, and that is the most important
+caveat in this report.
+
+### Findings
+
+**1. The local gate exists as exactly one line, in a CI file, and no contributor doc names it.**
+`checks.yml:154` runs `make fmtcheck importscheck vetcheck copyright generate staticcheck exhaustive
+protobuf`, and "Code Consistency Checks" is a **required** status check. I grepped `CONTRIBUTING.md`,
+`BUILDING.md`, `README.md` and `docs/`: none of those target names appears in any of them. The single
+check most likely to bounce a PR is transcribed nowhere a human would look.
+
+**2. `make fmtcheck` is not a check — it rewrites your working tree.** `scripts/gofmtcheck.sh:8` is
+`gofmt_files=$(go fmt ./...)`, and `go fmt` is `gofmt -l -w`: it *writes*. In CI this is harmless on an
+ephemeral checkout, which is exactly why it has survived. *Evidence, from reading the file — I did not
+run it, because it would modify the clone.*
+
+**3. Two rules that look enforced and are not.** Rulesets 2045004 and 2044810 are both
+`enforcement: evaluate` — they log and never block. One is redundant with an active org ruleset; the
+other asserts that only core team members may create version branches, and **no active ruleset enforces
+that**.
+
+**Absences — present / absent / unsupported here / unknown**
 
 | | |
 |---|---|
-| CI on pull requests | **absent** |
-| Required status checks, required review | **absent** — direct pushes to `main` are permitted |
-| Actions pinned to SHA | **absent** — 6 of 9 use a mutable tag |
-| Explicit `permissions:` block | **absent** — default token is write-scoped |
-| Secret scanning, Dependabot | **absent** |
-| Rollback | **unknown** — a procedure exists in `docs/`; nobody I asked has run it |
-| `CODEOWNERS`, PR template, `SECURITY.md` | **absent** |
-| Newcomer to passing tests in one command | **absent** — needs 4 undocumented steps |
-
-**Inference, not evidence:** `invoice.py` appearing in 3 of 4 reverts suggests it is the fragile spot,
-but four data points is not a pattern I would bet on.
-
-**Could not verify:** branch protection (the API needs admin rights — 404 for me); whether the deploy
-script has ever been run by anyone but its author.
+| CI on pull requests, required checks, required review | **present** — verified via the rulesets API |
+| Actions pinned to SHA | **present** — 48 references across 18 distinct actions, **zero mutable tags** |
+| `timeout-minutes` | **absent** — every job, every workflow |
+| Local gate command in any contributor doc | **absent** — finding 1 |
+| `SECURITY.md` | **present via the org** — checked before calling it missing |
+| Repo Actions permissions policy | **unknown** — 403 at READ. *Not* "disabled" |
+| Legacy branch protection | **unknown** — 404, which is ambiguous by design |
 
 ---
 
 ## Plan
 
-Ordered by damage prevented per unit of effort.
+**1. Write the local pre-PR gate down.** *(~30 min · affects: every contributor · reversible: it's a doc)*
+Copy the exact line from `checks.yml:154` into `CONTRIBUTING.md` beside the existing `go test ./...`
+guidance, noting that two of those targets rewrite the tree. **If only one item is picked, pick this
+one** — everything else assumes people can reproduce CI locally, and today they cannot without reading
+a workflow file.
 
-**1. Run the existing tests on pull requests.** *(~15 min · affects: everyone who merges · reversible:
-delete 3 lines)*
-Add `pull_request` to the existing workflow's triggers. The tests already exist and already pass —
-today nothing runs them before a merge. This is the whole of the gap between "we have tests" and "our
-tests protect `main`".
+**2. Make `make fmtcheck` actually check.** *(~5 min · affects: everyone running it locally · reversible: one line)*
+`go fmt ./...` → `gofmt -l $(go list -f '{{.Dir}}' ./...)`. CI behaviour is unchanged; local behaviour
+stops being destructive. Do this **with** item 1, not after — item 1 tells people to run a command that
+currently edits their files.
 
-**2. Fail the build when integration tests cannot run.** *(~30 min · affects: everyone who merges ·
-reversible)*
-34 tests skipped silently on my run and the suite reported success. A green suite that tested nothing
-is worse than a red one. Either start Postgres in CI or make the absence an error.
+**3. Add `timeout-minutes` to `checks.yml` and `pr.yml`.** *(~10 min · affects: nobody's correctness · reversible)*
+Set it above the observed p95; PR runs land in 6–13 minutes. Today a hung Go job holds a runner for six
+hours.
 
-**3. Pin the six mutable action references to SHAs, and add `permissions: contents: read`.**
-*(~20 min · affects: nobody until an action is updated · reversible)*
-A tag can be re-pointed at new code, and the default token currently grants repository write to every
-third-party action in the pipeline.
+**4. Resolve the two `evaluate`-mode rulesets.** *(config · affects: release branch creation · **maintainer decision**)*
+Promote or delete. As written, one of them is a name, not a rule.
 
-**4. Record which commit is deployed.** *(~1h · affects: whoever deploys · reversible)*
-Write the SHA to a file or endpoint at deploy time. Nothing else in this list can be verified in
-production until "what is running?" has an answer.
+**If only one:** item 1.
 
-**5. Ask a maintainer to require the test check and one review on `main`.** *(configuration, not code ·
-affects: everyone who merges — a maintainer decision, not mine)*
-14 of the last 50 merges had no approving review. This is the item I would expect disagreement on; it
-is a team norm, not a defect, and it should follow items 1 and 2 so the required check is one that
-actually runs.
+**Not proposed:** a `CLAUDE.md` — `CONTRIBUTING.md` already fills the role and is good; a second
+document would compete with it. Also not proposed: SBOM, chaos testing, coverage gates. All real; none
+of them what stands between this repo and its next bad day.
 
-**If only one:** item 1. Everything else assumes a change gets checked before it lands.
-
-**Appendix — worth doing, not yet worth interrupting for:** `CODEOWNERS`; a PR template asking for a
-rollback note; Dependabot; a documented one-command setup; a smoke test after deploy; retiring the
-laptop deploy in favour of a pipeline.
-
-**Not proposed:** SBOM, provenance attestation, chaos testing. All real; none of them the thing
-standing between this repo and its next incident.
+**Could not verify:** the full test suite (cost); `make generate`/`protobuf` (they write to the tree);
+the external release pipeline (lives in another repository, driven by an internal tool). Repo Actions
+policy and legacy branch protection — permission-limited, **unknown, not absent**.

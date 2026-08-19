@@ -50,6 +50,25 @@ how completion is claimed.
 
 Full detail in [`skills/uplevel/README.md`](skills/uplevel/README.md), which ships with the skill.
 
+## What it has been tested on
+
+22 public repositories across 9 languages — Angular, Grafana, Symfony, Airflow, Rails, Rust,
+Terraform, Django, Neovim, Redis, five NVIDIA projects and seven others. 19 of those audits were run
+by agents with no prior context, and every headline finding was re-checked against the source file,
+commit or API response it rested on.
+
+**Two limits worth knowing before you rely on it.**
+
+Every repository tested was mature, public, and multi-contributor. **None had a deployed service, a
+production database, or an on-call rotation the audit could observe** — so the parts of this skill
+that deal with deploys, migrations against real data, and environment safety are the least exercised,
+and they are also the parts it argues matter most. If your process problem is a Friday deploy nobody
+watched, this has not yet been tested on your case.
+
+The three modes are unevenly proven. Investigation has 22 repositories behind it. Automation has
+four. Enforcement — the mode covering check-in, deploys and migrations — has the least evidence of
+the three.
+
 ## Development
 
 ```sh
