@@ -2,6 +2,11 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.44.0 — 2026-08-19
+
+- `automation.md`: three rules for adding a check — prove it on the case that motivated it, re-prove
+  the original case whenever you loosen it, and time the whole gate rather than the check.
+
 ## v0.43.0 — 2026-08-19
 
 - `mode-a-investigate.md`: a scope table — forge, gate, hazards, full — with the rule that a scoped
