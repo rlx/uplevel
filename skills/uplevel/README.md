@@ -1,39 +1,33 @@
 # uplevel
 
-A Claude Code skill for codebases that keep breaking in production because the process lives in
-people's heads.
+Audits a repository's engineering process and returns a ranked plan to fix it.
 
-It does three things:
+## What it does
 
-1. **Investigate, then propose** — inspects the repo (CI config, hooks, task runner, deployment
-   manifests, and the revert/hotfix history), *runs* the candidate gate commands it has read and judged
-   safe, maps the environments and the path to production, hunts the operations that destroy something
-   irreplaceable, runs an **absence audit** that names what is missing — no CI on pull requests, no
-   required checks, unpinned actions, no rollback — and asks you the handful of things code cannot
-   answer. It writes nothing. It hands
-   back **a report of what it found and a numbered plan of proposed changes** — each with what it
-   prevents, what it costs, who it affects, and how to undo it — and builds only the items you pick.
-2. **Automate, by proposal** — the most valuable plan items are usually the ones that replace a
-   sentence with a check: CI gates, secret scanning, migration safety, config validation, deploy smoke
-   tests. A document is the weakest form of enforcement. Anything that could fail a colleague's merge —
-   branch protection, required checks, shared hooks — is proposed for a maintainer to apply, never
-   applied by the skill.
-3. **Learn** — the absence checklist is seeded from a universal list, then **kept in the repository**
-   and grown from that repo's own incidents, near misses, and whatever a reviewer had to explain by
-   hand on a newcomer's first pull request. Re-audits report a diff — resolved, regressed, still open —
-   rather than repeating the same survey, so the second audit is more useful than the first.
-4. **Enforce** — during ordinary work: run the gate before check-in, print which environment you are
-   pointed at before touching one, stop and ask before irreversible operations, ship with a known
-   rollback, keep long migrations and backfills resumable, and report results honestly.
+**Investigate, then propose.** Reads CI config, hooks, task runners, deployment manifests and the
+revert history. Runs the candidate gate commands it has read and judged safe. Maps the environments
+and the path to production. Finds the operations that destroy something irreplaceable. Runs an
+absence audit that names what is missing rather than only what is wrong. It writes nothing, and ends
+in a report plus a numbered plan — each item with what it prevents, what it costs, who it affects,
+and how to undo it.
 
-Three rules it holds itself to. It is **advisory**: it proposes, you choose, and it changes nothing
-that affects other people without being asked. It **branches before its first write**, so anything it
-does build is one `git switch -` away from never having happened. And it **discovers, never guesses** —
-every command in its report is one it ran and watched pass, or is marked unverified.
+**Automate, by proposal.** The valuable plan items replace a sentence with a check: CI gates, secret
+scanning, migration safety, config validation, deploy smoke tests. A document is the weakest form of
+enforcement. Anything that could fail a colleague's merge is proposed for a maintainer, never
+applied.
+
+**Enforce during ordinary work.** Run the gate before check-in, print which environment you are
+pointed at before touching one, stop before irreversible operations, ship with a known rollback,
+keep backfills resumable, and report results honestly.
+
+## Rules it holds itself to
+
+- **Advisory.** It proposes, you choose. Nothing affecting other people is applied unasked.
+- **Branches before its first write**, so anything it builds is one `git switch -` from undone.
+- **Discovers, never guesses.** Every command it reports is one it ran and watched pass, or is
+  marked unverified.
 
 ## Install
-
-Copy the folder to either location:
 
 ```sh
 # personal — available in every project
@@ -43,66 +37,53 @@ mkdir -p ~/.claude/skills && cp -R uplevel ~/.claude/skills/
 mkdir -p .claude/skills && cp -R uplevel .claude/skills/
 ```
 
-Restart Claude Code (or start a new session). Confirm it loaded with `/skills`.
+Restart Claude Code and confirm with `/skills`.
 
 ## Use
 
 ```
-/uplevel                         # bootstrap this repo
+/uplevel
 ```
 
-or just ask: *"uplevel this repo"*, *"write a CLAUDE.md documenting our process"*,
-*"we keep breaking production — what should we enforce?"*
+Or ask: "uplevel this repo", "write a CLAUDE.md documenting our process", "we keep breaking
+production — what should we enforce?"
 
-It will come back with findings and a numbered plan. Reply with the numbers you want — `1, 3, 5` is a
-sufficient answer — and it builds those and nothing adjacent. The parts only you know (which data is
-irreplaceable, what broke last quarter, who is allowed to deploy) are the parts worth correcting before
-you choose.
+It returns findings and a numbered plan. Reply with the numbers you want — `1, 3, 5` is enough — and
+it builds those and nothing adjacent. The parts only you know (which data is irreplaceable, what
+broke last quarter, who may deploy) are worth correcting before you choose.
 
 ## Contents
 
 ```
-SKILL.md                          the three modes, branching, and the rules
-references/discovery.md           finding the real gate, per ecosystem, and what it fails to cover
+SKILL.md                          the three modes, branching, and the invariants
+references/mode-a-investigate.md  the audit procedure, report shape and plan rules
+references/mode-c-enforce.md      check-in, shipping, hazards, incidents, claims
+references/discovery.md           finding the real gate; toolchain preflight; cleanup
 references/production.md          environments, secrets, deploys, migrations, incidents
-references/forge-hygiene.md       the universal seed checklist — CI triggers, Actions security, protection
-references/checklist.md           the per-repo living checklist — how it grows and re-audits as a diff
+references/forge-hygiene.md       CI triggers, Actions security, protection, releases
+references/checklist.md           the per-repo checklist and how it re-audits as a diff
 references/destructive-ops.md     the stop list, and how to derive a repo's own
 references/automation.md          the enforcement ladder — turning rules into checks
 references/claude-md-template.md  the template the bootstrap fills in
-references/long-runs.md           long reads vs. long writes; resumable backfills
+references/long-runs.md           migrations, backfills, anything measured
+references/evidence.md            wording a completion claim to match the evidence
+references/example-output.md      one worked report and plan
 ```
 
-## Sharing what one repo learns with the others
-
-There is no built-in mechanism that syncs learning between repositories. Sharing means moving a check
-into something that is itself shared:
-
-- **Personal skill** (`~/.claude/skills/`) — already covers every repo you work on, on this machine.
-- **Skill in a git repo, installed as a plugin** — reaches everyone who installs it, and updates
-  propagate when they pull. This is the mechanism if a team wants shared guardrails.
-- **A shared org checklist** the per-repo file inherits from (`extends:`), fetched read-only, with
-  local entries winning on conflict.
-
-Promotion from a repo's checklist into the shared seed is gated on one question: *would this check
-make sense in a repo that shares none of this one's code, team, or stack?* Promote sparingly and
-sanitize the origin — the check travels, the incident narrative stays home.
-
-## Known limitations
+## Limitations
 
 - **Settings-derived findings depend on your access.** Branch protection and org policy need
-  permissions an auditor may not have. Those are reported as unknown, never as absent.
-- **It does not measure its own effect.** Nothing re-checks incident rate after a plan is applied,
-  so the value of a change is argued rather than demonstrated.
-- **Plans assume a primary gate.** A repository with several independent pipelines will get a plan
+  permissions an auditor may not have. Reported as unknown, never as absent.
+- **It does not measure its own effect.** Nothing re-checks incident rate after a plan is applied.
+- **Plans assume a primary gate.** A repository with several independent pipelines gets a plan
   weighted toward one of them.
 - **Absent domains**: disaster recovery and restore testing, API and client backwards compatibility,
   feature-flag lifecycle, runtime cost regressions, clock and timezone failures.
 
-Run `selfcheck.sh` for the structural checks the skill enforces on itself.
+Run `selfcheck.sh` for the structural checks it enforces on itself.
 
 ## Scope
 
-Language-, stack-, and deployment-agnostic; weighted toward services that run somewhere and can page
-someone. Sections that do not apply are meant to be deleted — a small library's `CLAUDE.md` should come
-out a few lines long, and that is the correct result.
+Language-, stack- and deployment-agnostic, weighted toward services that run somewhere and can page
+someone. Sections that do not apply are meant to be deleted; a small library's `CLAUDE.md` should
+come out a few lines long.
