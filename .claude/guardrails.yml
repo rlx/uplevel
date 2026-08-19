@@ -209,6 +209,16 @@ checks:
       plus the uninstall. Found two live defects on its first run. Too slow for
       the commit hook at about five seconds, so CI carries it.
 
+  - id: new-check-recorded-in-checklist
+    status: enforced
+    by: scripts/check-repo.sh; commit time, gate scripts only
+    note: >-
+      the date check proves the checklist was looked at, not that it is true - it
+      passed while four controls were in place and unrecorded. This fires when a
+      gate script gains a heading, which is the moment the file goes stale.
+      Renames net to zero. Origin: the re-audit of 2026-08-19. Verified
+      red-then-green.
+
   - id: changelog
     status: present
     by: CHANGELOG.md, linked from README.md

@@ -51,6 +51,34 @@ else
   note "skill content is staged without a version: bump in SKILL.md"
 fi
 
+echo "== a new check is recorded in the checklist =="
+# The date check below proves the checklist was looked at, not that it says what
+# is true: it passed while four controls were in place and unrecorded. A gate
+# script gaining a check is the moment the checklist goes stale, so that is where
+# this fires. Renames net to zero, so only genuinely new headings ask for an
+# entry. Commit time only, for the same reason the version rule is: "in the same
+# commit" is a question only answerable here.
+staged=$(git diff --cached --name-only 2>/dev/null)
+gates="scripts/check-repo.sh skills/uplevel/selfcheck.sh"
+if [ -z "$staged" ]; then
+  echo "  nothing staged, skipping"
+elif ! printf '%s\n' "$staged" | grep -qE '^(scripts/check-repo\.sh|skills/uplevel/selfcheck\.sh)$'; then
+  echo "  no gate script staged"
+else
+  # shellcheck disable=SC2086
+  add=$(git diff --cached -U0 -- $gates | grep -cE '^\+echo "== ')
+  # shellcheck disable=SC2086
+  del=$(git diff --cached -U0 -- $gates | grep -cE '^-echo "== ')
+  net=$((add - del))
+  if [ "$net" -le 0 ]; then
+    echo "  gate script staged, no check added ($add added, $del removed)"
+  elif printf '%s\n' "$staged" | grep -q '^\.claude/guardrails\.yml$'; then
+    echo "  $net new check(s) staged, checklist updated alongside"
+  else
+    note "$net new check(s) staged without a change to .claude/guardrails.yml — record what it enforces"
+  fi
+fi
+
 echo "== installed skill resolves =="
 if [ -n "${CI:-}" ]; then
   echo "  CI run, installation is a local concern, skipping"
