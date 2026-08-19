@@ -14,10 +14,17 @@ Expect an acknowledgement within seven days.
 
 ## Scope
 
-This repository contains a Claude Code skill: markdown instructions plus two shell scripts
-(`skills/uplevel/selfcheck.sh` and `scripts/check-repo.sh`). Relevant reports include anything that
-would cause the skill to read a secret, run an unsafe command, or mislead a reader about whether a
-check ran.
+This repository contains a Claude Code skill: markdown instructions plus four executable scripts.
+
+| script | what it does |
+|---|---|
+| `scripts/check-repo.sh` | this repository's gate; runs the checks below |
+| `scripts/install-hooks.sh` | **writes to `.git/hooks/`** — the only script that modifies your clone |
+| `scripts/hooks/pre-commit` | the tracked source the installer copies into place |
+| `skills/uplevel/selfcheck.sh` | structural checks on the skill itself |
+
+Relevant reports include anything that would cause the skill to read a secret, run an unsafe command,
+write outside the paths above, or mislead a reader about whether a check ran.
 
 The skill inspects repositories it is pointed at. It is designed to enumerate configuration keys
 rather than read secret values, and to avoid running commands that need credentials or touch shared
