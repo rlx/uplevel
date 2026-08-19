@@ -66,7 +66,16 @@ checks:
 
   - id: secret-scanning
     status: enforced
-    by: repository security settings; scanning and push protection both enabled
+    by: repository security settings; scanning, push protection, non-provider
+        patterns and validity checks all enabled
+    note: >-
+      the last two are settable only in the web UI, under Settings > Advanced
+      Security > Secret Protection, and their state is NOT observable through
+      the REST API: PATCH /repos/{owner}/{repo} returns 200 and silently
+      discards both fields, and GET reports them disabled while the UI shows
+      them enabled. The UI is the ground truth here. A future audit reading the
+      API will see "disabled" and be wrong - check the settings page before
+      re-doing this.
 
   - id: dependabot-security-updates
     status: enforced
@@ -128,6 +137,17 @@ checks:
     note: >-
       a dated file with no freshness check is a claim that decays silently. The
       gate now reads the date rather than trusting the reader to notice it.
+
+  - id: push-protection-evidence
+    status: enforced
+    by: repository security settings, read through the API
+    note: >-
+      recorded on a settings read rather than a behavioral test, deliberately.
+      A test was attempted once with vendor-published example keys, which
+      scanners allowlist, and was inconclusive. Any string that would actually
+      prove the control also looks like a real secret sitting in a public
+      repository, so the test is not worth running here. This entry exists so
+      the question is answered once instead of reopening at every audit.
 
   - id: private-vulnerability-reporting
     status: enforced

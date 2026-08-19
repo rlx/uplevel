@@ -215,6 +215,19 @@ the blast radius out loud rather than reporting the mechanism as though it were 
 `security_events`; a token without it returns `404`, which is indistinguishable from *not configured*.
 Record **unknown** and name the scope — do not report a control as missing because you could not see it.
 
+**And some settings the API reports are simply wrong.** `security_and_analysis` carries
+`secret_scanning_non_provider_patterns` and `secret_scanning_validity_checks`, and both are
+**write-discarded and read-unreliable** on the repository endpoint: `PATCH` returns `200` while
+dropping the field, and `GET` can report `disabled` for a control the settings page shows enabled.
+Observed on a repository where the same token successfully changed an unrelated field on that same
+endpoint, so it is not a permissions problem.
+
+The rule that follows generalizes past these two fields: **a `200` is not a write, and a read is only
+evidence if a write through the same surface would have been honored.** Re-read after every settings
+change you make, and where a control is UI-only, say that the settings page is the source of truth and
+name the path. Reporting `disabled` here would be reporting a control as absent when it is present —
+the inverse of the error this file spends most of its length preventing, and just as wrong.
+
 ## 2. Actions supply chain and permissions
 
 - **Third-party actions pinned to a mutable tag** (`@v4`, `@main`). A tag can be re-pointed at new
