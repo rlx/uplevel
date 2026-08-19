@@ -1,15 +1,18 @@
 # uplevel
 
 **Uplevel your repository's engineering process.** Your repo isn't broken — its process is
-undocumented, unenforced, and living in three people's heads. That knowledge doesn't survive a
-new joiner, a busy week, or an agent working unattended.
+undocumented, unenforced, and living in three people's heads. That knowledge doesn't survive a new
+joiner, a busy week, or an agent working unattended.
 
-Most tools tell you what is wrong. **uplevel tells you what is not there** — no CI on pull requests,
-a check that reports green having run nothing, Etc. Absence is the finding nothing else surfaces, because a missing control produces no error to detect. It reports what it verified and marks what it could not.
+Most tools tell you what is wrong. **uplevel tells you what is not there** — no CI on pull
+requests, or a check that reports green having run nothing. Absence is the finding nothing else
+surfaces, because a missing control produces no error to detect. It reports what it verified and
+marks what it could not.
 
 Then it hands back a numbered plan, reply with the numbers you want upleveled.
 
-It changes nothing until you pick. Anything that could fail a colleague's merge is proposed, never applied.
+It changes nothing until you pick. Anything that could fail a colleague's merge is proposed, never
+applied.
 
 ## Install
 
@@ -21,8 +24,8 @@ ln -sfn "$PWD/skills/uplevel" ~/.claude/skills/uplevel
 ```
 
 `-sfn` matters: without it, a second run follows the existing link and creates a nested copy inside
-the clone. Linking means the working tree *is* the installed skill — `git pull` updates it, and moving
-or deleting the clone breaks it. To copy instead, so the install survives the clone:
+the clone. Linking means the working tree *is* the installed skill — `git pull` updates it, and
+moving or deleting the clone breaks it. To copy instead, so the install survives the clone:
 
 ```sh
 cp -R skills/uplevel ~/.claude/skills/uplevel
