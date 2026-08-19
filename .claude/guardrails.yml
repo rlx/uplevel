@@ -1,0 +1,52 @@
+# Living checklist for this repo. Re-audit as a diff against this file.
+# status: present | absent | unsupported here | unknown | enforced
+audited: 2026-08-18
+audit: first
+
+checks:
+  - id: gate-runs-on-commit
+    status: enforced
+    by: .git/hooks/pre-commit -> scripts/check-repo.sh
+    origin: audit 2026-08-18 — the gate ran only when a human remembered
+
+  - id: broken-reference-fails-gate
+    status: enforced
+    by: skills/engineering-guardrails/selfcheck.sh
+    origin: audit 2026-08-18 — check printed a warning and exited 0 for its whole life
+
+  - id: shipped-commands-parse
+    status: enforced
+    by: selfcheck.sh — bash -n on fenced blocks, plus grep -E pattern validation
+    origin: findings.md §13 — a PCRE lookahead shipped and failed on all seven audited repos
+
+  - id: skill-md-under-4k-tokens
+    status: enforced
+    by: selfcheck.sh
+    origin: SKILL.md loads on every trigger; it had drifted 5700 -> 6497 before the mode split
+
+  - id: relative-links-resolve
+    status: enforced
+    by: scripts/check-repo.sh (tracked files only)
+
+  - id: hook-installed-and-current
+    status: enforced
+    by: scripts/check-repo.sh
+    origin: hooks are untracked, so a fresh clone starts with no gate at all
+
+  - id: ci-on-pull-request
+    status: unsupported here
+    note: no git remote is configured, so there is no forge to host CI. Not a gap
+      this repo can close by configuring; revisit if it is ever pushed.
+
+  - id: branch-protection-required-checks
+    status: unsupported here
+    note: same reason as above.
+
+  - id: licence
+    status: absent
+    note: README carries install instructions that cannot lawfully be followed
+      without one. Owner's decision, open.
+
+  - id: selfcheck-covers-research-docs
+    status: partial
+    note: links are checked; prose claims in research/ are not machine-checkable.
