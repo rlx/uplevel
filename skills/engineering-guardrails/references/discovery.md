@@ -59,6 +59,62 @@ Record the answer to each; the gaps are the valuable part.
   document — a suite that silently skips when its dependency is absent reports green having tested
   nothing. Check explicitly for skip-on-missing-service behavior; it is common and invisible.
 
+## Toolchain preflight — do this before anything else
+
+**A repository analysis assumes the machine can build the repository.** That is the normal case and
+the one to design for: the checkout is there, the runtimes are installed, the gate is runnable. Run
+the preflight anyway, because when the assumption is false, everything downstream silently degrades
+to `unverified` and the report quietly stops being worth reading.
+
+Read the repo's own declarations — never guess a version:
+
+| source | declares |
+|---|---|
+| `package.json` → `engines`, `packageManager` | node, and the **exact** package manager + version |
+| `.nvmrc`, `.node-version`, `.tool-versions`, `mise.toml` | pinned runtimes |
+| `go.mod` → `go <version>` | minimum Go |
+| `pyproject.toml` → `requires-python`; `.python-version` | Python |
+| `rust-toolchain.toml`, `Gemfile` → `ruby`, `.ruby-version` | Rust, Ruby |
+| the CI workflow's `setup-*` steps and `env:` version pins | what CI actually uses — the authority |
+
+Then compare against what is present (`node --version`, `go version`, …) and classify each:
+
+- **satisfied** — proceed; the gate is runnable and the hard rule applies in full.
+- **missing** — the tool is absent entirely.
+- **mismatched** — present but the wrong major, or a different package manager than the repo pins.
+  This is the dangerous one: `yarn install` with yarn 1 in a repo pinned to yarn 4 does not fail
+  cleanly, it produces a wrong tree.
+
+**A missing or mismatched toolchain is a finding, not a silent excuse.** Say it in the report, by
+name, with the version the repo wants and the version present — and treat it as one of the "could not
+verify" lines, never as grounds for reporting a gate you never ran as though you had.
+
+### Offer to install, and say what it costs
+
+When something is missing, **suggest the install and give the exact command**, matched to how the repo
+pins it. Do not run it unasked — installing a runtime changes the user's machine, is outside the
+repository you were pointed at, and is exactly the kind of thing this skill asks permission for.
+
+| missing | suggest |
+|---|---|
+| a pinned package manager (yarn 2+, pnpm) | `corepack enable` — it reads `packageManager` and installs the exact pinned version. Try this first; it fixes most mismatches. **Corepack is no longer bundled from Node 25 on**, so on a recent Node it is `npm i -g corepack && corepack enable`. |
+| node at a pinned version | `nvm install` / `fnm use --install-if-missing` (reads `.nvmrc`), or `mise install` |
+| Go | `mise use -g go@<version>`, `brew install go`, or the tarball from go.dev |
+| Python | `uv python install <version>`, `pyenv install`, or `mise install` |
+| Rust, Ruby | `rustup toolchain install`, `rbenv install` |
+| any of the above, uniformly | `mise install` if `.tool-versions`/`mise.toml` exists — one command, repo-pinned versions |
+| a local service the gate needs | `docker compose up -d <service>` from the repo's own compose file |
+
+Prefer the version manager the repo already commits config for. Installing a *different* one is a
+change to the user's environment they did not ask for, and it will drift from CI.
+
+If the user declines, or the install is not practical, that is a legitimate outcome — continue the
+audit, run every check that does not need the missing tool (workflow reading, git archaeology, the
+absence audit, and the hazard inventory all work fine without a toolchain), and mark the gate section
+`unverified — needs <tool> <version>`. **Say which parts of the report that weakens.** A report whose
+static half is verified and whose gate half is explicitly unverified is honest and useful; one that
+does not distinguish them is neither.
+
 ## Verifying — safely
 
 **Read every command before you run it.** Names lie: a target called `test` or `check` can seed a
@@ -72,6 +128,11 @@ Order of attempt, stopping at the first that cannot be run safely:
    the ports are free; note what it starts and stop it afterwards.
 3. Needs credentials, a shared environment, or money — **do not run.** Record as
    `— unverified, needs X`. This is not a failure of discovery; it is the correct outcome.
+4. The toolchain to run it is missing or mismatched — **do not improvise a substitute.** Offer the
+   install (above). Until it is installed, record as `— unverified, needs <tool> <version>`. Never
+   swap in a neighbouring command because it happens to run: `npm test` in a yarn-4 monorepo, or
+   `go test ./...` where CI runs a driver matrix, tests something other than the gate and reports it
+   under the gate's name.
 
 Run the gate on a clean tree before writing it down. Then, if cheap, confirm it can **fail**: a gate
 that passes on a deliberately broken tree is not measuring anything. Revert the deliberate break

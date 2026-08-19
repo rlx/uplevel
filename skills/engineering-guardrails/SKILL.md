@@ -12,7 +12,7 @@ description: >
   CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.11.0
+version: 0.12.0
 ---
 
 # Engineering guardrails
@@ -135,8 +135,19 @@ up", that still means: investigate, propose, and wait — then build what they c
 Every command you put in the report must have been **run once, in this repo, and observed to work**. A
 gate command that doesn't exist is worse than no gate — it manufactures confidence, and the next
 session will report green having run nothing. If a command cannot be verified (needs credentials, a
-deployed environment, paid infrastructure), record it as `— unverified, needs X`. **Never run an
-unverified command against a deployed environment to find out what it does.**
+deployed environment, paid infrastructure, or **a toolchain this machine does not have**), record it
+as `— unverified, needs X`. **Never run an unverified command against a deployed environment to find
+out what it does.**
+
+**Preflight the toolchain before you rely on that rule** — `references/discovery.md` §*Toolchain
+preflight*. Analysis assumes the machine can build the repo, and usually it can; when it cannot, the
+hard rule quietly converts the whole gate section to `unverified` and the report stops being worth
+reading. Read the repo's declared versions (`engines`, `packageManager`, `go.mod`, `.tool-versions`,
+the CI `setup-*` steps), compare them to what is installed, and **name any missing or mismatched tool
+in the report**. Offer the install command — `corepack enable` first, since a pinned package manager
+is the most common gap — and let the user decide; installing a runtime is a change to their machine,
+not to the repo you were pointed at. A version *mismatch* is the trap, not absence: the wrong major
+package manager installs a wrong tree instead of failing.
 
 ### Investigate
 
