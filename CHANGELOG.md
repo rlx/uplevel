@@ -2,6 +2,15 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.37.0 — 2026-08-19
+
+- `check-repo.sh`: en-US spelling and a 105-character markdown wrap ceiling.
+- `README.md`: names Claude Code in the first line; install caveats collapsed.
+- `discovery.md`, `checklist.md`: pinned tool versions and sample dates that would date.
+- `CONTRIBUTING.md`: the leak scan cannot see third-party fingerprints; review must.
+- `CLAUDE.md`: tagging is printed, not gated.
+- `CHANGELOG.md` added.
+
 ## v0.35.0 — 2026-08-19
 
 - `forge-hygiene.md`: the two secret-scanning fields the GitHub API discards on write and misreports
