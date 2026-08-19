@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.40.0 — 2026-08-19
+
+- `forge-hygiene.md`: `gh` not being installed, and which half of the forge audit still works without it.
+- `selfcheck.sh`: prints what each mode costs to load, not only `SKILL.md`.
+- `selfcheck.sh`: all eleven invariants must be stated in `SKILL.md`, from `invariants.txt`.
+- `check-repo.sh`: a new gate check must be recorded in `.claude/guardrails.yml` in the same commit.
+
 ## v0.37.0 — 2026-08-19
 
 - `check-repo.sh`: en-US spelling and a 105-character markdown wrap ceiling.
