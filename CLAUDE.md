@@ -1,6 +1,6 @@
 # uplevel
 
-A Claude Code skill. The deliverable is markdown that changes agent behaviour, so an inaccurate
+A Claude Code skill. The deliverable is markdown that changes agent behavior, so an inaccurate
 sentence is a defect.
 
 ## Gate
@@ -30,6 +30,11 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
   tools, and the commit hook gates on that one. Gate scripts therefore avoid GNU-only constructs,
   listed in `scripts/gnu-only-constructs.txt` and enforced. Add to that file rather than working
   around it.
+- Prose is **en-US** throughout — behavior, license, judgment, labeled. The repository is public and
+  the skill ships as text; mixed spelling reads as two authors who never compared notes.
+- `.claude/guardrails.yml` is public, so it records only what is **in place**. Absent, unverified, and
+  undecided items go in the untracked `.claude/improvement-plan.md` — a public list of a project's own
+  gaps is a roadmap for whoever wants to use them.
 - `.claude/guardrails.yml` is the per-repo checklist and must parse as YAML — enforced where
   `python3` and `pyyaml` are available, skipped where they are not. Quote or use a block scalar for
   any value containing `#` or `: `.

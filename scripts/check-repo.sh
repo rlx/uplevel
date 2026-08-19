@@ -59,17 +59,67 @@ else
   note "~/.claude/skills/uplevel exists but does not resolve; rerun the install step"
 fi
 
-echo "== the checklist parses =="
-# It shipped unparseable: an unquoted "PR #1" started a YAML comment mid-value.
-# A checklist nothing reads is a checklist nothing notices is wrong.
+echo "== the checklist parses, and is current =="
+# It shipped unparseable once: an unquoted "#" started a YAML comment mid-value.
+# A checklist nothing reads is a checklist nothing notices is wrong. The date is
+# checked for the same reason -- an audit date nothing reads decays in silence,
+# and a stale checklist reads exactly like a current one.
 if ! command -v python3 >/dev/null 2>&1; then
   echo "  no python3, skipping"
 elif ! python3 -c 'import yaml' >/dev/null 2>&1; then
   echo "  no pyyaml, skipping"
-elif python3 -c 'import yaml,sys; yaml.safe_load(open(".claude/guardrails.yml"))' 2>/dev/null; then
-  echo "  .claude/guardrails.yml is valid YAML"
 else
-  note ".claude/guardrails.yml does not parse as YAML"
+  msg=$(python3 - <<'CHECKLIST'
+import datetime, sys, yaml
+MAX_AGE = 180
+try:
+    doc = yaml.safe_load(open(".claude/guardrails.yml"))
+except Exception as exc:
+    print("does not parse as YAML: %s" % str(exc).splitlines()[0])
+    sys.exit(1)
+audited = doc.get("audited") if isinstance(doc, dict) else None
+if not isinstance(audited, datetime.date):
+    print("has no 'audited:' date in YYYY-MM-DD form")
+    sys.exit(1)
+age = (datetime.date.today() - audited).days
+if age < 0:
+    print("is audited %s, which is in the future" % audited)
+    sys.exit(1)
+if age > MAX_AGE:
+    print("was audited %s, %d days ago; re-audit and update the date" % (audited, age))
+    sys.exit(1)
+print("valid YAML, audited %d days ago, %d before it goes stale" % (age, MAX_AGE - age))
+CHECKLIST
+  )
+  if [ $? -eq 0 ]; then
+    echo "  .claude/guardrails.yml is $msg"
+  else
+    note ".claude/guardrails.yml $msg"
+  fi
+fi
+
+echo "== every tag declares the version it claims =="
+# The version bump is gated at commit time; the tag was not, so main once
+# carried a version that had never been released and nothing noticed. An
+# installed copy is identified by that number, so a tag pointing at a commit
+# that declares a different one makes the number useless.
+VERSION_FS='[ \t]*:[ \t]*'
+tagn=0
+while IFS= read -r t; do
+  [ -z "$t" ] && continue
+  tagn=$((tagn+1))
+  tv="$(git show "$t:skills/uplevel/SKILL.md" 2>/dev/null \
+        | awk -F"$VERSION_FS" '/^version:/ { print $2; exit }')"
+  [ "$tv" = "${t#v}" ] || note "$t points at a commit declaring version '${tv:-none}'"
+done < <(git tag -l 'v*' 2>/dev/null)
+cur="$(awk -F"$VERSION_FS" '/^version:/ { print $2; exit }' skills/uplevel/SKILL.md)"
+if [ "$tagn" = "1" ]; then tw="tag"; else tw="tags"; fi
+if [ "$tagn" = "0" ]; then
+  echo "  no v* tags yet; SKILL.md declares $cur"
+elif git rev-parse -q --verify "refs/tags/v$cur" >/dev/null 2>&1; then
+  echo "  $tagn $tw checked; SKILL.md declares $cur, which is tagged"
+else
+  echo "  $tagn $tw checked; SKILL.md declares $cur, not yet tagged - tag it when it reaches main"
 fi
 
 echo "== gate scripts stay portable =="
