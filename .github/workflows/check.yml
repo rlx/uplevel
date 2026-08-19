@@ -9,7 +9,11 @@ on:
 permissions: {}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # On a pull request, supersede the previous run for that PR. On a push to main
+  # the PR number is null, so keying on the ref would give every merge the same
+  # group and each merge would cancel the previous merge's validation. Key on the
+  # commit instead, so post-merge runs never cancel each other.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:

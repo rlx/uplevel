@@ -134,6 +134,22 @@ Failure modes to check for by name, each of which produces a green repo that val
   pending checks.
 - **No `concurrency:` group.** Superseded runs keep executing — wasted minutes, and racing deploys if
   the workflow deploys.
+- **A `concurrency:` group too coarse for the event — the inverse defect, and the more damaging one.**
+  `group: ${{ github.workflow }}-${{ github.ref }}` with `cancel-in-progress: true` is correct for pull
+  requests and wrong for pushes to the default branch: there the ref is constant, so **every merge
+  cancels the previous merge's validation run.** Post-merge CI then exists on paper and almost never
+  completes. One audited repo finished 3 of 60 runs this way.
+  ```sh
+  grep -A2 '^concurrency:' .github/workflows/*.y*ml        # is the key constant for push events?
+  gh run list --branch <default> --limit 60 --json conclusion \
+    --jq '[.[].conclusion]|group_by(.)|map("\(.[0])=\(length)")|join(" ")'
+  ```
+  **A high `cancelled` count on the default branch is the symptom**, and it reads as green in any
+  aggregate that only counts failures. The fix is to key on something unique per run for non-PR events
+  — `github.event.pull_request.number || github.sha` — or to set `cancel-in-progress: false` there.
+  Check the repo's other workflows first: a project that has hit this usually has one file with the
+  correct pattern and a comment explaining it, which makes the broken one an oversight rather than a
+  decision.
 - **No `workflow_dispatch`.** Nothing can be re-run without pushing an empty commit.
 - **Fork pull requests get no secrets**, so integration tests silently skip and report success. Decide
   deliberately what runs for forks.
@@ -141,6 +157,42 @@ Failure modes to check for by name, each of which produces a green repo that val
   security scan that quietly stopped months ago is worse than none, because everyone believes it runs.
 - **Matrix covers one runtime version while production runs another.**
 - **Caches that never invalidate**, so CI passes against dependencies nobody has locally.
+
+## 1b. Repository settings, not just workflow files
+
+**Half of what governs Actions is not in `.github/`.** A workflow can be flawless and still run with a
+write-scoped default token, or accept any action from anywhere. These are separate API surfaces and a
+file-only audit never sees them.
+
+```sh
+gh api repos/{o}/{r}/actions/permissions           # enabled, allowed_actions
+gh api repos/{o}/{r}/actions/permissions/workflow  # default token scope, PR-approval ability
+gh api repos/{o}/{r}/actions/permissions/fork-pr-contributor-approval
+gh api repos/{o}/{r}/actions/runners               # self-hosted?
+gh api repos/{o}/{r}/actions/secrets               # how much is there to steal
+gh api repos/{o}/{r}/code-scanning/default-setup
+gh api repos/{o}/{r} --jq '{delete_branch_on_merge, allow_auto_merge}'
+```
+
+| setting | what to look for |
+|---|---|
+| `default_workflow_permissions` | `write` hands repo-write to every action in every job, including third-party ones. `read` is the safe default and costs nothing to set. |
+| `can_approve_pull_request_reviews` | if true, a workflow can approve a PR — which defeats required review |
+| `allowed_actions` | `all` permits any action from any owner. Restricting is the highest rung available, at the cost of friction whenever a new action is wanted |
+| fork-PR approval policy | on a public repo anyone can open a PR that runs CI. Confirm the policy is at least `first_time_contributors` |
+| self-hosted runners + secret count | **these set the blast radius of a fork PR.** Zero runners and zero secrets means the worst case is stolen compute; a self-hosted runner with secrets means something else entirely |
+| `code-scanning/default-setup` | free on public repositories, and it lints workflows themselves. `not-configured` on a public repo is a cheap gap |
+| `delete_branch_on_merge` | off means merged branches accumulate and someone tidies them by hand forever |
+
+**Judge a fork PR by what it can reach, not by whether it runs your code.** Any repository whose CI
+runs a checked-in script executes the PR author's version of that script — that is inherent, not a
+defect. What decides severity is the trigger (`pull_request` gets a read-only token and no secrets;
+`pull_request_target` does not), the secret count, and whether a self-hosted runner is involved. Say
+the blast radius out loud rather than reporting the mechanism as though it were a finding.
+
+**Some of these need scopes an audit may not hold.** The code-scanning endpoints require
+`security_events`; a token without it returns `404`, which is indistinguishable from *not configured*.
+Record **unknown** and name the scope — do not report a control as missing because you could not see it.
 
 ## 2. Actions supply chain and permissions
 
