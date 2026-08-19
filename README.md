@@ -1,18 +1,17 @@
 # uplevel
 
-**Uplevel your repository's engineering process.** Your repo isn't broken — its process is
-undocumented, unenforced, and living in three people's heads. That knowledge doesn't survive a new
-joiner, a busy week, or an agent working unattended.
+A Claude Code skill that uplevels a repository's engineering process.
+
+Your repo isn't broken — its process is undocumented, unenforced, and living in three people's
+heads. That knowledge doesn't survive a new joiner, a busy week, or an agent working unattended.
 
 Most tools tell you what is wrong. **uplevel tells you what is not there** — no CI on pull
 requests, or a check that reports green having run nothing. Absence is the finding nothing else
 surfaces, because a missing control produces no error to detect. It reports what it verified and
 marks what it could not.
 
-Then it hands back a numbered plan, reply with the numbers you want upleveled.
-
-It changes nothing until you pick. Anything that could fail a colleague's merge is proposed, never
-applied.
+It hands back a numbered plan and changes nothing until you reply with the numbers you want.
+Anything that could fail a colleague's merge is proposed, never applied.
 
 ## Install
 
@@ -23,9 +22,10 @@ mkdir -p ~/.claude/skills
 ln -sfn "$PWD/skills/uplevel" ~/.claude/skills/uplevel
 ```
 
-`-sfn` matters: without it, a second run follows the existing link and creates a nested copy inside
-the clone. Linking means the working tree *is* the installed skill — `git pull` updates it, and
-moving or deleting the clone breaks it. To copy instead, so the install survives the clone:
+Restart Claude Code. The skill is then available as `/uplevel`.
+
+This links, so the working tree *is* the installed skill and `git pull` updates it. To copy instead,
+so the install survives deleting the clone:
 
 ```sh
 mkdir -p ~/.claude/skills
@@ -33,16 +33,24 @@ rm -rf ~/.claude/skills/uplevel
 cp -R skills/uplevel ~/.claude/skills/uplevel
 ```
 
-The `rm -rf` is what makes it repeatable, and it is why the destination is named explicitly on both
-lines. `cp -R` into a path that already exists copies *into* it, so re-running without the removal
-nests a copy inside the install — and so does `cp -R skills/uplevel ~/.claude/skills/`, which works
-the first time and nests the second. Updating a copy install means running the block again, so this
-is the second run, every time.
+To uninstall: `rm -rf ~/.claude/skills/uplevel` — it removes the link or the copy, never the clone.
 
-Restart Claude Code. The skill is then available as `/uplevel`. For a single project, copy it into
-that repo's `.claude/skills/` and commit it.
+<details>
+<summary>Why each command is written the way it is</summary>
 
-To uninstall: `rm -rf ~/.claude/skills/uplevel` (removes the link or the copy, never the clone).
+`-sfn` on the link: without `n`, a second run follows the existing link and creates a nested copy
+inside the clone.
+
+`rm -rf` before the copy: `cp -R` into a path that already exists copies *into* it, so re-running
+without the removal nests a copy inside the install. Naming the destination explicitly does not
+prevent this — `cp -R skills/uplevel ~/.claude/skills/` nests on the second run too. Updating a copy
+install means running the block again, so this is the second run, every time.
+
+For a single project rather than every project, use `.claude/skills/uplevel` in that repo and commit
+it. Both commands are run against a clean `HOME` in CI, so this section is executed rather than
+asserted.
+
+</details>
 
 ## Use
 
