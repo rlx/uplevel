@@ -122,6 +122,17 @@ checks:
       the thing to watch: one merge has consumed about 10 percent of the budget
       before now.
 
+  - id: mode-working-set-visible
+    status: enforced
+    by: skills/uplevel/selfcheck.sh; prints tokens per mode on every run
+    note: >-
+      SKILL.md's 4k budget is the entry cost, not the cost. A full Mode A audit
+      reads most of references/ before touching the user's repository, and
+      nothing was measuring that - so the number people optimized was a seventh
+      of what an audit actually spends. Records no figure here for the same
+      reason the SKILL.md entry does not. The file list is guarded: a rename
+      that leaves it dangling fails the gate. Verified red-then-green.
+
   - id: checklist-parses
     status: enforced
     by: scripts/check-repo.sh; python3 + pyyaml, skipped when absent
