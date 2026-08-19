@@ -12,7 +12,7 @@ description: >
   CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.12.0
+version: 0.13.0
 ---
 
 # Engineering guardrails
@@ -176,6 +176,14 @@ package manager installs a wrong tree instead of failing.
 7. **Run the absence audit.** Discovery describes what exists; this step names what is **missing**,
    which in a repo with recurring incidents is usually where the value is.
 
+   **Establish what this environment can do before calling anything missing** —
+   `references/forge-hygiene.md` §0. Is there a remote at all; which forge; are Actions enabled at repo
+   and org level; can you see settings. A control that is **unsupported here** is a different finding
+   from one nobody configured, and proposing the latter's fix for the former wastes the reader's time.
+   Absences get one of four words — **absent / unsupported here / unknown / present** — and
+   *unsupported* still gets said: name it as best practice with no support in this environment, say
+   what protection is therefore missing, and propose the substitute that does work.
+
    **Look for an existing checklist first** — `.claude/guardrails.yml` or wherever this repo keeps it
    (`references/checklist.md`). If one exists, this is a **re-audit**: work from that file, and lead
    the report with the diff — what was resolved, what **regressed**, what is still open and how long
@@ -210,7 +218,8 @@ package manager installs a wrong tree instead of failing.
    **Say the absences out loud in the report, by name.** "There is no workflow triggered by
    `pull_request`, so nothing validates a change before it reaches `main`" is a finding; saying nothing
    reads as approval. Where you could not check (protection APIs need admin rights), record *unknown* —
-   never infer that a control exists.
+   never infer that a control exists, and never round *unknown* down to *absent*: a 403 is missing
+   permission, not a missing control, and treating it as one puts a false accusation in the report.
 8. **Ask what code cannot tell you.** One batched message, short: what broke recently and what would
    have caught it; who reviews; who can deploy; what is genuinely irreversible; whether a process
    document is even wanted, and where it should live.

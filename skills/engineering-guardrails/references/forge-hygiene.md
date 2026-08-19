@@ -17,6 +17,78 @@ finding. Silence about it reads as approval.
 
 ---
 
+## 0. What this environment can even do — establish before auditing anything
+
+**Run this first.** Every check below assumes a forge that offers the feature and an account permitted
+to use it. That assumption is often false, and when it is, the whole audit misreads: a repo with no
+Actions workflows because Actions are *unavailable here* is a completely different finding from one
+that simply never set them up, and proposing "add a `pull_request` workflow" to the first is advice
+that cannot be taken.
+
+Discover, read-only:
+
+```sh
+git remote -v                                  # is there a remote at all?
+gh auth status                                 # authenticated? which host? which scopes?
+gh repo view --json viewerPermission,isPrivate,visibility,defaultBranchRef
+gh api repos/{owner}/{repo}/actions/permissions          # 403 here means unknown, not disabled
+gh api repos/{owner}/{repo}/rulesets                     # readable at READ — start here
+gh api repos/{owner}/{repo}/branches/{default}/protection # admin-only; 404 is ambiguous
+```
+
+**Resolve the default branch first** — `defaultBranchRef.name`. Querying `main` on a repo whose default
+is `master` returns a 404 that looks exactly like "unprotected", and you will report a control missing
+on a branch that does not exist.
+
+**Query rulesets before branch protection.** Rulesets are the current mechanism and, unlike the legacy
+protection endpoint, `GET /repos/{o}/{r}/rulesets` and the per-ruleset detail are **readable with plain
+READ access**. That single call often converts the audit's most consequential line from *unknown* to a
+verified answer. Then check two things beyond existence:
+
+- **`enforcement`** — `active` or `disabled`. A ruleset with `enforcement: disabled` is a control that
+  looks real in the settings UI and stops nothing. That is a finding, and it is invisible if you only
+  check whether a ruleset exists.
+- **`bypass_actors`** — a required check that an admin, app, or team can bypass is a different
+  guarantee from one nobody can. An empty list is worth stating.
+
+Cross-reference the required check *names* against the workflows you read. A ruleset requiring a check
+called `ci` proves nothing until you find the job that produces that exact name — and a required check
+that no workflow ever emits blocks every merge or none, depending on configuration.
+
+Read the failures as data — they are the answer, not an error:
+
+| observation | what it means | how to report it |
+|---|---|---|
+| no remote at all | local-only repo; **no forge CI is possible** | not a gap the team can close by configuring; say so |
+| host is not github.com | GitLab / Gitea / Forgejo / Bitbucket / GHES — different CI system, different feature set | audit their equivalent; do not propose Actions |
+| `gh auth status` unauthenticated | you cannot see settings, protection, or runs | everything settings-derived is **unknown**, never *absent* |
+| Actions `disabled` at repo or org level | workflows will not run even if written | **missing support**, not missing configuration |
+| `actions/permissions` returns a permissions error | you are not an admin | **unknown** — *not* "Actions are disabled" |
+| `viewerPermission` is `READ` | no settings or org policy; **rulesets are still readable** | query rulesets anyway before recording *unknown* |
+| `rulesets` returns `[]` | readable and genuinely empty | **absent** — real evidence, though legacy branch protection may still exist unseen |
+| ruleset present with `enforcement: disabled` | a control that enforces nothing | **absent in effect** — say it plainly; the settings page implies otherwise |
+| protection endpoint 403 | needs admin | **unknown** |
+| protection endpoint 404 | **ambiguous** — GitHub returns 404 rather than 403 to avoid disclosing existence, and also returns it for a branch that does not exist | **unknown**, unless `viewerPermission` is `ADMIN` *and* the branch exists — only then is it *absent* |
+| self-hosted forge with no runners registered | CI is defined and never executes | worse than absent; the badge lies |
+
+**Then classify every absence in this file into one of four buckets, and use the words:**
+
+- **absent** — the forge supports it, the account can use it, nobody set it up. *A gap the team owns.*
+- **unsupported here** — the platform, plan, or org policy does not offer it. **Still say it.** Name it
+  as *best practice with no support in this environment*, say what protection is therefore missing, and
+  point at the nearest thing that is available. It is not the team's failing, and it is not the team's
+  fix either — but a reader deciding whether this repo is safe needs to know the control does not exist.
+- **unknown** — you lacked the permission or the tool to check. Never round this to *absent*; inferring
+  a missing control from a 403 is how a report acquires a false accusation.
+- **present** — verified, with what you ran to verify it.
+
+A plan item aimed at an *unsupported* control is not actionable and should not be numbered as though
+it were. Put it in the report as a stated limitation of the environment, and — where one exists —
+propose the substitute that does work: a pre-push hook where there are no required checks, a
+`CODEOWNERS` convention where review cannot be enforced, a local gate where there is no CI at all.
+
+---
+
 ## 1. What runs, and when — trigger correctness
 
 A pipeline that exists is not a pipeline that protects you. Read every workflow's `on:` block and
