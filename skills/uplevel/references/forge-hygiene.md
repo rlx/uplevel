@@ -280,12 +280,20 @@ the inverse of the error this file spends most of its length preventing, and jus
   security improvement most repos can make.
   ```sh
   grep -rhoE 'uses:[[:space:]]*[^[:space:]@]+@[0-9a-fA-F]{40}' .github/workflows/ | wc -l   # pinned
-  grep -rhoE 'uses:[[:space:]]*[^[:space:]@#]+@[^[:space:]#]+' .github/workflows/ \
-    | grep -vE '@[0-9a-fA-F]{40}' | grep -vE 'uses:[[:space:]]*\.' | sort | uniq -c | sort -rn
+  mut=$(grep -rhoE 'uses:[[:space:]]*[^[:space:]@#]+@[^[:space:]#]+' .github/workflows/ \
+    | grep -vE '@[0-9a-fA-F]{40}' | grep -vE 'uses:[[:space:]]*\.')
+  printf '%s\n' "$mut" | grep -cE  'uses:[[:space:]]*(actions|github)/'   # first-party
+  printf '%s\n' "$mut" | grep -vcE 'uses:[[:space:]]*(actions|github)/'   # third-party — rank these
+  printf '%s\n' "$mut" | grep -vE  'uses:[[:space:]]*(actions|github)/' | sort | uniq -c | sort -rn
   ```
 
-  The second lists the mutable references with counts rather than totalling them, because the total is
-  the number least worth reporting — see the blast-radius rule below. A local `uses: ./` is not
+  **Report the third-party number, not the total.** They differ by more than the rounding: on one
+  audited repository the combined figure was 66 and the third-party figure 28, and it is the 28 that
+  the finding is about. A first-party `actions/checkout@v5` on a mutable tag is a different risk from
+  a third-party action on one, and quoting the total inflates the finding while burying it.
+
+  The listing gives counts per reference rather than a total, because the total is the number least
+  worth reporting — see the blast-radius rule below. A local `uses: ./` is not
   third-party and is excluded. **Do not anchor the SHA filter to end-of-line**: `uses:` values are
   often quoted, so `@<sha>'` does not end at the hex and every quoted pinned action is then reported
   as mutable. That single character was the difference between a clean answer and a false finding on

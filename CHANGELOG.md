@@ -2,6 +2,11 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.42.0 — 2026-08-19
+
+- `forge-hygiene.md`: the pinning census splits first-party from third-party, which the same section
+  already told the reader to do and the command did not.
+
 ## v0.41.0 — 2026-08-19
 
 - `forge-hygiene.md`: commands for the trigger census, the pinning census and the workflow file
