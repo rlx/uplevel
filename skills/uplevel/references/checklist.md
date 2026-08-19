@@ -20,6 +20,13 @@ their call, same as the document itself. Committed is usually right: the point i
 person who learned the lesson, and reaches the contributor who has not yet made the mistake. Local-only
 and gitignored is a legitimate choice for a repo where an agent-specific file is unwelcome.
 
+**In a public repository, split the file.** A committed checklist should record what is **in place**;
+what is absent, unverified, or still being argued about belongs in an untracked companion the team
+works from. The reasoning is not secrecy about the controls — it is that a published list of a
+project's own gaps, ranked and dated, is a starting point for anyone who wants to use them, and it
+ages into an accusation the moment the work is done and the file is not updated. Say this out loud
+when you propose the file; it is the team's call, and a private repo has no such problem.
+
 ```yaml
 version: 1
 generated_by: uplevel
@@ -59,7 +66,7 @@ checks:
 
 Field rules:
 
-- **`source: derived` requires `origin`** — the incident, PR, commit, or observed behaviour that
+- **`source: derived` requires `origin`** — the incident, PR, commit, or observed behavior that
   produced it. A derived check with no origin is an opinion that has smuggled itself into a list of
   facts, and the list stops being trustworthy the moment it contains one.
 - **`status: enforced` means stop asking.** Once a check is a CI job or a database constraint, the
@@ -164,7 +171,7 @@ origin: "incident 2026-02-11 — unbounded query in /reports timed out the pool 
 origin: "learned in a service with continuous deploy; unbounded query exhausted a connection pool"
 ```
 
-If the skill is shared outside your organisation, treat promotion as **publishing**: apply the same
+If the skill is shared outside your organization, treat promotion as **publishing**: apply the same
 care you would to a public postmortem, and ask the user before it leaves the building.
 
 ### Where it goes

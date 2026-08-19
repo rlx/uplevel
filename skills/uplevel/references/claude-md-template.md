@@ -58,7 +58,7 @@ runs on pull requests" is more useful than an empty section.*
 - **Runs on pull request**: `<workflow + what it covers>` / `<or: nothing — state it>`
 - **Required to merge**: `<checks that genuinely block>` / `<or: none — direct pushes are possible>`
 - **Review**: `<CODEOWNERS, required approvals, how they are dismissed>`
-- **Known trigger gaps**: `<path filters, fork behaviour, anything skippable>`
+- **Known trigger gaps**: `<path filters, fork behavior, anything skippable>`
 - **Actions hygiene**: `<pinned to SHA? explicit permissions? dependency updates?>`
 
 ## Releasing
@@ -104,7 +104,7 @@ runs on pull requests" is more useful than an empty section.*
 it destroys, and what legitimate use looks like. Keep to what is genuinely irreversible here.*
 
 - `<command>` — <what it overwrites>. <When it is legitimate; what to review before and after.>
-- `<hand-labelled or curated path>` — <why it is the measuring instrument, how to amend it safely>.
+- `<hand-labeled or curated path>` — <why it is the measuring instrument, how to amend it safely>.
 - `<gitignored-but-precious path>` — <why a re-fetch does not restore it>.
 - `<anything that costs money or touches production>` — <estimate cost / confirm environment first>.
 - Weakening a check to make it pass. A failing test is a finding: record it with its diagnosis.

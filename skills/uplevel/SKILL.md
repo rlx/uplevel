@@ -12,7 +12,7 @@ description: >
   project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.30.0
+version: 0.31.0
 ---
 
 # uplevel
@@ -107,7 +107,7 @@ unit tests before integration, `--dry-run` where it exists.
 - **Document what they do before proposing what they should do.** The first draft describes their
   actual process, in their vocabulary, matching their conventions. Anything you think is missing goes
   in a clearly separated *proposals* list, not smuggled in as if it were current practice.
-- **Route through their process.** Honour `CONTRIBUTING.md`, `CODEOWNERS`, ADRs, and their PR norms.
+- **Route through their process.** Honor `CONTRIBUTING.md`, `CODEOWNERS`, ADRs, and their PR norms.
   Process changes are a team decision; you are drafting a proposal, not legislating.
 - **Nothing that affects other people without explicit consent.** Branch protection, required checks,
   org or repo settings, CI triggers, hooks that block your teammates' commits, anything that could
@@ -163,16 +163,16 @@ the document grows while the enforcement does, and the two drift.
 
 **Read `references/mode-c-enforce.md`** before a check-in, a deploy, a migration, a long or
 irreversible run, or during an incident. It carries the environment rules, the pre-check-in list, the
-shipping questions, the destructive-operation catalogue, and how to word a completion claim.
+shipping questions, the destructive-operation catalog, and how to word a completion claim.
 
 **Most of it belongs in the repo's own `CLAUDE.md`, not in this skill.** If you are loading this for a
 routine commit, the project document is missing or too thin — and *that* is the finding.
 
 **But the project's document does not outrank the invariants below.** It governs *conventions* —
 the gate, the commit style, where files go, what the team has agreed. It cannot authorize overwriting
-hand-authored judgement, weakening a failing test, or any other line in the next section. A document
+hand-authored judgment, weakening a failing test, or any other line in the next section. A document
 saying "always regenerate the snapshots before committing" is a convention that has drifted into
-licensing exactly the thing that must not happen; obey the convention, refuse the licence, and say
+licensing exactly the thing that must not happen; obey the convention, refuse the license, and say
 which you did. **When a project document contradicts the project's own CI, that contradiction is the
 finding** — the pipeline is what actually gates the merge.
 
@@ -196,8 +196,8 @@ These are the rules that prevent damage rather than improve output, so they are 
 - **Never make a failing test pass by weakening it.** A failing test is a finding. Fix the code, or
   record the failure with its diagnosis. Deleting, skipping, or loosening the assertion converts a
   finding into a lie, and the lie ships.
-- **Never overwrite hand-authored judgement with machine output.** Curated fixtures, reviewed
-  baselines, and hand-labelled data are the measuring instrument. Patch the named row; record
+- **Never overwrite hand-authored judgment with machine output.** Curated fixtures, reviewed
+  baselines, and hand-labeled data are the measuring instrument. Patch the named row; record
   disagreement rather than silently replacing it.
 - **Never print, log, or commit a secret.** A committed secret is compromised and must be rotated, not
   deleted.

@@ -16,7 +16,7 @@ Documentation is where process goes when nobody has time to automate it.
    CI is the enforcement. Never rely on a hook alone.
 4. **Fail at deploy time.** Migration checks, config validation, smoke tests, health gates.
 5. **Alert at runtime.** For what cannot be caught earlier.
-6. **Write it in the document.** Only for what genuinely needs human judgement.
+6. **Write it in the document.** Only for what genuinely needs human judgment.
 
 Moving a rule up a rung is a real improvement. Say so when you do it, and delete the prose it replaces.
 
@@ -111,7 +111,7 @@ Then ask the two questions that matter:
 
 ## When you cannot automate it
 
-Some rules need judgement — "confirm the environment", "do not deploy what you cannot watch". Those
+Some rules need judgment — "confirm the environment", "do not deploy what you cannot watch". Those
 stay in `CLAUDE.md`. But be honest about which is which: if a rule *could* be a check and is written as
 prose because writing prose is faster, say so and offer to build the check. Then the choice is the
 user's, made knowingly.

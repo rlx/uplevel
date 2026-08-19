@@ -26,6 +26,10 @@ The gate takes well under a second. If it fails it names what to fix. Bypass it 
   around it.
 - **No machine- or project-specific strings.** Patterns in `skills/uplevel/leak-patterns.txt`.
 
+Two rules the gate does not yet enforce: prose is **en-US** (behavior, license, judgment, labeled),
+and nothing absent or unverified about this repository's own posture goes in a tracked file — that
+belongs in the untracked `.claude/improvement-plan.md`.
+
 ## The rule the gate cannot enforce
 
 **Every command the skill prints must have been run, here, and observed to work.** The gate checks

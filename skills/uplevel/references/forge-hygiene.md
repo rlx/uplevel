@@ -165,7 +165,7 @@ Failure modes to check for by name, each of which produces a green repo that val
   gh run list --branch <default> --limit 60 --json conclusion \
     --jq '[.[].conclusion]|group_by(.)|map("\(.[0])=\(length)")|join(" ")'
   ```
-  **A high `cancelled` count on the default branch is the symptom**, and it reads as green in any
+  **A high `canceled` count on the default branch is the symptom**, and it reads as green in any
   aggregate that only counts failures. The fix is to key on something unique per run for non-PR events
   — `github.event.pull_request.number || github.sha` — or to set `cancel-in-progress: false` there.
   Check the repo's other workflows first: a project that has hit this usually has one file with the
@@ -322,7 +322,7 @@ them precisely because they keep causing outages.
 
 - **Coverage on changed lines, not global percentage.** A repo-wide number is a bad gate: it barely
   moves, so it never blocks anything, and it punishes people who touch large old files. Coverage of
-  *new and modified* code is the version that changes behaviour.
+  *new and modified* code is the version that changes behavior.
 - **Do the tests exercise the path a real request takes**, or only units around it?
 - **Flaky-test policy**: quarantine with an owner and a deadline. Blanket retries convert real
   intermittent bugs into invisible ones.

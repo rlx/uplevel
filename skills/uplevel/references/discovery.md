@@ -31,7 +31,7 @@ earlier ones describe what is enforced.
 3. **Task runner** — `Makefile`, `justfile`, `Taskfile.yml`, `package.json` scripts, `scripts/`, `*.sh`
    at the root. A repo-local `ci.sh`/`check.sh` is usually the intended one-command gate.
 4. **Ecosystem default** — only if nothing above exists.
-5. **The user** — for anything that needs hardware, credentials, or judgement.
+5. **The user** — for anything that needs hardware, credentials, or judgment.
 
 ## Ecosystem defaults (verify, do not assume)
 
@@ -131,7 +131,7 @@ cd repo && yarn --version        # 4.12.0   — the version this repo actually u
 ```
 
 Repos routinely **vendor** their package manager and delegate to it: `.yarnrc.yml` with `yarnPath:`
-pointing at a committed `.yarn/releases/yarn-*.cjs`, a corepack shim honouring `packageManager`, a
+pointing at a committed `.yarn/releases/yarn-*.cjs`, a corepack shim honoring `packageManager`, a
 `.tool-versions` shim. Yarn Classic reads `yarnPath` and hands over to the vendored binary, so a
 machine with "only yarn 1" runs yarn 4 inside such a repo without anything being installed. **Check for
 these before concluding a tool is missing** — `.yarnrc.yml`, `.yarn/releases/`, `.tool-versions`,
@@ -219,7 +219,7 @@ Order of attempt, stopping at the first that cannot be run safely:
    `— unverified, needs X`. This is not a failure of discovery; it is the correct outcome.
 4. The toolchain to run it is missing or mismatched — **do not improvise a substitute.** Offer the
    install (above). Until it is installed, record as `— unverified, needs <tool> <version>`. Never
-   swap in a neighbouring command because it happens to run: `npm test` in a yarn-4 monorepo, or
+   swap in a neighboring command because it happens to run: `npm test` in a yarn-4 monorepo, or
    `go test ./...` where CI runs a driver matrix, tests something other than the gate and reports it
    under the gate's name.
 

@@ -5,12 +5,15 @@
 Report privately, not in a public issue.
 
 Use GitHub's private vulnerability reporting: open the **Security** tab and choose *Report a
-vulnerability*. This creates a private advisory visible only to the maintainers.
+vulnerability*. This creates a private advisory visible only to the maintainers, and it is the
+channel that reaches us — it raises an email and a GitHub notification directly.
 
 If that option is unavailable, open an issue asking for a private channel without including any
 detail of the problem itself.
 
-Expect an acknowledgement within seven days.
+This is a small project with one active maintainer, so there is no guaranteed response time. Reports
+are read as soon as they are seen, usually within a few days. If a week passes with no reply, a
+comment on the advisory is a reasonable nudge.
 
 ## Scope
 
