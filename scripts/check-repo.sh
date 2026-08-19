@@ -145,6 +145,18 @@ while IFS= read -r t; do
 done < <(git tag -l 'v*' 2>/dev/null)
 cur="$(awk -F"$VERSION_FS" '/^version:/ { print $2; exit }' skills/uplevel/SKILL.md)"
 if [ "$tagn" = "1" ]; then tw="tag"; else tw="tags"; fi
+# A tag was published whose own commit did not document the version it released:
+# the changelog PR was open, and the release went out first. Checked forward on
+# main rather than over history, so it gates the next tag instead of relitigating
+# published ones -- and it fails while there is still time to write the entry.
+if [ ! -f CHANGELOG.md ]; then
+  echo "  no CHANGELOG.md, skipping the entry check"
+elif grep -q "^## v$cur" CHANGELOG.md; then
+  echo "  CHANGELOG.md documents $cur"
+else
+  note "CHANGELOG.md has no '## v$cur' entry — write it in the change, not after the tag"
+fi
+
 if [ "$tagn" = "0" ]; then
   echo "  no v* tags yet; SKILL.md declares $cur"
 elif git rev-parse -q --verify "refs/tags/v$cur" >/dev/null 2>&1; then

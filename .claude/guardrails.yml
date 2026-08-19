@@ -245,6 +245,17 @@ checks:
     status: present
     by: CHANGELOG.md, linked from README.md
 
+  - id: changelog-documents-declared-version
+    status: enforced
+    by: scripts/check-repo.sh; main's SKILL.md version must have a CHANGELOG entry
+    note: >-
+      v0.40.0 was tagged and released while its changelog PR was still open, so
+      the tagged commit documents every version except the one it released. The
+      tag is published and was left alone; retagging would leave two disagreeing
+      copies in circulation. Checked forward on main rather than over history, so
+      it gates the next tag while there is still time to write the entry.
+      Verified red-then-green, plus the no-CHANGELOG skip path.
+
   - id: contributing-guide
     status: present
     by: CONTRIBUTING.md
