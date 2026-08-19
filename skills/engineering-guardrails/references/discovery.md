@@ -162,3 +162,25 @@ Order of attempt, stopping at the first that cannot be run safely:
 Run the gate on a clean tree before writing it down. Then, if cheap, confirm it can **fail**: a gate
 that passes on a deliberately broken tree is not measuring anything. Revert the deliberate break
 immediately and verify with `git status` that nothing is left behind. Note the runtime you observed.
+
+## Clean up after verifying — and offer, don't assume
+
+**Verifying a gate is not free, and the cost is invisible until someone runs out of disk.** A single
+monorepo install can be several gigabytes; a docker-based integration suite leaves images and volumes
+behind. Record what you created and hand the user the choice.
+
+1. **Look before you install.** Note whether `node_modules`, `.venv`, `target/`, `vendor/`, a
+   package-manager cache, or the relevant containers already existed. This is the only moment the
+   distinction is cheap to establish, and everything below depends on it.
+2. **Report the cost with the result.** "The gate passes — 4076 tests in 43s. Verifying it created
+   3.4 GB of `node_modules` and an 807 MB package-manager cache." One sentence, in the same reply.
+3. **Offer to remove it**, and name what you would remove. Regenerable artifacts are the easy yes; say
+   roughly what re-creating them would cost so the answer is informed.
+4. **Only remove what you created.** A pre-existing install is the user's working environment — deleting
+   it is a destructive act against something you did not make. When in doubt, leave it and say so.
+5. **Never delete anything the repo tracks.** Vendored package-manager releases (`.yarn/releases/`),
+   committed patches, and checked-in fixtures live beside the artifacts and are not artifacts. Confirm
+   with `git check-ignore` before removing, and re-check `git status` in the repo afterwards to prove
+   nothing tracked moved.
+6. **Stop what you started.** Containers, compose stacks, background servers, port-forwards — leaving
+   one running is residue that also holds a port.

@@ -12,7 +12,7 @@ description: >
   CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.13.0
+version: 0.14.0
 ---
 
 # Engineering guardrails
@@ -116,9 +116,15 @@ unit tests before integration, `--dry-run` where it exists.
   data where it should not be, report it to the user **privately and directly** — never write it into
   the document, a commit message, a PR, or anything published. Say it must be rotated, not just
   deleted.
-- **Leave no residue.** Temporary files, deliberately-broken code used to prove a test can fail,
-  scratch branches — clean them up and say what you touched. `git status` at the end should show only
-  what you intended.
+- **Leave no residue, and always offer to clean up.** Two kinds. *Yours to remove without asking:*
+  temporary files, deliberately-broken code used to prove a test can fail, scratch branches — clean
+  them up and say what you touched. *Yours to offer:* everything verifying the gate created —
+  `node_modules`, package-manager caches, virtualenvs, build output, containers and images, downloaded
+  toolchains. **Say what you created and how much space it took, and offer to remove it**, in the same
+  reply that reports the gate result. It is a real cost the user did not ask for and cannot see.
+  **Only ever remove what you created**: an install that was already there is the user's working
+  environment, and deleting it costs them the rebuild. Check before, not after. `git status` at the
+  end should show only what you intended.
 
 If you cannot tell whether something is safe to run or safe to change: ask. In a foreign repo, one
 question costs a minute and guessing can cost a day of someone else's.
