@@ -22,7 +22,7 @@ and gitignored is a legitimate choice for a repo where an agent-specific file is
 
 ```yaml
 version: 1
-generated_by: engineering-guardrails
+generated_by: uplevel
 last_audit: 2026-03-04
 
 profile:                      # what makes this repo's risk shape specific

@@ -11,7 +11,7 @@ checks:
 
   - id: broken-reference-fails-gate
     status: enforced
-    by: skills/engineering-guardrails/selfcheck.sh
+    by: skills/uplevel/selfcheck.sh
     origin: audit 2026-08-18 — check printed a warning and exited 0 for its whole life
 
   - id: shipped-commands-parse

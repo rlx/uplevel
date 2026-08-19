@@ -1,4 +1,4 @@
-# engineering-guardrails — working rules
+# uplevel — working rules
 
 This repo is the source of a Claude Code skill. Its product is prose that changes how agents behave,
 so a wrong sentence here is a defect that ships.
@@ -17,7 +17,7 @@ Bypass deliberately with `git commit --no-verify`, and say why in your reply.
 
 ## Two things that are easy to get wrong here
 
-- **`skills/engineering-guardrails/` is symlinked into `~/.claude/skills/`.** The working tree *is* the
+- **`skills/uplevel/` is symlinked into `~/.claude/skills/`.** The working tree *is* the
   deployed artifact — an edit is live in the next session. There is no build, no publish, no staging.
   Rollback is `git` and nothing else.
 - **`SKILL.md` must stay under 4000 tokens.** It loads on every single trigger, while `references/*.md`

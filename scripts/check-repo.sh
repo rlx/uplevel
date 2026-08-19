@@ -33,6 +33,6 @@ else
 fi
 
 echo "== the skill's own gate =="
-skills/engineering-guardrails/selfcheck.sh | sed 's/^/  /' || fail=1
+skills/uplevel/selfcheck.sh | sed 's/^/  /' || fail=1
 
 [ "$fail" = "0" ] && echo "REPO OK" || { echo "REPO FAILED"; exit 1; }

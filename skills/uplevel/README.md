@@ -1,4 +1,4 @@
-# engineering-guardrails
+# uplevel
 
 A Claude Code skill for codebases that keep breaking in production because the process lives in
 people's heads.
@@ -37,10 +37,10 @@ Copy the folder to either location:
 
 ```sh
 # personal — available in every project
-mkdir -p ~/.claude/skills && cp -R engineering-guardrails ~/.claude/skills/
+mkdir -p ~/.claude/skills && cp -R uplevel ~/.claude/skills/
 
 # project — checked in, shared with the team
-mkdir -p .claude/skills && cp -R engineering-guardrails .claude/skills/
+mkdir -p .claude/skills && cp -R uplevel .claude/skills/
 ```
 
 Restart Claude Code (or start a new session). Confirm it loaded with `/skills`.
@@ -48,7 +48,7 @@ Restart Claude Code (or start a new session). Confirm it loaded with `/skills`.
 ## Use
 
 ```
-/engineering-guardrails          # bootstrap this repo
+/uplevel                         # bootstrap this repo
 ```
 
 or just ask: *"set up engineering guardrails"*, *"write a CLAUDE.md documenting our process"*,
@@ -109,7 +109,7 @@ Stated plainly, because the skill demands the same of its users:
 - **Absent domains**: disaster recovery and restore testing, API/client backwards compatibility,
   feature-flag lifecycle, runtime cost regressions, clock and timezone failures.
 
-Run `skills/engineering-guardrails/selfcheck.sh` for the structural checks it does enforce.
+Run `skills/uplevel/selfcheck.sh` for the structural checks it does enforce.
 
 ## Scope
 
