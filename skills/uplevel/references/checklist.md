@@ -27,10 +27,12 @@ project's own gaps, ranked and dated, is a starting point for anyone who wants t
 ages into an accusation the moment the work is done and the file is not updated. Say this out loud
 when you propose the file; it is the team's call, and a private repo has no such problem.
 
+Dates below are placeholders; a real file carries the day it was audited.
+
 ```yaml
 version: 1
 generated_by: uplevel
-last_audit: 2026-03-04
+last_audit: <YYYY-MM-DD>
 
 profile:                      # what makes this repo's risk shape specific
   deploys: continuous-on-merge
@@ -44,24 +46,24 @@ checks:
     severity: high
     evidence: ".github/workflows/test.yml triggers on pull_request"
     enforced_by: "required status check 'test' on main"
-    last_checked: 2026-03-04
+    last_checked: <YYYY-MM-DD>
 
   - id: actions-pinned-to-sha
     source: universal
     status: absent
     severity: high
     evidence: "6 of 9 third-party action references use a mutable tag"
-    last_checked: 2026-03-04
+    last_checked: <YYYY-MM-DD>
 
   - id: no-raw-sql-in-request-path
     source: derived           # learned here, not from the seed
-    origin: "incident 2026-02-11 — unbounded query in /reports timed out the pool; fixed in 4f21a9c"
+    origin: "incident <date> — unbounded query in /reports timed out the pool; fixed in <sha>"
     status: absent
     severity: high
     evidence: "3 call sites still build SQL inline"
-    proposed_enforcement: "lint rule; would have caught the 2026-02-11 query"
-    added: 2026-02-12
-    last_checked: 2026-03-04
+    proposed_enforcement: "lint rule; would have caught that query"
+    added: <YYYY-MM-DD>
+    last_checked: <YYYY-MM-DD>
 ```
 
 Field rules:
@@ -166,7 +168,7 @@ identify the outage. Replace it with the abstracted lesson:
 
 ```yaml
 # local
-origin: "incident 2026-02-11 — unbounded query in /reports timed out the pool for 40 min"
+origin: "incident <date> — unbounded query in /reports timed out the pool for 40 min"
 # promoted
 origin: "learned in a service with continuous deploy; unbounded query exhausted a connection pool"
 ```

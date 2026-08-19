@@ -22,8 +22,10 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
 - Every command in the skill should have been run and observed to work before it is written down.
   This is a discipline, not an enforced rule: the gate parses fenced blocks and validates `grep -E`
   patterns, which proves they are well-formed, not that they do what the text claims.
-- Bumping `version:` in `SKILL.md` alongside any change to `SKILL.md` or `references/` is enforced at
-  commit time.
+- Bumping `version:` in `SKILL.md` alongside any change under `skills/uplevel/` is enforced at commit
+  time. Tagging is not: the gate prints when the declared version has no tag, and does not fail.
+  Failing at commit time would fail the commit that does the bump, and failing in CI would leave
+  `main` red between merge and tag. Tag after merge.
 - Every reference file must be linked from `SKILL.md`, and every link must resolve. Both directions
   are enforced.
 - CI is `ubuntu-latest` (bash 5, GNU coreutils); a maintainer may be on bash 3.2 with BSD or ugrep

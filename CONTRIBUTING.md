@@ -53,6 +53,13 @@ becomes vacuous on exactly the machines that needed it, while still reading as g
 A check that searches the tree is *in* the tree. Keep its patterns in a data file, or it will match
 itself and report a defect it invented.
 
+**One leak the gate cannot catch, so review has to.** `leak-patterns.txt` matches shapes — home
+directories, drive letters, machine paths. Another project's file paths have no shape to match, and a
+denylist of names only catches the leak already found. The worked example once shipped with its
+subject repository's package paths and script line numbers still in it, and no pattern would have
+seen them. When editing `references/example-output.md`, or adding any example drawn from a real
+repository, check by hand that nothing identifies it.
+
 ## Commits and pull requests
 
 **Say what was done.** Concise, accurate, simple. Most changes need only a subject line. No AI
