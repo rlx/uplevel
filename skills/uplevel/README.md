@@ -29,15 +29,18 @@ keep backfills resumable, and report results honestly.
 
 ## Install
 
+From the repository root:
+
 ```sh
 # personal — available in every project
-mkdir -p ~/.claude/skills && cp -R uplevel ~/.claude/skills/
+mkdir -p ~/.claude/skills && cp -R skills/uplevel ~/.claude/skills/uplevel
 
 # project — checked in, shared with the team
-mkdir -p .claude/skills && cp -R uplevel .claude/skills/
+mkdir -p .claude/skills && cp -R skills/uplevel .claude/skills/uplevel
 ```
 
-Restart Claude Code and confirm with `/skills`.
+Name the destination explicitly: `cp -R skills/uplevel ~/.claude/skills/` works the first time and
+nests a copy inside itself the second. Restart Claude Code; the skill is then available as `/uplevel`.
 
 ## Use
 

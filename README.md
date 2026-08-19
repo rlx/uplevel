@@ -20,18 +20,27 @@ required checks, shared hooks — is proposed for a maintainer, never applied.
 ## Install
 
 ```sh
+git clone https://github.com/rlx/uplevel.git
+cd uplevel
 mkdir -p ~/.claude/skills
-ln -s "$PWD/skills/uplevel" ~/.claude/skills/uplevel
+ln -sfn "$PWD/skills/uplevel" ~/.claude/skills/uplevel
 ```
 
-Or copy it instead of linking:
+`-sfn` matters: without it, a second run follows the existing link and creates a nested copy inside
+the clone. Linking means the working tree *is* the installed skill — `git pull` updates it, and moving
+or deleting the clone breaks it. To copy instead, so the install survives the clone:
 
 ```sh
-cp -R skills/uplevel ~/.claude/skills/
+cp -R skills/uplevel ~/.claude/skills/uplevel
 ```
 
-Restart Claude Code and confirm with `/skills`. For a single project, copy it to that repo's
-`.claude/skills/` and commit it.
+Name the destination explicitly there too. `cp -R skills/uplevel ~/.claude/skills/` works the first
+time and nests a copy inside itself the second.
+
+Restart Claude Code. The skill is then available as `/uplevel`. For a single project, copy it into
+that repo's `.claude/skills/` and commit it.
+
+To uninstall: `rm -rf ~/.claude/skills/uplevel` (removes the link or the copy, never the clone).
 
 ## Use
 
@@ -41,6 +50,25 @@ Restart Claude Code and confirm with `/skills`. For a single project, copy it to
 
 Or ask in plain language: "uplevel this repo", "audit our engineering process", "we keep breaking
 production — what should we enforce?"
+
+## What the output looks like
+
+Findings first, each tied to a file and line. Then a plan where every item carries the same six
+fields, so you can decide without reading back through the report:
+
+```
+**1. Make `make fmtcheck` actually check.**
+prevents: a target named "check" silently rewriting a contributor's working tree
+if skipped: item 2 tells people to run a command that edits their files
+effort: 15 min, incl. review · affects: everyone who commits
+undo: `git revert` — one line · needs: —
+```
+
+Reply with the numbers you want. `if skipped` is there so you can decline an item on purpose rather
+than by omission, and `needs` is there so picking `1, 3` never leaves you half-applied.
+
+Full worked example, from a real audit of `hashicorp/terraform`:
+[`references/example-output.md`](skills/uplevel/references/example-output.md).
 
 ## What it covers
 
@@ -74,7 +102,7 @@ so rather than substituting a command that happened to run.
 ## Development
 
 ```sh
-./scripts/install-hooks.sh   # after cloning; hooks are not tracked by git
+./scripts/install-hooks.sh   # after cloning; git does not install hooks for you
 ./scripts/check-repo.sh      # runs on every commit and in CI
 ```
 

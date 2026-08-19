@@ -9,7 +9,8 @@ sentence is a defect.
 ./scripts/check-repo.sh
 ```
 
-Runs on every commit via `.git/hooks/pre-commit`, and in CI. Hooks are not tracked by git, so run
+Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is tracked at
+`scripts/hooks/pre-commit`; git does not install it into `.git/hooks/` for you, so run
 `./scripts/install-hooks.sh` after cloning. Bypass with `git commit --no-verify` and say why.
 
 ## Constraints
