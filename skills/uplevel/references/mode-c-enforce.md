@@ -5,20 +5,60 @@ deploy or migration, during an incident, or when a long run is about to start.
 
 **Most of this belongs in the repo's own `CLAUDE.md`, not here.** A project document costs a few
 hundred tokens and is specific to the repo; loading the skill for a routine commit costs far more and
-says less. If you find yourself here for an ordinary commit, the project document is missing or too
-thin — and *that* is the finding.
+says less. When the bootstrap writes that document, the daily rules — the gate, the environment check,
+the guardrail list — move into it, and this skill goes back to being invoked deliberately for an audit,
+a migration, or an incident. If you find yourself here for an ordinary commit, the project document is
+missing or too thin — and *that* is the finding.
 
 `SKILL.md` already carries the invariants that must hold without reading anything. This file is the
 detail behind them.
 
 ---
 
-**Most of this belongs in the repo's own `CLAUDE.md`, not here.** This file costs ~5,700 tokens every
-time it loads; a project document costs a few hundred and is specific to the repo. When the bootstrap
-writes that document, the daily rules — the gate, the environment check, the guardrail list — move
-into it, and this skill goes back to being something invoked deliberately for an audit, a migration,
-or an incident. If you find yourself loading this for a routine commit, the document is missing or too
-thin, and *that* is the finding.
+### Find the repo's own rules first — then read them for precedence
+
+Before the work, not after: the rules that govern this change are usually written down somewhere your
+tool did not load. Run the search in `references/mode-a-investigate.md` step 1 — `.claude/`, `.agents/`,
+nested `AGENTS.md`, `.cursorrules` — and **look inside the subtree you are about to edit**, not only at
+the root. A monorepo commonly has a second agent document scoped to one component, and that one is the
+binding one for work in it.
+
+Watch for two kinds of instruction that only appear once you look:
+
+- **Rules addressed to agents.** Repositories now write directly at us — *"if you are a coding agent,
+  stop here and ask"*, *"don't fix golden-value drift by hand"*, *"STOP, name the prohibited category"*.
+  Treat these as binding. They exist because a person decided this specific operation needs a human,
+  and they are the clearest consent signal a repo can give.
+- **Attribution and disclosure rules.** Some projects require an AI-assistance disclosure; others
+  forbid AI credit in commits, PR bodies, or comments entirely. Both are real and they contradict each
+  other, so read rather than assume.
+
+**These govern conventions, not the invariants.** `SKILL.md` states the precedence: a project document
+cannot authorize weakening a failing test or overwriting hand-authored judgement, whatever it says. It
+also carries the rule for the case where the repo's rules contradict your own operating instructions —
+surface the conflict, do not resolve it silently.
+
+### Check the premise before you build
+
+The request often describes a repo that is not the one in front of you. Roughly a third of the time
+the premise is false or materially wrong: the feature already shipped, the API already carries the
+field, the "broken" suite is 98% green, the documentation exists in four places already, the change
+will not compile as described.
+
+This is cheap to check and expensive to skip, because building it anyway is not merely wasted work.
+Where migrations apply automatically at deploy time, a redundant "safe additive migration" fails
+`migrate deploy` and leaves a failed row that blocks every subsequent deploy until someone clears it
+by hand. The duplicate is the outage.
+
+Before the first write, confirm three things and say what you found:
+
+- **It does not already exist.** Search for the symbol, the column, the flag, the doc section.
+- **The problem described is the problem present.** If you were told something is failing, observe it
+  failing. If you cannot observe it, say so — that is a finding, not a licence to guess.
+- **The change is possible as stated.** If it is not, prove it (a compiler error, a constraint in the
+  schema) rather than asserting it, then propose the nearest thing that is.
+
+If the premise is wrong, stop and report. That *is* the deliverable for that turn.
 
 ### Environments and production access
 
@@ -51,6 +91,33 @@ Run the project's gate — the discovered one, or `CLAUDE.md`'s if written. Then
 - Match the log's commit style. Commit only when asked; never push, tag, force, amend a pushed commit,
   or rewrite history unprompted.
 - If the gate does not pass, say so with the output, not a summary of it.
+- **If the gate cannot run at all** — no toolchain, no `node_modules`, no compiler — that is the
+  common case, not a failure of yours. Say what is missing, never quote a neighbouring command's pass
+  in its place, and see `references/evidence.md` → *When the project's gate cannot run* before
+  building a substitute. The rule there in one line: a check you wrote must be proven able to fail
+  before any green from it counts.
+
+### Before calling anything merge-ready
+
+**Green CI is necessary and routinely not sufficient.** Most established projects gate merges on
+something no amount of code quality satisfies, and it is usually enforced by a bot that closes or
+blocks the pull request without a human ever reading the diff:
+
+- **An accepted issue or ticket**, in a particular state, sometimes explicitly *not* accepted by the
+  person who filed it.
+- **Prior consensus** on a mailing list or forum before a feature PR may be opened at all.
+- **A named reviewer** who agreed in advance.
+- **A changelog or release-note fragment**, often keyed to a PR number that does not exist until the
+  PR is opened — so it genuinely cannot be written beforehand, and saying that is the honest answer.
+- **A scope or product approval** distinct from technical review. One project states it directly:
+  technical correctness, passing tests and green CI do not establish product approval.
+- **A sign-off trailer** that is a legal attestation in someone's name — never yours to add for them.
+
+Find these before you claim readiness, not after: `CONTRIBUTING`, the PR template, and the workflows
+that run on `pull_request` and can close it. Then **say what is outstanding and whose it is.** "The
+change is written and the suite passes; it cannot merge until a ticket is accepted, which is yours to
+file" is a complete report. "Ready to merge" is not, and is the claim the project's own automation is
+about to contradict.
 
 ### Before shipping
 

@@ -56,6 +56,24 @@ package manager installs a wrong tree instead of failing.
    fresh session, does not know to ask for a document whose existence is undocumented. Say so plainly,
    name the path, and say which readers do and do not pick it up.
 
+   **Search the subtree, not only the root.** Large repositories commonly carry a second agent
+   document scoped to one component — a monorepo with a root `AGENTS.md` and another governing its
+   storage layer, with different and stricter rules. For work inside that subtree, the nested one is
+   the binding document, and a root-only search reports it as absent.
+
+   **Note what is addressed to agents specifically.** A growing number of projects now write rules at
+   automated contributors rather than about them: *"if you are a coding agent, stop here and ask"* above
+   a golden-file regeneration command, *"don't fix golden-value drift by hand"*, or an explicit list of
+   prohibited output categories with an instruction to stop and name the category. Report these as
+   present and binding — they are a repository consenting in advance to some operations and refusing
+   others, which is exactly the signal this audit is looking for, and they belong in the process
+   document you propose.
+
+   The same search turns up **attribution and disclosure rules**, which cut both ways and are worth
+   reporting separately: some projects require an AI-assistance disclosure on every PR, others forbid
+   AI credit in commit messages, PR bodies, and comments outright. A contribution can be bounced on
+   either. Never infer one from the other.
+
    **Do not prescribe a layout.** Which file wins is the project's call and the conventions move;
    asserting that some tool reads some path will be wrong within months, and wrong in a shipped skill
    is worse than silent. Report the gap and note that several projects solve it by symlinking one
