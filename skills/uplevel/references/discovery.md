@@ -255,3 +255,8 @@ behind. Record what you created and hand the user the choice.
    nothing tracked moved.
 7. **Stop what you started.** Containers, compose stacks, background servers, port-forwards — leaving
    one running is residue that also holds a port.
+8. **Clean up last, and measure at that point.** Cleaning and then running one more check puts the
+   residue straight back, and your report is wrong the moment it is written — build directories,
+   caches and `__pycache__` all reappear from a single verification run. Do it after the final
+   command, then measure, then report. One audit tidied 61 cache directories and a later check
+   recreated 51 of them, so the reported figure was false on arrival.

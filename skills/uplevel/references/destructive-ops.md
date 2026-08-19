@@ -12,7 +12,7 @@ Not `rm -rf` — that one announces itself. It is `--record`, `--force`, `--rese
 damage shows up as a green test suite measuring nothing.
 
 A generic "go ahead" on a task is not consent for these. Consent is scoped to what was described. It
-does not extend to the next instance, a wider blast radius, or a different dataset.
+does not extend to the next instance, a wider blast radius, or a different environment.
 
 ## Categories
 

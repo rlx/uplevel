@@ -6,8 +6,10 @@ safety rules that apply regardless of mode; this file is the procedure.
 
 ---
 
-**Nothing is written in this mode.** It ends with a report and a plan. If the user asks you to "set it
-up", that still means: investigate, propose, and wait — then build what they choose.
+**Nothing is written while you are investigating.** The mode ends with a report and a plan; if the
+user asks you to "set it up", that still means investigate, propose, and wait. Writing begins only
+once they have picked, which is what *Execute* below covers — and at that point you are no longer
+investigating, so branch first and build only what was chosen.
 
 ### The one hard rule: discover, never guess
 

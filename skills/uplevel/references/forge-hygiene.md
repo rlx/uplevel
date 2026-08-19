@@ -348,25 +348,14 @@ Cheap, and their absence is usually a symptom rather than the disease:
 - **Are the checks trusted?** A permanently red `main`, or a job everyone re-runs until it passes,
   means the team has already learned to ignore signal. Adding another check to that repo makes things
   worse, not better — restoring trust in the existing ones comes first.
-- **Flaky-test policy.** Blanket retries convert real intermittent bugs into invisible ones. Quarantine
-  with an owner and a deadline beats `retries: 3`.
 
 ---
 
 ## Reporting this well
 
 You are describing someone's repository, often to people who inherited it and already know it is
-imperfect. A list of forty deficiencies is socially expensive and gets ignored.
+imperfect. The rules for the report and the plan live in `mode-a-investigate.md` — lead with their
+own data, cap the plan, name the constraint you can see, and raise anything security-urgent directly
+rather than as a numbered item. They are stated there so they cannot drift from the schema they
+describe.
 
-- **Lead with their own data**, not with a standard: "eleven of the last fifty merges to `main` had no
-  approving review" lands where "you should require reviews" does not.
-- **Name the constraint you can see.** Missing CI on a small internal tool is a reasonable trade-off;
-  missing CI on a service with weekly incidents is not. Say which you think this is, and why.
-- **Separate security-urgent from everything else.** `pull_request_target` with a head checkout, a
-  committed secret, or an unpinned action with write permissions are not "nice to fix" — raise them
-  first, and directly to the user rather than in a document.
-- **Cap the plan.** Five to seven items someone might actually do; the rest as an appendix. A
-  forty-item plan is a way of not being acted on.
-- **Make the first item small, obviously safe, and clearly valuable** — pinning actions to SHAs, adding
-  `permissions: contents: read`, adding a `pull_request` trigger. Earning the second change matters
-  more than the first change being the biggest.
