@@ -12,7 +12,7 @@ description: >
   CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.15.0
+version: 0.16.0
 ---
 
 # Engineering guardrails

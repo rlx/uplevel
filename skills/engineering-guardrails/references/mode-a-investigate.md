@@ -61,6 +61,19 @@ package manager installs a wrong tree instead of failing.
 5. **Find the hazards.** See `references/destructive-ops.md`. Migrations, seed/reset scripts, `--force`
    and `--record` flags, precious-but-gitignored state, anything that spends money or touches customer
    data.
+
+   **Match on shape, not on a word.** Directory names vary and bare keywords hit prose and identifiers:
+   `find -type d -name migrations` returned **nothing** on a repo holding 124 migration files in
+   `store/migration` (singular), and a plain `truncate` grep returned **66 hits, 1 of them real** on a
+   Rust codebase full of `truncate()` string calls.
+   ```sh
+   find . -ipath '*migrat*' \( -name '*.sql' -o -name '*.go' -o -name '*.py' -o -name '*.rb' \) \
+     -not -path '*/node_modules/*' -not -path '*/vendor/*'
+   grep -rnE '\b(DROP TABLE|DROP COLUMN|TRUNCATE TABLE|DELETE FROM|ALTER TABLE)\b' \
+     --include='*.sql' --include='*.go' --include='*.py' .
+   ```
+   Word boundaries and an uppercase SQL context, scoped to datastore code — then read each hit before
+   it becomes a finding.
 6. **Audit what is already automated**, and what is defined but not enforced — a job that never blocks
    a merge, and one that is permanently red, are both worse than nothing.
    See `references/automation.md`.
@@ -68,6 +81,25 @@ package manager installs a wrong tree instead of failing.
    which in a repo with recurring incidents is usually where the value is. The seed list, the
    environment-capability check that must precede it, and how to report each item live in
    `references/forge-hygiene.md` — read it here rather than working from memory.
+
+   **Count, then confirm — and never report an absence you have only counted.** Mechanical counting
+   is how this step starts, not how it ends. On one audited repo the count said *"2 of 50 workflows
+   trigger on `pull_request`"*, which reads as a repo with no gate; it actually runs 16 reusable
+   workflows behind one orchestrator into a `required` aggregate. That absence, reported, would have
+   been the headline and would have been wrong about the most important question in the report.
+   Two of seven repos audited had that shape. Before any absence is written down, resolve:
+
+   - **Fan-out.** Does an orchestrator reach the checks indirectly?
+     `grep -rl workflow_call .github/workflows/` and `grep -rh 'uses: *\./\.github/workflows/'`.
+     A low `pull_request:` count next to a high `workflow_call` count means the gate is one level down.
+   - **Aliasing.** Is the same suite running under a different workflow name? Compare the *commands*,
+     not the filenames — one repo runs its full test suite on PRs from a workflow whose name mentions
+     only coverage, so "tests don't run on PRs" was true of the file and false of the repo.
+   - **Deliberate design.** Does the file carry a comment, a gate job, or an aggregate check showing
+     the maintainers already reasoned about this? If so the finding is a question, never a headline.
+
+   A count is a lead. Only a read is a finding — and **a security-urgent claim may reach the first
+   paragraph only after the file has been read end to end.**
 
    Three rules that decide whether the output is trustworthy:
 
@@ -132,8 +164,13 @@ Rules for the plan itself:
 - **Cheapest genuine win first.** If item 1 is a week of work, the plan will not be started.
 - **Separate what is definitely broken from what you would merely prefer.** Never blend a taste
   preference into a list of fixes; the reader must be able to trust the whole list.
-- **Writing the process document is itself a plan item**, not a foregone conclusion. Say where it would
-  live and whether it would be committed.
+- **Writing the process document is a plan item only when nothing already fills the role**, and
+  usually something does. Across seven audited repos, **six already carried an `AGENTS.md`,
+  `CLAUDE.md`, or substantial `CONTRIBUTING.md`** — proposing another would have competed with a
+  better document in every one of those cases. It was the right proposal exactly once, in a repo whose
+  contributing doc was seven lines pointing off-site and named none of its own scripts. Read what
+  exists first; if it covers the ground, say so and propose nothing. When it *is* right, say where the
+  file would live and whether it would be committed.
 - **Anything affecting other people is flagged as needing a maintainer's decision**, not yours.
 - **Say what you would do first if only one item were picked**, and why.
 - **Cap it at five to seven items.** Put the rest in an appendix. A forty-item plan is a way of not
