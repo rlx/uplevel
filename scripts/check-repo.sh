@@ -32,6 +32,32 @@ else
   echo "  not a git checkout, skipping"
 fi
 
+echo "== skill version bumped with skill changes =="
+# The rule lives in references/mode-c-enforce.md: bump the version marker in the
+# same commit as the change it invalidates. Enforced at commit time, which is the
+# only point where "same commit" is a question that can be answered.
+staged=$(git diff --cached --name-only 2>/dev/null)
+if [ -z "$staged" ]; then
+  echo "  nothing staged, skipping"
+elif ! printf '%s\n' "$staged" | grep -qE '^skills/uplevel/(SKILL\.md|references/)'; then
+  echo "  no skill content staged"
+elif git diff --cached -U0 -- skills/uplevel/SKILL.md | grep -q '^+version:'; then
+  echo "  skill content changed, version bumped"
+else
+  note "skill content is staged without a version: bump in SKILL.md"
+fi
+
+echo "== installed skill resolves =="
+if [ -n "${CI:-}" ]; then
+  echo "  CI run, installation is a local concern, skipping"
+elif [ ! -e "$HOME/.claude/skills/uplevel" ] && [ ! -L "$HOME/.claude/skills/uplevel" ]; then
+  echo "  not installed on this machine, skipping"
+elif [ -f "$HOME/.claude/skills/uplevel/SKILL.md" ]; then
+  echo "  resolves to a skill"
+else
+  note "~/.claude/skills/uplevel exists but does not resolve; rerun the install step"
+fi
+
 echo "== the skill's own gate =="
 skills/uplevel/selfcheck.sh | sed 's/^/  /' || fail=1
 
