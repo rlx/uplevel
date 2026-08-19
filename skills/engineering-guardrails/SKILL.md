@@ -7,11 +7,12 @@ description: >
   to "set up engineering guardrails", "write a CLAUDE.md for this repo", "document our process", "add
   a pre-commit gate", "we keep breaking production", "stop shipping bugs", or when starting substantial
   work in a repo whose gate, environments, and destructive operations are not yet written down. Also
-  applies silently during ordinary work: before committing, before anything that touches a deployed
-  environment or production data, before running migrations or backfills, and during an incident.
+  applies when work is about to touch a deployed environment or production data, run a migration or
+  backfill, or change what CI enforces. Day-to-day commit discipline belongs in the project's own
+  CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.10.0
+version: 0.11.0
 ---
 
 # Engineering guardrails
@@ -79,6 +80,13 @@ are before writing anything.
 Assume it isn't. This skill is most often pointed at a codebase with existing owners, conventions, and
 opinions that predate you — and the failure mode is not being wrong, it is being **presumptuous**. The
 contribution has to be one a maintainer would have merged anyway.
+
+**Never read secret values.** Discovery reads config, and config holds credentials. Enumerate the
+*keys* and never the values: `grep -o '^[A-Z_]*=' .env`, not `cat .env`. The same applies to
+`docker-compose.yml` with inline credentials, deployment manifests, CI secret files, cloud credential
+files, and `~/.netrc`/`~/.aws`. Reading a secret puts it in a conversation transcript, in scrollback,
+and possibly in logs — it is now exposed regardless of what you do next, and the correct remediation
+is rotation, which costs somebody an afternoon. Knowing a variable *exists* is all the audit needs.
 
 **Read before you run.** Never execute a command you have not read, however ordinary its name. A
 target called `test`, `check`, or `verify` may seed a database, connect to staging with real
@@ -220,6 +228,9 @@ a document that might be published.
 
 ### Plan
 
+**Read `references/example-output.md` before writing your first report** — one worked example conveys
+the shape faster than these rules do.
+
 Then a numbered list the user can pick from — `1, 3, 5` should be a sufficient reply. For each item:
 
 | field | what it must say |
@@ -286,6 +297,13 @@ locally with the exact command CI runs; and **verified to fail before you make i
 ---
 
 ## Mode C — Enforce
+
+**Most of this belongs in the repo's own `CLAUDE.md`, not here.** This file costs ~5,700 tokens every
+time it loads; a project document costs a few hundred and is specific to the repo. When the bootstrap
+writes that document, the daily rules — the gate, the environment check, the guardrail list — move
+into it, and this skill goes back to being something invoked deliberately for an audit, a migration,
+or an incident. If you find yourself loading this for a routine commit, the document is missing or too
+thin, and *that* is the finding.
 
 ### Environments and production access
 
@@ -417,4 +435,5 @@ least often checked. Run the search, quote it, state its blind spots.
 | `references/automation.md` | what to propose, in what order, and whose decision each check is |
 | `references/claude-md-template.md` | only once the user picks the document off the plan |
 | `references/long-runs.md` | migrations, backfills, batch jobs, anything measured |
+| `references/example-output.md` | before writing the first report — the shape, in one example |
 | `references/evidence.md` | before any completion claim, and before writing a PR body or changelog |

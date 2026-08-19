@@ -96,6 +96,21 @@ mention `pull_request_target`, required status checks, action SHA-pinning, or se
 gap is what this skill is for. Full survey, including the checks it borrowed back, in
 `research/prior-art.md` of the source repository.
 
+## Known limitations
+
+Stated plainly, because the skill demands the same of its users:
+
+- **It has not been run end to end.** Discovery has been dry-run against a real repository; the
+  report-and-plan output has never been produced in anger, and the execute path is untested.
+- **It assumes one service, one gate, one path to production.** A monorepo of twenty services, or one
+  service split across repos, will produce a plan that reads as confident and is wrong in shape.
+- **It does not measure whether it helped.** Nothing re-checks incident rate after the plan is done,
+  so its value is argued rather than demonstrated.
+- **Absent domains**: disaster recovery and restore testing, API/client backwards compatibility,
+  feature-flag lifecycle, runtime cost regressions, clock and timezone failures.
+
+Run `skills/engineering-guardrails/selfcheck.sh` for the structural checks it does enforce.
+
 ## Scope
 
 Language-, stack-, and deployment-agnostic; weighted toward services that run somewhere and can page
