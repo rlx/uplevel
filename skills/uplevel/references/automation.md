@@ -85,6 +85,23 @@ A check is a policy, not a patch. Before adding or tightening one in a repo you 
   nobody exercises. Run it with the dependency absent and confirm it skips loudly and exits zero,
   rather than erroring, hanging, or reporting a pass. An unexercised skip is how a check becomes
   vacuous on exactly the machines that needed it most, and it will read as green.
+- **Prove it on the case that motivated it, not a case you invented.** "Verify it fails before you
+  make it pass" is necessary and not sufficient: a synthetic failure proves the check fires on
+  *something*. If the check exists because of a specific escape — a bug that shipped, a rule that got
+  skipped — reconstruct *that* input and confirm it goes red. A check keyed on a convenient proxy
+  passes its synthetic test and misses the real thing: one written to catch new checks keyed on
+  section headings, went red on a synthetic new section, and then silently ignored a real check added
+  inside an existing one. The synthetic test was green the whole time.
+- **Loosening a check is where coverage disappears; re-prove the original case.** Tightening is safe
+  and self-announcing — it goes red and someone looks. Loosening to silence a false positive quietly
+  removes coverage, and nothing goes red to tell you. Every time you narrow a pattern or add an
+  exclusion, re-run the failure the check was built for and confirm it still fires. Do it in the same
+  change, and say in the pull request that you did.
+- **Measure the gate, not the check.** Each addition looks cheap alone and the budget is shared. Time
+  the whole gate before and after; a check that adds three seconds to a one-second gate has
+  quadrupled it, however reasonable it looked in isolation. Then **update whatever documents the
+  runtime** — a contributor guide claiming "well under a second" for a gate that now takes five is
+  wrong in the file people read to learn the process.
 - **Make it runnable locally** with the exact command CI uses. "Push and wait for CI" is not a
   development loop.
 
