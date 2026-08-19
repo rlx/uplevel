@@ -46,9 +46,25 @@ Before every commit that touches `<area>`:
 5. `<version/cache-key/schema-version bump, naming the file — in the SAME commit as the change>`
 6. `<new env vars: deployment config + example file + docs, same change>`
 
-*Then, in one line each:* commit message style (quote the convention the log actually uses); the PR
-norm; confirm you are still on the working branch before committing; and: commit or push only when
-asked — never push, tag, force, or rewrite history unprompted.
+*Then, in one line each:* confirm you are still on the working branch before committing; and: commit
+or push only when asked — never push, tag, force, or rewrite history unprompted.
+
+## Commits and pull requests
+
+*Visibility: `<public | private | internal>`. In a public repository a commit message is a
+publication — permanent, unreviewable after the fact, and carried by every clone.*
+
+- **Say what was done.** Concise, accurate, simple. `<quote the form the log actually uses>`
+- **Context needs approval.** Reasoning, alternatives, what this supersedes — offer it and wait. Do
+  not add it unasked.
+- **Never**: how it was found, verification narration, blame for earlier changes, vendor or API
+  forensics, `<internal trackers, hostnames, run ids, machine paths>`, `<third parties>`.
+- **Trailers**: `<the exact trailer this repo uses, verbatim — or: none>`
+- **Merge mode**: `<squash | merge | rebase>` writes `<what actually lands on the default branch>`
+- Detail that is worth keeping but not worth publishing goes in `<the untracked working notes>`.
+
+*Delete this section for a private repository with a settled convention. Keep the first two lines
+everywhere else — they are the ones that get violated.*
 
 ## CI and merging
 

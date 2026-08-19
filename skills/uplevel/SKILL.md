@@ -12,7 +12,7 @@ description: >
   project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.31.0
+version: 0.32.0
 ---
 
 # uplevel
@@ -163,7 +163,9 @@ the document grows while the enforcement does, and the two drift.
 
 **Read `references/mode-c-enforce.md`** before a check-in, a deploy, a migration, a long or
 irreversible run, or during an incident. It carries the environment rules, the pre-check-in list, the
-shipping questions, the destructive-operation catalog, and how to word a completion claim.
+shipping questions, the destructive-operation catalog, and how to word a completion claim. Before
+writing the commit message or PR body itself, read `references/commit-hygiene.md`: **say what was
+done, and treat anything beyond that as context the author has to approve.**
 
 **Most of it belongs in the repo's own `CLAUDE.md`, not in this skill.** If you are loading this for a
 routine commit, the project document is missing or too thin — and *that* is the finding.
@@ -230,3 +232,4 @@ These are the rules that prevent damage rather than improve output, so they are 
 | `references/long-runs.md` | migrations, backfills, batch jobs, anything measured |
 | `references/example-output.md` | before writing the first report — the shape, in one example |
 | `references/evidence.md` | before any completion claim, and before writing a PR body or changelog |
+| `references/commit-hygiene.md` | before writing a commit message, PR body, or release note |
