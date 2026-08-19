@@ -23,6 +23,8 @@ The gate runs in about a second. If it fails it names what to fix. Bypass it wit
 - **`SKILL.md` has a 4000-token budget.** It loads on every trigger; `references/` load only when
   read. New detail goes in a reference, not in `SKILL.md`.
 - **Bump `version:` in `SKILL.md`** in the same commit as any change to `SKILL.md` or `references/`.
+- **Write the `CHANGELOG.md` entry in the same change**, not in a follow-up. A release was published
+  once from a commit that documented every version except the one it released.
 - **Every reference must be linked from `SKILL.md`, and every link must resolve.** Both directions.
 - **References cite each other by bare filename** — `evidence.md`, not `references/evidence.md`, which
   would mean `references/references/`.
