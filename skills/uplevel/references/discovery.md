@@ -183,6 +183,28 @@ does not distinguish them is neither.
 database, hit staging, deploy, or call a paid API. Open the script or task definition first and look
 for network calls, credential reads, datastore writes, container orchestration, and environment names.
 
+**The sharpest case is a name promising a read while the body writes.** These are common enough to
+look for by default, and they are dangerous precisely because you reach for them to be careful:
+
+- A `fmtcheck` target whose script runs the formatter's *write* mode and diffs the result, so
+  "checking" reformats your working tree.
+- A `check-*` script for a generated file that regenerates it in place on mismatch — a fixer wearing a
+  checker's name. Read its logic and compare by hand instead, or you have silently accepted the
+  machine's answer to the question you were asking.
+- A gate target that downloads its own tooling, or runs a dependency-tidy step that rewrites the
+  lockfile as a side effect of "checking".
+- An `apply`/`sync` helper that overwrites a config in place, sometimes keyed off an environment
+  variable that would point it at the real repository if it were ever exported.
+
+When a target writes, use the read-only form instead — the formatter's list mode, a hand comparison,
+the underlying subcommand — and say in your report that you substituted it and why. Then, before the
+next thing, `git status` to prove nothing changed.
+
+**And check the inverse: a target that cannot fail.** A generated-file check that silently skips when
+its generator is absent, a suite that reports success on the tests it could still collect, a lint step
+whose matcher no longer matches anything. These pass, cost nothing, and prove nothing. If a check has
+never been observed failing, it is not yet evidence — see `references/evidence.md`.
+
 Order of attempt, stopping at the first that cannot be run safely:
 
 1. Read-only and local (formatters in check mode, type checks, unit tests) — run these.

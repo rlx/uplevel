@@ -65,9 +65,11 @@ that deal with deploys, migrations against real data, and environment safety are
 and they are also the parts it argues matter most. If your process problem is a Friday deploy nobody
 watched, this has not yet been tested on your case.
 
-The three modes are unevenly proven. Investigation has 22 repositories behind it. Automation has
-four. Enforcement — the mode covering check-in, deploys and migrations — has the least evidence of
-the three.
+The three modes are unevenly proven. Investigation and enforcement each have 22 repositories behind
+them; automation has four. The enforcement runs asked for a real change in each repository — a
+migration, a public API addition, a release-path check — and only six of the 22 could run the
+project's own gate, the rest lacking a toolchain. That is the ordinary condition, and the reports say
+so rather than substituting a command that happened to run.
 
 ## Development
 

@@ -34,10 +34,9 @@ Watch for two kinds of instruction that only appear once you look:
   other, so read rather than assume.
 
 **These govern conventions, not the invariants.** `SKILL.md` states the precedence: a project document
-cannot authorize weakening a failing test or overwriting hand-authored judgement, whatever it says.
-And **if the project's rules conflict with your own operating instructions — a mandated commit trailer
-the repo bans, a required disclosure your harness strips — surface the conflict and let the user
-resolve it.** Silently picking a side gets the contribution bounced and hides why.
+cannot authorize weakening a failing test or overwriting hand-authored judgement, whatever it says. It
+also carries the rule for the case where the repo's rules contradict your own operating instructions —
+surface the conflict, do not resolve it silently.
 
 ### Check the premise before you build
 
@@ -97,6 +96,28 @@ Run the project's gate — the discovered one, or `CLAUDE.md`'s if written. Then
   in its place, and see `references/evidence.md` → *When the project's gate cannot run* before
   building a substitute. The rule there in one line: a check you wrote must be proven able to fail
   before any green from it counts.
+
+### Before calling anything merge-ready
+
+**Green CI is necessary and routinely not sufficient.** Most established projects gate merges on
+something no amount of code quality satisfies, and it is usually enforced by a bot that closes or
+blocks the pull request without a human ever reading the diff:
+
+- **An accepted issue or ticket**, in a particular state, sometimes explicitly *not* accepted by the
+  person who filed it.
+- **Prior consensus** on a mailing list or forum before a feature PR may be opened at all.
+- **A named reviewer** who agreed in advance.
+- **A changelog or release-note fragment**, often keyed to a PR number that does not exist until the
+  PR is opened — so it genuinely cannot be written beforehand, and saying that is the honest answer.
+- **A scope or product approval** distinct from technical review. One project states it directly:
+  technical correctness, passing tests and green CI do not establish product approval.
+- **A sign-off trailer** that is a legal attestation in someone's name — never yours to add for them.
+
+Find these before you claim readiness, not after: `CONTRIBUTING`, the PR template, and the workflows
+that run on `pull_request` and can close it. Then **say what is outstanding and whose it is.** "The
+change is written and the suite passes; it cannot merge until a ticket is accepted, which is yours to
+file" is a complete report. "Ready to merge" is not, and is the claim the project's own automation is
+about to contradict.
 
 ### Before shipping
 
