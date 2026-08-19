@@ -22,7 +22,7 @@ done
 echo "== load cost =="
 w=$(wc -w < SKILL.md); tok=$((w * 4 / 3))
 echo "  SKILL.md ≈ $tok tokens (loaded whenever the skill triggers)"
-[ "$tok" -gt 8000 ] && note "SKILL.md is over the 8k budget — move detail into references/"
+[ "$tok" -gt 4000 ] && note "SKILL.md is over the 4k budget — it loads on every trigger; move detail into references/"
 
 echo "== no project-specific leakage =="
 if grep -rniE 'clarus|candor|tendingus|/Users/|~/dev/' --include='*.md' . >/dev/null 2>&1; then

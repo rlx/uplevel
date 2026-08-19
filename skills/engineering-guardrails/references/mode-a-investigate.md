@@ -1,0 +1,148 @@
+# Mode A — investigate, then propose
+
+Read this when the task is an audit, a bootstrap, or any "set up guardrails here" request. It ends in
+**a report and a numbered plan** — never in changed files. `SKILL.md` carries the posture and the
+safety rules that apply regardless of mode; this file is the procedure.
+
+---
+
+**Nothing is written in this mode.** It ends with a report and a plan. If the user asks you to "set it
+up", that still means: investigate, propose, and wait — then build what they choose.
+
+### The one hard rule: discover, never guess
+
+Every command you put in the report must have been **run once, in this repo, and observed to work**. A
+gate command that doesn't exist is worse than no gate — it manufactures confidence, and the next
+session will report green having run nothing. If a command cannot be verified (needs credentials, a
+deployed environment, paid infrastructure, or **a toolchain this machine does not have**), record it
+as `— unverified, needs X`. **Never run an unverified command against a deployed environment to find
+out what it does.**
+
+**Preflight the toolchain before you rely on that rule** — `references/discovery.md` §*Toolchain
+preflight*. Analysis assumes the machine can build the repo, and usually it can; when it cannot, the
+hard rule quietly converts the whole gate section to `unverified` and the report stops being worth
+reading. Read the repo's declared versions (`engines`, `packageManager`, `go.mod`, `.tool-versions`,
+the CI `setup-*` steps), compare them to what is installed, and **name any missing or mismatched tool
+in the report**. Offer the install command — `corepack enable` first, since a pinned package manager
+is the most common gap — and let the user decide; installing a runtime is a change to their machine,
+not to the repo you were pointed at. A version *mismatch* is the trap, not absence: the wrong major
+package manager installs a wrong tree instead of failing.
+
+### Investigate
+
+1. **Read what already exists.** `README`, `CONTRIBUTING`, `docs/`, runbooks, `CLAUDE.md`/`AGENTS.md`,
+   CI config, `Makefile`/`justfile`/package scripts, `.pre-commit-config.yaml`, `.git/hooks/`,
+   `docker-compose.yml`, deployment manifests, `.env.example`. Most projects already have a process; it
+   is just scattered and unenforced. **Do not propose one that competes with it.**
+2. **Read the git log — especially the failures.**
+   ```sh
+   git log --oneline -50
+   git log --oneline --grep='revert\|hotfix\|urgent\|rollback\|incident\|outage' -i -30
+   ```
+   Reverts and hotfixes are incidents with the write-up missing. **Rules derived from what actually
+   broke here are the only ones certain to earn their place** — and they are what makes the plan
+   persuasive rather than generic.
+3. **Find the real gate.** See `references/discovery.md`, including its rules on reading a command
+   before running it. Record what passes, its runtime, and what it does *not* cover.
+4. **Map the environments and the path to production.** See `references/production.md` §1 and §3. Read
+   config and ask; **never probe a deployed environment.**
+5. **Find the hazards.** See `references/destructive-ops.md`. Migrations, seed/reset scripts, `--force`
+   and `--record` flags, precious-but-gitignored state, anything that spends money or touches customer
+   data.
+6. **Audit what is already automated**, and what is defined but not enforced — a job that never blocks
+   a merge, and one that is permanently red, are both worse than nothing.
+   See `references/automation.md`.
+7. **Run the absence audit.** Discovery describes what exists; this step names what is **missing**,
+   which in a repo with recurring incidents is usually where the value is. The seed list, the
+   environment-capability check that must precede it, and how to report each item live in
+   `references/forge-hygiene.md` — read it here rather than working from memory.
+
+   Three rules that decide whether the output is trustworthy:
+
+   - **Classify, never omit.** Every item is **present / absent / unsupported here / unknown**.
+     *Unsupported* still gets said, as best practice with no support in this environment plus whatever
+     substitute does work. *Unknown* is never rounded down to *absent* — a 403 is a missing permission,
+     not a missing control, and treating it as one puts a false accusation in the report.
+   - **Check for an existing checklist first** (`references/checklist.md`). If one exists this is a
+     **re-audit**: lead with the diff — resolved, **regressed**, still open and for how long. A list
+     that only ever grows stops being read.
+   - **Every proposed addition cites what produced it** — an incident, a revert, a near miss, a review
+     comment written twice, a capability the repo has just gained. A check with no origin is an opinion
+     smuggled into a list of facts, and one of those makes the whole list untrustworthy.
+
+   **Say the absences out loud, by name.** "There is no workflow triggered by `pull_request`, so
+   nothing validates a change before it reaches `main`" is a finding; saying nothing reads as approval.
+
+8. **Ask what code cannot tell you.** One batched message, short: what broke recently and what would
+   have caught it; who reviews; who can deploy; what is genuinely irreversible; whether a process
+   document is even wanted, and where it should live.
+
+### Report
+
+Lead with findings, not recommendations. Keep it to what you verified:
+
+- **The gate as it exists** — the command, its runtime, and what it does not cover.
+- **What validates a change before it reaches the default branch, and before it reaches production.**
+  If the answer to either is "nothing", that is the headline, not a footnote.
+- **The gaps**, each tied to something real: an incident in the log, an unenforced rule in a doc, a
+  hazard with no guard. Say which are *evidence* and which are *inference*.
+- **Absences, named** — see the absence audit. Present / absent / unknown, never silently omitted.
+- **What is enforced by a machine versus what depends on someone remembering.**
+- **What you could not verify**, and why. Do not pad this away.
+
+**Prefer their numbers to your standards.** `gh pr list` and `gh run list` will tell you how many
+merges reached the default branch without review, how often its CI is red, and how often work is
+reverted. A team rarely argues with its own history, and often argues with a best practice.
+
+**Anything security-urgent is raised first and directly to the user** — not filed as plan item nine.
+An exposed secret, `pull_request_target` running untrusted code with secrets, or an unpinned
+third-party action holding write permissions belong in the first paragraph of your reply, and never in
+a document that might be published.
+
+### Plan
+
+**Read `references/example-output.md` before writing your first report** — one worked example conveys
+the shape faster than these rules do.
+
+Then a numbered list the user can pick from — `1, 3, 5` should be a sufficient reply. For each item:
+
+| field | what it must say |
+|---|---|
+| **What** | the concrete change, in one line |
+| **Why** | what it prevents — ideally naming the incident or gap it maps to |
+| **Effort** | rough, honest |
+| **Who it affects** | just this repo's agents / everyone who commits / everyone who merges / production |
+| **Reversible** | how it is undone, or that it is not |
+
+Rules for the plan itself:
+
+- **Order by damage prevented per unit of effort**, not by what is interesting to build.
+- **Cheapest genuine win first.** If item 1 is a week of work, the plan will not be started.
+- **Separate what is definitely broken from what you would merely prefer.** Never blend a taste
+  preference into a list of fixes; the reader must be able to trust the whole list.
+- **Writing the process document is itself a plan item**, not a foregone conclusion. Say where it would
+  live and whether it would be committed.
+- **Anything affecting other people is flagged as needing a maintainer's decision**, not yours.
+- **Say what you would do first if only one item were picked**, and why.
+- **Cap it at five to seven items.** Put the rest in an appendix. A forty-item plan is a way of not
+  being acted on, and it reads as a verdict on the team rather than an offer of help.
+- **Make item one small, obviously safe, and clearly valuable** — pinning actions to SHAs, adding a
+  `pull_request` trigger, an explicit `permissions:` block. Earning the right to propose a second
+  change matters more than the first being the biggest.
+- **Name the constraint you can see.** Missing CI on a small internal tool is a defensible trade-off;
+  missing CI on a service with weekly incidents is not. Say which you think this is.
+
+### Execute — only what was chosen
+
+When the user picks items: branch first (see *Before the first change*), do the selected items and
+nothing adjacent, land them one reviewable change at a time, and report back what passed, what did not,
+and what you did not touch. Scope creep here is the fastest way to make the next proposal unwelcome.
+
+### Calibration
+
+Rules earn their place by having prevented a real incident, or by guarding something genuinely
+irreversible. If you cannot name what a rule prevents, cut it. Prefer the rule that names a file and a
+line over the rule that names a virtue.
+
+---
+
