@@ -11,7 +11,7 @@ description: >
   environment or production data, before running migrations or backfills, and during an incident.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.9.0
+version: 0.10.0
 ---
 
 # Engineering guardrails
@@ -378,11 +378,30 @@ incident narrative does not. Promote sparingly; a check that fires everywhere an
 costs attention on every audit. And a check the user declined is `retired`, not a finding
 to re-raise at every audit.
 
-### Reporting
+### Reporting — claims and evidence
 
-Report what you measured, not what would be nice. If a step was skipped, say which. If a result is
-within noise, say so rather than claiming the win. State plainly when something is done and verified;
-hedge only where you actually are uncertain.
+See `references/evidence.md`. Every status is a promise about evidence, and the next decision — merge,
+deploy, stop looking — gets made on your word without anyone re-deriving it.
+
+Evidence has to be **fresh** (postdates your last edit to anything it depends on), **attributed** (it
+exercised the thing you are claiming about), and **falsifiable** (it could have failed, and you know
+what failure would have looked like). Miss one and you have an observation, not evidence.
+
+Then pick the strongest word your evidence supports — **verified / partially verified / unverified /
+assumed / contradicted** — and say the next one down out loud rather than rounding up. **"Unverified"
+is a professional report; a false "done" is not.** Scale the effort to the cost of being wrong:
+identical ceremony for a typo and a schema change means the ceremony gets dropped for both.
+
+Two failure modes worth naming here, because both look like success:
+
+- **Green and proving nothing** — the suite silently skipped when its database was absent, or never
+  touched the changed lines, or ran against a stale artifact, or would have passed before the fix.
+  Check the test *count*, not just the exit code.
+- **Re-run until green** — if it failed once and passed on the third try with nothing changed, the
+  finding is *flaky*, not *passing*.
+
+And: **negative claims need a search.** "Nothing else uses this" is the claim most often wrong and
+least often checked. Run the search, quote it, state its blind spots.
 
 ---
 
@@ -398,3 +417,4 @@ hedge only where you actually are uncertain.
 | `references/automation.md` | what to propose, in what order, and whose decision each check is |
 | `references/claude-md-template.md` | only once the user picks the document off the plan |
 | `references/long-runs.md` | migrations, backfills, batch jobs, anything measured |
+| `references/evidence.md` | before any completion claim, and before writing a PR body or changelog |
