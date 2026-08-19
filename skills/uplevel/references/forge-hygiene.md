@@ -28,6 +28,7 @@ that cannot be taken.
 Discover, read-only:
 
 ```sh
+command -v gh                                  # absent? see the first row of the table below
 git remote -v                                  # is there a remote at all?
 gh auth status                                 # authenticated? which host? which scopes?
 gh repo view --json viewerPermission,isPrivate,visibility,defaultBranchRef
@@ -59,6 +60,7 @@ Read the failures as data — they are the answer, not an error:
 
 | observation | what it means | how to report it |
 |---|---|---|
+| `gh` not installed | the **CLI** is absent, not the controls. `gh auth status` fails as "command not found", which is not the unauthenticated case below | everything settings-derived is **unknown**. Offer the install, audit what is on disk, and never report a control missing because you could not look |
 | no remote at all | local-only repo; **no forge CI is possible** | not a gap the team can close by configuring; say so |
 | host is not github.com | GitLab / Gitea / Forgejo / Bitbucket / GHES — different CI system, different feature set | audit their equivalent; do not propose Actions |
 | `gh auth status` unauthenticated | you cannot see settings, protection, or runs | everything settings-derived is **unknown**, never *absent* |
@@ -70,6 +72,19 @@ Read the failures as data — they are the answer, not an error:
 | protection endpoint 403 | needs admin | **unknown** |
 | protection endpoint 404 | **ambiguous** — GitHub returns 404 rather than 403 to avoid disclosing existence, and also returns it for a branch that does not exist | **unknown**, unless `viewerPermission` is `ADMIN` *and* the branch exists — only then is it *absent* |
 | self-hosted forge with no runners registered | CI is defined and never executes | worse than absent; the badge lies |
+
+**Without `gh`, most of this file still works.** The distinction is *on disk* versus *settings*, and
+it is worth stating in the report rather than abandoning the section:
+
+- **Still auditable** — everything in `.github/workflows/`: triggers, `permissions:` blocks, action
+  pinning and mutable tags, `timeout-minutes`, `concurrency`, fork-PR trigger choice. That is
+  sections 1 and 2 nearly in full, and it is where most workflow findings live anyway.
+- **Needs `gh`** — rulesets and branch protection, repository and Actions settings, secret scanning,
+  code scanning, run history and review statistics. Sections 1b and 3, and the *their own numbers*
+  evidence throughout.
+
+Say which half you ran. A report that covers the workflows and marks the settings **unknown** is a
+useful half; one that says nothing because the first command failed is not.
 
 ### Check what is configured against what is enforced
 
