@@ -213,11 +213,18 @@ that matters. Measured on ten large repositories, `grep -l pull_request` over-re
 eight of them, and on one it reports 7 where the reality is 2 gated and 4 on the dangerous trigger.
 
 ```sh
-ls .github/workflows/*.y*ml | wc -l          # workflow FILES; `ls dir | wc -l` counts README and scripts/
-grep -lE '^[[:space:]]+pull_request:|^[[:space:]]*-[[:space:]]*pull_request$|^on:.*[[,][[:space:]]*pull_request[],]' .github/workflows/*.y*ml
-grep -lE '^[[:space:]]+pull_request_target:|^[[:space:]]*-[[:space:]]*pull_request_target$|^on:.*[[,][[:space:]]*pull_request_target[],]' .github/workflows/*.y*ml
-grep -lE '^[[:space:]]*permissions:' .github/workflows/*.y*ml | wc -l
+ls .github/workflows/ >/dev/null 2>&1 || echo "no workflows directory — the finding is absence"
+ls .github/workflows/*.y*ml 2>/dev/null | wc -l   # FILES; `ls dir | wc -l` counts README and scripts/
+grep -lE '^[[:space:]]+pull_request:|^[[:space:]]*-[[:space:]]*pull_request$|^on:.*[[,][[:space:]]*pull_request[],]' .github/workflows/*.y*ml 2>/dev/null
+grep -lE '^[[:space:]]+pull_request_target:|^[[:space:]]*-[[:space:]]*pull_request_target$|^on:.*[[,][[:space:]]*pull_request_target[],]' .github/workflows/*.y*ml 2>/dev/null
+grep -lE '^[[:space:]]*permissions:' .github/workflows/*.y*ml 2>/dev/null | wc -l
 ```
+
+**Run the first line first.** A repository with no `.github/workflows` is the case this whole section
+exists to find, and without the redirections every command below it fails with `No such file or
+directory` instead of returning zero — noise at exactly the moment the answer is *"nothing runs on a
+pull request, because nothing runs at all"*. Observed on a repository with six figures of stars and no
+CI whatsoever.
 
 The three alternatives cover the block form, the sequence form, and the inline list `on: [push,
 pull_request]` — the last is what a naive indent-anchored pattern misses, and it cost two repositories
@@ -279,8 +286,8 @@ the inverse of the error this file spends most of its length preventing, and jus
   code; pin to a full commit SHA with the version in a trailing comment. This is the cheapest real
   security improvement most repos can make.
   ```sh
-  grep -rhoE 'uses:[[:space:]]*[^[:space:]@]+@[0-9a-fA-F]{40}' .github/workflows/ | wc -l   # pinned
-  mut=$(grep -rhoE 'uses:[[:space:]]*[^[:space:]@#]+@[^[:space:]#]+' .github/workflows/ \
+  grep -rhoE 'uses:[[:space:]]*[^[:space:]@]+@[0-9a-fA-F]{40}' .github/workflows/ 2>/dev/null | wc -l
+  mut=$(grep -rhoE 'uses:[[:space:]]*[^[:space:]@#]+@[^[:space:]#]+' .github/workflows/ 2>/dev/null \
     | grep -vE '@[0-9a-fA-F]{40}' | grep -vE 'uses:[[:space:]]*\.')
   printf '%s\n' "$mut" | grep -cE  'uses:[[:space:]]*(actions|github)/'   # first-party
   printf '%s\n' "$mut" | grep -vcE 'uses:[[:space:]]*(actions|github)/'   # third-party — rank these
