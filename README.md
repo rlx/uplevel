@@ -1,49 +1,46 @@
 # uplevel
 
-A Claude Code skill for codebases that keep breaking in production because the engineering process
-lives in people's heads.
+A Claude Code skill that audits a repository's engineering process and proposes improvements.
 
-It investigates a repository, reports what it found, and hands back a **numbered plan** of proposed
-changes — then builds only the items you pick. It is advisory by default: it changes nothing that
-affects other people without being asked.
-
-The skill itself lives in [`skills/uplevel/`](skills/uplevel/) — see
-[its README](skills/uplevel/README.md) for what it does and how it behaves.
+It investigates the repo, reports what it found, and returns a numbered plan. It changes nothing
+until you pick items from that plan.
 
 ## Install
 
 ```sh
-# personal — available in every project on this machine
 mkdir -p ~/.claude/skills
 ln -s "$PWD/skills/uplevel" ~/.claude/skills/uplevel
+```
 
-# or copy, if you prefer not to symlink
+Or copy it instead of linking:
+
+```sh
 cp -R skills/uplevel ~/.claude/skills/
 ```
 
-Restart Claude Code, then confirm with `/skills`.
+Restart Claude Code and confirm with `/skills`. For a single project, copy it to that repo's
+`.claude/skills/` and commit it.
 
-For a project rather than a machine, copy it to that repo's `.claude/skills/` instead and commit it.
-
-## Layout
+## Usage
 
 ```
-skills/uplevel/   the skill — SKILL.md + references/
-research/                        evidence behind the design: prior-art survey, gap analysis
+/uplevel
 ```
 
-`research/corpus/` is gitignored — it holds shallow clones of other people's skill repos used for
-the survey, and is reproducible from `research/prior-art.md`.
+Or ask in plain language: "uplevel this repo", "audit our engineering process", "set up a
+pre-commit gate".
 
-## Contributing
+See [`skills/uplevel/README.md`](skills/uplevel/README.md) for what the skill covers.
+
+## Development
 
 ```sh
-./scripts/install-hooks.sh   # after a fresh clone — hooks are not tracked by git
-./scripts/check-repo.sh      # the gate; also runs on every commit and in CI
+./scripts/install-hooks.sh   # after cloning; hooks are not tracked by git
+./scripts/check-repo.sh      # runs on every commit and in CI
 ```
 
-See [`CLAUDE.md`](CLAUDE.md) for what a session here needs to know that the code does not say.
+See [`CLAUDE.md`](CLAUDE.md) for project conventions.
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE). Copyright (c) 2026 Lior Rudnik and Tracey Mercer.
+MIT. Copyright (c) 2026 Lior Rudnik and Tracey Mercer.

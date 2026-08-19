@@ -40,9 +40,9 @@ package manager installs a wrong tree instead of failing.
 
    **Match the subject, never the whole message.** `--grep` searches the body too, and squash-merge
    bodies quote the PR description, so any commit whose discussion mentions "revert" is counted as
-   one. This is not a small error: on one audited repo the body-matching form reported **34 reverts in
-   500 commits (~7%)** where the true count was **0**. A revert rate is a number the team will be
-   asked to react to, and being wrong in the alarming direction loses the room in the first minute.
+   one. The over-count is not marginal — it can exceed the real figure by an order of magnitude. A
+   revert rate is a number the team will be asked to react to, and being wrong in the alarming
+   direction loses the room in the first minute.
 
    ```sh
    git log --oneline -50                       # shape, style, cadence
@@ -63,9 +63,8 @@ package manager installs a wrong tree instead of failing.
    data.
 
    **Match on shape, not on a word.** Directory names vary and bare keywords hit prose and identifiers:
-   `find -type d -name migrations` returned **nothing** on a repo holding 124 migration files in
-   `store/migration` (singular), and a plain `truncate` grep returned **66 hits, 1 of them real** on a
-   Rust codebase full of `truncate()` string calls.
+   `find -type d -name migrations` returns nothing in a tree whose directory is `migration`, and a
+   bare `truncate` grep matches string helpers far more often than SQL.
    ```sh
    find . -ipath '*migrat*' \( -name '*.sql' -o -name '*.go' -o -name '*.py' -o -name '*.rb' \) \
      -not -path '*/node_modules/*' -not -path '*/vendor/*'
@@ -83,11 +82,10 @@ package manager installs a wrong tree instead of failing.
    `references/forge-hygiene.md` — read it here rather than working from memory.
 
    **Count, then confirm — and never report an absence you have only counted.** Mechanical counting
-   is how this step starts, not how it ends. On one audited repo the count said *"2 of 50 workflows
-   trigger on `pull_request`"*, which reads as a repo with no gate; it actually runs 16 reusable
-   workflows behind one orchestrator into a `required` aggregate. That absence, reported, would have
-   been the headline and would have been wrong about the most important question in the report.
-   Two of seven repos audited had that shape. Before any absence is written down, resolve:
+   is how this step starts, not how it ends. A low `pull_request:` count reads as a repo with no
+   gate, while an orchestrator may fan out to reusable workflows that converge on a single required
+   check. Reported as an absence that is the headline of the report, and wrong about its most
+   important question. Before any absence is written down, resolve:
 
    - **Fan-out.** Does an orchestrator reach the checks indirectly?
      `grep -rl workflow_call .github/workflows/` and `grep -rh 'uses: *\./\.github/workflows/'`.
@@ -165,10 +163,9 @@ Rules for the plan itself:
 - **Separate what is definitely broken from what you would merely prefer.** Never blend a taste
   preference into a list of fixes; the reader must be able to trust the whole list.
 - **Writing the process document is a plan item only when nothing already fills the role**, and
-  usually something does. Across seven audited repos, **six already carried an `AGENTS.md`,
-  `CLAUDE.md`, or substantial `CONTRIBUTING.md`** — proposing another would have competed with a
-  better document in every one of those cases. It was the right proposal exactly once, in a repo whose
-  contributing doc was seven lines pointing off-site and named none of its own scripts. Read what
+  usually something does — an `AGENTS.md`, a `CLAUDE.md`, or a substantial `CONTRIBUTING.md`.
+  Proposing another competes with a better document. It is the right proposal only where what exists
+  is a stub that names none of the project's own commands. Read what
   exists first; if it covers the ground, say so and propose nothing. When it *is* right, say where the
   file would live and whether it would be committed.
 - **Anything affecting other people is flagged as needing a maintainer's decision**, not yours.

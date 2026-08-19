@@ -1,62 +1,48 @@
-# Living checklist for this repo. Re-audit as a diff against this file.
+# Repository checklist. Re-audit as a diff against this file.
 # status: present | absent | unsupported here | unknown | enforced
 audited: 2026-08-19
-audit: second (published)
 
 checks:
   - id: gate-runs-on-commit
     status: enforced
     by: .git/hooks/pre-commit -> scripts/check-repo.sh
-    origin: audit 2026-08-18 — the gate ran only when a human remembered
 
   - id: broken-reference-fails-gate
     status: enforced
     by: skills/uplevel/selfcheck.sh
-    origin: audit 2026-08-18 — check printed a warning and exited 0 for its whole life
 
   - id: shipped-commands-parse
     status: enforced
-    by: selfcheck.sh — bash -n on fenced blocks, plus grep -E pattern validation
-    origin: findings.md §13 — a PCRE lookahead shipped and failed on all seven audited repos
+    by: selfcheck.sh; bash -n on fenced blocks, plus grep -E pattern validation
 
   - id: skill-md-under-4k-tokens
     status: enforced
     by: selfcheck.sh
-    origin: SKILL.md loads on every trigger; it had drifted 5700 -> 6497 before the mode split
 
   - id: relative-links-resolve
     status: enforced
-    by: scripts/check-repo.sh (tracked files only)
+    by: scripts/check-repo.sh; tracked files only
 
   - id: hook-installed-and-current
     status: enforced
     by: scripts/check-repo.sh
-    origin: hooks are untracked, so a fresh clone starts with no gate at all
+
+  - id: hook-check-skipped-in-ci
+    status: enforced
+    by: scripts/check-repo.sh; CI env var guard
 
   - id: ci-on-pull-request
     status: enforced
     by: .github/workflows/check.yml -> scripts/check-repo.sh
-    note: verified on the first run after publishing (2026-08-19) -- it executed
-      the real checks, not a no-op: 4 links, 11 shell blocks, 6 regexes, REPO OK.
 
   - id: branch-protection-required-checks
     status: absent
-    note: reclassified from "unsupported here" on 2026-08-19 -- the repo now has
-      a remote, so this is a real gap rather than an impossibility. Ask an owner
-      to require the "Repo gate" check on main. Owner decision, not ours to apply.
+    note: require the "Repo gate" check on main. Owner decision.
 
   - id: licence
     status: present
-    by: LICENSE — MIT, (c) 2026 Lior Rudnik and Tracey Mercer
-    origin: audit 2026-08-18 — README shipped install instructions that could
-      not lawfully be followed
+    by: LICENSE (MIT)
 
-  - id: hook-check-skipped-in-ci
-    status: enforced
-    by: scripts/check-repo.sh — CI env var guard
-    origin: the hook check would have made CI red on its first run, since
-      runners have no git hooks. Verified in both directions.
-
-  - id: selfcheck-covers-research-docs
-    status: partial
-    note: links are checked; prose claims in research/ are not machine-checkable.
+  - id: codeowners
+    status: absent
+    note: single maintainer; revisit if contributors join.

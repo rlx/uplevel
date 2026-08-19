@@ -125,10 +125,9 @@ Failure modes to check for by name, each of which produces a green repo that val
   security improvement most repos can make.
 - **Audit every executable fetch, not just `uses:`.** A `uses:`-only check reports a clean bill of
   health on repos that download and run unpinned third-party code at build time — a false *clean*,
-  which is worse than a false alarm. Of seven repos audited, **three scored 100% SHA-pinned on
-  `uses:` and still executed unpinned code**: three `go install …@latest` in one, and
-  `curl … | bash` off a third party's default branch in two — one of those inside a *production*
-  workflow. Grep the `run:` steps too:
+  which is worse than a false alarm. A repository can score 100% SHA-pinned on `uses:` and still
+  execute unpinned code — `go install …@latest`, or `curl … | bash` off a third party's default
+  branch, sometimes inside a production workflow. Grep the `run:` steps too:
   ```sh
   grep -rnE 'curl[^|]*\|[[:space:]]*(ba)?sh|bash <\(curl' .github/workflows/
   grep -rnE '(go|cargo|pipx|uv tool) install[^|&;]*@(latest|main|master)' .github/workflows/
@@ -138,9 +137,8 @@ Failure modes to check for by name, each of which produces a green repo that val
   holding registry credentials outranks twenty in a comment bot.
 - **Rank pinning findings by blast radius, never by tally.** Separate first-party (`actions/*`,
   `github/*`) from third-party, then order by the permissions of the job the action runs in. A raw
-  count inverts the answer: one audited repo had 89 mutable refs that were mostly PR-comment bots
-  holding `pull-requests: write`, while another had 66 — the smaller number — including the registry
-  login and release-publishing actions on the path that ships images to every self-hosted install.
+  count inverts the answer: ninety mutable refs that are all PR-comment bots holding
+  `pull-requests: write` matter less than a handful on the release path holding registry credentials.
 - **No `permissions:` block.** The default `GITHUB_TOKEN` may carry write scope to the whole
   repository, handed to every action including third-party ones. Set `permissions: contents: read` at
   workflow level and widen per-job only where needed.
