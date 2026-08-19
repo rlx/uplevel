@@ -9,9 +9,11 @@
 audited: 2026-08-19
 visibility: public
 last_audit_scope: >
-  Re-audit as a diff. Verified this pass: gate, workflow triggers and
-  permissions, action pinning, ruleset, repository security settings,
-  code scanning, toolchain portability, release tagging.
+  Re-audit as a diff. Verified this pass: gate and its runtime, workflow
+  triggers and permissions, action pinning, ruleset rules and bypass actors,
+  repository security settings, code scanning, toolchain portability, release
+  tagging, merged-branch deletion, and the repository's own review and CI
+  history. Nothing regressed; four controls were in place and unrecorded.
 
 checks:
   - id: gate-runs-on-commit
@@ -179,6 +181,37 @@ checks:
     note: >-
       the bump was gated and the tag was not, so main carried a version that
       had never been released and nothing noticed. Verified red-then-green.
+
+  - id: prose-is-en-us
+    status: enforced
+    by: scripts/check-repo.sh against scripts/en-gb-spellings.txt
+    note: >-
+      47 spellings across tracked markdown and YAML, in one grep rather than one
+      per pattern per file - the readable nested loop cost 3.3s of a 4.5s gate,
+      on the pre-commit path. Verified red-then-green.
+
+  - id: prose-wrap-ceiling
+    status: enforced
+    by: scripts/check-repo.sh; 105 characters, python3, skipped when absent
+    note: >-
+      counted in characters, not bytes: an em dash is three bytes, and a byte
+      count flags correctly-wrapped prose. The ceiling is 105 rather than 100
+      because the prose sits at 103 and a 100 limit would demand a reflow of
+      every line rather than catch the lines nobody wrapped. Tables, fenced code
+      and long URLs are exempt. Verified red-then-green.
+
+  - id: documented-install-runs
+    status: enforced
+    by: scripts/check-install.sh, a step in the required "Repo gate" job
+    note: >-
+      extracts the install commands from README.md and skills/uplevel/README.md
+      rather than restating them, and runs both against a clean HOME, each twice,
+      plus the uninstall. Found two live defects on its first run. Too slow for
+      the commit hook at about five seconds, so CI carries it.
+
+  - id: changelog
+    status: present
+    by: CHANGELOG.md, linked from README.md
 
   - id: contributing-guide
     status: present
