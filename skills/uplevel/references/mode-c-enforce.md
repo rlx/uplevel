@@ -22,17 +22,19 @@ thin, and *that* is the finding.
 
 ### Environments and production access
 
-Read `references/production.md` §1 before any command that reads credentials, connects to a datastore,
-or mutates deployed state. The short form:
+**The environment invariants are in `SKILL.md` → *Always true, in every mode*** — print where you are
+pointed, production is read-only unless named this turn, ambiguous environment means stop, never print
+or commit a secret. They are stated there rather than here because they must hold whether or not this
+file was read. Do not restate them; they are not optional in any mode.
 
-- **Print where you are pointed, and say it in your reply** — the resolved value, not an intention.
-- **Production is read-only unless the user names production in this turn.** Approval to fix something
-  is not approval to fix it in production.
+What this mode adds:
+
 - **No ad-hoc writes against production.** Changes to production data go through a reviewed, reversible,
-  re-runnable path, because that is the only version anyone can audit or undo.
-- **Ambiguous environment → stop and ask.** This is never recoverable by being clever afterwards.
-- **Never print, log, or commit a secret**; a committed secret is compromised and must be rotated, not
-  deleted.
+  re-runnable path, because that is the only version anyone can audit or undo. A correct one-off
+  `UPDATE` is still the version nobody can review, repeat, or undo.
+
+Read `references/production.md` §1 before any command that reads credentials, connects to a datastore,
+or mutates deployed state.
 
 ### Before check-in
 
@@ -48,7 +50,7 @@ Run the project's gate — the discovered one, or `CLAUDE.md`'s if written. Then
 - Confirm you are still on the working branch, not the default one — before committing, not after.
 - Match the log's commit style. Commit only when asked; never push, tag, force, amend a pushed commit,
   or rewrite history unprompted.
-- If the gate does not pass, say so with the output. Never describe partially-verified work as done.
+- If the gate does not pass, say so with the output, not a summary of it.
 
 ### Before shipping
 
@@ -61,21 +63,15 @@ same deploy that stops using the thing, test on realistic *size*, and know which
 
 ### Before irreversible operations — stop and ask
 
-Full catalog in `references/destructive-ops.md`. The recurring shape: **a command whose normal use is
-legitimate, whose failure mode is silent, and whose input was expensive to produce.** Resetting a
-database, force-pushing, a destructive migration, `--record` on a baseline, scaling to zero.
+**The rule, the shape to watch for, and the examples are in `SKILL.md` → *Always true, in every
+mode*.** So are the two that most need blocking — never overwrite hand-authored judgement with machine
+output, and never make a failing test pass by weakening it — because they apply during an audit and an
+automation change too, not only here. Full catalog in `references/destructive-ops.md`.
 
-A generic "go ahead" on a task is not consent for these. Consent is scoped to what was described; it
-does not extend to the next instance, a wider blast radius, or a different environment.
-
-Two that specifically need blocking:
-
-- **Never overwrite hand-authored judgement with machine output.** Curated fixtures, reviewed
-  baselines, and hand-labelled data are the measuring instrument. Patch the named row; record
-  disagreement rather than silently replacing it.
-- **Never make a failing test pass by weakening it.** A failing test is a finding. Fix the code, or
-  record the failure as a known-open defect with its diagnosis. Deleting, skipping, or loosening the
-  assertion converts a finding into a lie, and the lie ships.
+What this mode adds is the scope of consent: **a generic "go ahead" on a task is not consent for an
+irreversible operation.** Consent attaches to what was described. It does not extend to the next
+instance, a wider blast radius, or a different environment — and the second time is exactly when it
+feels like it should.
 
 ### Long or irreversible runs
 
