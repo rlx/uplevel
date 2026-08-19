@@ -4,7 +4,7 @@ description: >
   Establish, automate, and enforce a project's engineering process — the gate that runs before every
   commit, the checks that replace it with automation, the environment and deploy discipline that keeps
   production safe, and the irreversible operations that need explicit sign-off. Use when the user asks
-  to "uplevel this repo", "set up engineering guardrails", "write a CLAUDE.md for this repo", "document
+  to "uplevel this repo", "audit our engineering process", "write a CLAUDE.md for this repo", "document
   our process", "add a pre-commit gate", "we keep breaking production", "stop shipping bugs", "audit our
   engineering process", or when starting substantial
   work in a repo whose gate, environments, and destructive operations are not yet written down. Also
@@ -16,13 +16,13 @@ description: >
 version: 0.17.0
 ---
 
-# Engineering guardrails
+# uplevel
 
 **Three modes. Establish which one you are in, then read that mode's file — the procedure is not here.**
 
 | mode | when | read |
 |---|---|---|
-| **A — Investigate** | an audit, a bootstrap, "set up guardrails here". Ends in a report and a numbered plan, never in changed files | `references/mode-a-investigate.md` |
+| **A — Investigate** | an audit, a bootstrap, "set up guardrails for this repo". Ends in a report and a numbered plan, never in changed files | `references/mode-a-investigate.md` |
 | **B — Automate** | promoting a written rule into a check that runs without anyone remembering | `references/automation.md` (summary below) |
 | **C — Enforce** | work already underway: before a check-in, a deploy, a migration, a long run, or during an incident | `references/mode-c-enforce.md` |
 

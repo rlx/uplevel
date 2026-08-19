@@ -51,7 +51,7 @@ Restart Claude Code (or start a new session). Confirm it loaded with `/skills`.
 /uplevel                         # bootstrap this repo
 ```
 
-or just ask: *"set up engineering guardrails"*, *"write a CLAUDE.md documenting our process"*,
+or just ask: *"uplevel this repo"*, *"write a CLAUDE.md documenting our process"*,
 *"we keep breaking production — what should we enforce?"*
 
 It will come back with findings and a numbered plan. Reply with the numbers you want — `1, 3, 5` is a
