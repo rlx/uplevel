@@ -51,10 +51,12 @@ checks:
     status: enforced
     by: ruleset "Protect main" (21026886), active, no bypass actors
     note: >-
-      requires a pull request, the "Repo gate" check, and branches up to
-      date; blocks force-push and deletion. Verified behaviourally on
-      2026-08-19 - a direct push to main was rejected with both the
-      pull-request and required-status-check rules cited.
+      requires a pull request, branches up to date, and two checks - "Repo gate"
+      and "Analyze (actions)" from CodeQL. Blocks force-push and deletion, no
+      bypass actors. Verified behaviourally on 2026-08-19 - a direct push to main
+      was rejected with both the pull-request and required-status-check rules
+      cited. CodeQL was added to the required set once it had been observed
+      running on a pull request head; an advisory check is ignored within a week.
 
   - id: secret-scanning
     status: enforced
