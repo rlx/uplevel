@@ -28,7 +28,8 @@ named row only. Where your judgment differs from a recorded label, record the di
 silent overwrite destroys the disagreement, which was the signal.
 
 **Version control.** `push --force` (use `--force-with-lease` at minimum), `reset --hard`,
-`clean -fdx`, `checkout .`, `stash drop`, `branch -D`, `rebase`/`amend` on pushed commits, `filter-branch`,
+`clean -fdx`, `checkout .`, `stash drop`, `branch -D`, `rebase`/`amend` on pushed commits,
+`filter-branch`,
 tag deletion or moving. Check for uncommitted work before any of these; `clean -fdx` deletes
 gitignored files, which is often exactly the local state nobody can regenerate.
 

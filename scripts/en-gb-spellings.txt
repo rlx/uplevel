@@ -1,0 +1,53 @@
+# en-GB spellings that must not ship. The repository is public and the skill is
+# text, so mixed spelling reads as two authors who never compared notes.
+#
+# Extended regexes, one per line. Blank lines and # comments ignored.
+# Kept in .txt because the scan covers *.md and *.yml only, so this list cannot
+# match itself. Remove a pattern rather than working around it.
+[Bb]ehaviour
+[Hh]onour
+[Ll]icence
+[Cc]olour
+[Ff]lavour
+[Nn]eighbour
+[Aa]rtefact
+[Jj]udgement
+[Aa]cknowledgement
+[Cc]atalogue
+[Ll]abelled
+[Ll]abelling
+[Cc]ancelled
+[Cc]ancelling
+[Mm]odelling
+[Tt]ravelling
+[Ss]ignalling
+[Ff]uelled
+[Mm]arvellous
+[Dd]efence
+[Oo]ffence
+[Pp]ractise
+[Pp]rogramme
+[Ss]ceptic
+[Mm]anoeuvre
+[Aa]luminium
+[Ww]hilst
+[Aa]mongst
+[Aa]nalyse
+[Oo]rganis(e|ing|ed|ation)
+[Rr]ecognis(e|ing|ed)
+[Gg]eneralis(e|ing|ed)
+[Ss]pecialis(e|ing|ed)
+[Pp]rioritis(e|ing|ed)
+[Uu]tilis(e|ing|ed)
+[Ss]ummaris(e|ing|ed)
+[Mm]inimis(e|ing|ed)
+[Oo]ptimis(e|ing|ed)
+[Nn]ormalis(e|ing|ed)
+[Ss]tandardis(e|ing|ed)
+[Cc]ustomis(e|ing|ed)
+[Cc]ategoris(e|ing|ed)
+[Ee]mphasis(e|ing|ed)
+[Rr]ealis(e|ing|ed)
+[Aa]uthoris(e|ing|ed)
+[Cc]riticis(e|ing|ed)
+[Aa]pologis(e|ing|ed)

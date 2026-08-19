@@ -25,7 +25,8 @@ that pages someone.
 - **Never edit source that the run reads.** Harnesses that rebuild or re-import per item will silently
   mix two versions of the code. Finish or kill the run first. This is the single most common way a
   measurement is quietly invalidated.
-- Do not start a second run competing for the same resource (port, database, test schema, rate limit, CI runner)
+- Do not start a second run competing for the same resource (port, database, test schema, rate
+  limit, CI runner)
   unless you have confirmed it is isolated.
 - Leave the working tree alone generally — a git operation mid-run can change files under it.
 
@@ -37,7 +38,8 @@ that pages someone.
 - **Quote the log file, not scrollback.** Scrollback is lossy and gets truncated.
 - **Know the noise floor before claiming a win.** If you have not measured run-to-run variance on
   identical code, you cannot tell a real improvement from noise. Re-run the baseline; a difference
-  inside the spread is not a result. Sources of noise: network, cache warmth, machine load, noisy neighbors,
+  inside the spread is not a result. Sources of noise: network, cache warmth, machine load, noisy
+  neighbors,
   non-determinism in the system under test.
 - **Compare pairs, not totals.** A new failure appearing in a re-run is not automatically a regression,
   and an equal count is not evidence of no change. Diff the item-level results.

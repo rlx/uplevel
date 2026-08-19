@@ -24,7 +24,8 @@ earlier ones describe what is enforced.
    A repository with hundreds of thousands of commits and three workflow files is not under-gated; it
    is gated somewhere you have not looked yet.
 
-1. **CI config** — `.github/workflows/*.yml`, `.gitlab-ci.yml`, `Jenkinsfile`, `.circleci/`, `azure-pipelines.yml`.
+1. **CI config** — `.github/workflows/*.yml`, `.gitlab-ci.yml`, `Jenkinsfile`, `.circleci/`,
+   `azure-pipelines.yml`.
    Whatever blocks a merge *is* the gate, whatever the README claims.
 2. **Hooks** — `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`, `.git/hooks/` (local, unshared —
    note it, since a teammate will not have it).
@@ -97,7 +98,8 @@ find . -maxdepth 3 \( -name package.json -o -name go.mod -o -name pyproject.toml
   -not -path '*/node_modules/*' -not -path '*/vendor/*'
 ```
 
-On a monorepo this lists every workspace — twenty or more is common — and most declare nothing. Only the manifests
+On a monorepo this lists every workspace — twenty or more is common — and most declare nothing.
+Only the manifests
 carrying `packageManager`, `engines`, or a language version matter — filter to those:
 
 ```sh

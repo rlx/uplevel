@@ -112,5 +112,5 @@ Run `selfcheck.sh` for the structural checks it enforces on itself.
 ## Scope
 
 Language-, stack- and deployment-agnostic, weighted toward services that run somewhere and can page
-someone. The forge audit assumes GitHub; see *Limitations*. Sections that do not apply are meant to be deleted; a small library's `CLAUDE.md` should
-come out a few lines long.
+someone. The forge audit assumes GitHub; see *Limitations*. Sections that do not apply are meant to
+be deleted; a small library's `CLAUDE.md` should come out a few lines long.
