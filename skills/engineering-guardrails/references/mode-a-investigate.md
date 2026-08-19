@@ -34,14 +34,26 @@ package manager installs a wrong tree instead of failing.
    CI config, `Makefile`/`justfile`/package scripts, `.pre-commit-config.yaml`, `.git/hooks/`,
    `docker-compose.yml`, deployment manifests, `.env.example`. Most projects already have a process; it
    is just scattered and unenforced. **Do not propose one that competes with it.**
-2. **Read the git log — especially the failures.**
+2. **Read the git log — especially the failures.** Reverts and hotfixes are incidents with the
+   write-up missing. **Rules derived from what actually broke here are the only ones certain to earn
+   their place** — and they are what makes the plan persuasive rather than generic.
+
+   **Match the subject, never the whole message.** `--grep` searches the body too, and squash-merge
+   bodies quote the PR description, so any commit whose discussion mentions "revert" is counted as
+   one. This is not a small error: on one audited repo the body-matching form reported **34 reverts in
+   500 commits (~7%)** where the true count was **0**. A revert rate is a number the team will be
+   asked to react to, and being wrong in the alarming direction loses the room in the first minute.
+
    ```sh
-   git log --oneline -50
-   git log --oneline --grep='revert\|hotfix\|urgent\|rollback\|incident\|outage' -i -30
+   git log --oneline -50                       # shape, style, cadence
+   git log --format=%s | grep -icE '^(revert|"?Revert|[a-z]+(\(.+\))?: revert)'
+   git log --format=%s | grep -iE  '^(revert|"?Revert|[a-z]+(\(.+\))?: revert)' | head -20
+   git log --format='%h %s' --grep='hotfix\|rollback\|incident\|outage' -i -30
    ```
-   Reverts and hotfixes are incidents with the write-up missing. **Rules derived from what actually
-   broke here are the only ones certain to earn their place** — and they are what makes the plan
-   persuasive rather than generic.
+
+   Say the window and the rate, not the raw count — "41 reverts in 3000 commits, 1.4%" is a finding;
+   "272 matches" is an artefact. Check `git log --merges` first: if the count is ~0 the project
+   squash-merges, so every commit on the default branch is a PR and subject matching is reliable.
 3. **Find the real gate.** See `references/discovery.md`, including its rules on reading a command
    before running it. Record what passes, its runtime, and what it does *not* cover.
 4. **Map the environments and the path to production.** See `references/production.md` §1 and §3. Read

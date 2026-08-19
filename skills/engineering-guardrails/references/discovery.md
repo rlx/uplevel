@@ -199,9 +199,16 @@ behind. Record what you created and hand the user the choice.
    roughly what re-creating them would cost so the answer is informed.
 4. **Only remove what you created.** A pre-existing install is the user's working environment — deleting
    it is a destructive act against something you did not make. When in doubt, leave it and say so.
-5. **Never delete anything the repo tracks.** Vendored package-manager releases (`.yarn/releases/`),
+5. **Machine-wide caches are reported, not removed.** `~/go/pkg/mod` and the Go build cache, the pip,
+   npm, and Cargo registry caches are shared across every project on the machine, so "what you created"
+   cannot be separated from what was already there — one audit grew a Go build cache from 929 MB to
+   4.0 GB, and `go clean -cache` would have deleted the user's 929 MB too. Say the size you added, note
+   that the tool garbage-collects its own cache, and leave it unless asked. Repo-local artifacts
+   (`node_modules`, `.venv`, `target/`, a repo-local package-manager cache) are the ones you offer to
+   delete, because there the attribution is clean.
+6. **Never delete anything the repo tracks.** Vendored package-manager releases (`.yarn/releases/`),
    committed patches, and checked-in fixtures live beside the artifacts and are not artifacts. Confirm
    with `git check-ignore` before removing, and re-check `git status` in the repo afterwards to prove
    nothing tracked moved.
-6. **Stop what you started.** Containers, compose stacks, background servers, port-forwards — leaving
+7. **Stop what you started.** Containers, compose stacks, background servers, port-forwards — leaving
    one running is residue that also holds a port.
