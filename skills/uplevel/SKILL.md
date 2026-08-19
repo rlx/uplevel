@@ -5,15 +5,14 @@ description: >
   commit, the checks that replace it with automation, the environment and deploy discipline that keeps
   production safe, and the irreversible operations that need explicit sign-off. Use when the user asks
   to "uplevel this repo", "audit our engineering process", "write a CLAUDE.md for this repo", "document
-  our process", "add a pre-commit gate", "we keep breaking production", "stop shipping bugs", "audit our
-  engineering process", or when starting substantial
-  work in a repo whose gate, environments, and destructive operations are not yet written down. Also
-  applies when work is about to touch a deployed environment or production data, run a migration or
-  backfill, or change what CI enforces. Day-to-day commit discipline belongs in the project's own
-  CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
+  our process", "add a pre-commit gate", "we keep breaking production", "stop shipping bugs", or when
+  starting substantial work in a repo whose gate, environments, and destructive operations are not yet
+  written down. Also applies when work is about to touch a deployed environment or production data,
+  run a migration or backfill, or change what CI enforces. Day-to-day commit discipline belongs in the
+  project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.28.0
+version: 0.29.0
 ---
 
 # uplevel
@@ -23,7 +22,7 @@ version: 0.28.0
 | mode | when | read |
 |---|---|---|
 | **A — Investigate** | an audit, a bootstrap, "set up guardrails for this repo". Ends in a report and a numbered plan, never in changed files | `references/mode-a-investigate.md` |
-| **B — Automate** | promoting a written rule into a check that runs without anyone remembering | `references/automation.md` (summary below) |
+| **B — Automate** | promoting a written rule into a check that runs without anyone remembering | `references/automation.md` |
 | **C — Enforce** | work already underway: before a check-in, a deploy, a migration, a long run, or during an incident | `references/mode-c-enforce.md` |
 
 Everything in this file applies in **all three**.
@@ -96,10 +95,13 @@ first, and specifically look for: network calls, credential reads, datastore wri
 orchestration, and anything referencing an environment name. Run the fastest read-only subset first —
 unit tests before integration, `--dry-run` where it exists.
 
-- **Never run anything that needs credentials, touches shared infrastructure, or costs money** during
-  discovery. Record it as `— unverified, needs X` and move on. An unverified line in the document is a
-  small honest gap; a discovery run that wrote to someone's staging database is an incident you caused
-  while documenting how to avoid incidents.
+- **Never run anything that writes to shared infrastructure, costs money, or needs credentials you
+  had to go and find** during discovery. Record it as `— unverified, needs X` and move on. An
+  unverified line in the document is a small honest gap; a discovery run that wrote to someone's
+  staging database is an incident you caused while documenting how to avoid incidents. *Read-only
+  calls through a CLI the user has already authenticated — `gh api` for rulesets, runs and settings —
+  are how the forge audit works and are not what this forbids; the line is writes, spend, and
+  deployed environments.*
 - **Additive only.** Create new files; do not restructure, rewrite, or "tidy" existing docs, configs,
   or code. If an existing doc is wrong, say so in your reply — do not fix it as a side effect.
 - **Document what they do before proposing what they should do.** The first draft describes their
@@ -117,21 +119,14 @@ unit tests before integration, `--dry-run` where it exists.
   data where it should not be, report it to the user **privately and directly** — never write it into
   the document, a commit message, a PR, or anything published. Say it must be rotated, not just
   deleted.
-- **Leave no residue, and always offer to clean up.** Two kinds. *Yours to remove without asking:*
-  temporary files, deliberately-broken code used to prove a test can fail, scratch branches — clean
-  them up and say what you touched. *Yours to offer:* everything verifying the gate created —
-  `node_modules`, package-manager caches, virtualenvs, build output, containers and images, downloaded
-  toolchains. **Say what you created and how much space it took, and offer to remove it**, in the same
-  reply that reports the gate result. It is a real cost the user did not ask for and cannot see.
-  **Only ever remove what you created**: an install that was already there is the user's working
-  environment, and deleting it costs them the rebuild. Check before, not after. `git status` at the
-  end should show only what you intended.
-
-  **Clean up last, and measure at that point.** Cleaning and then running one more check puts the
-  residue back and makes your report wrong on arrival — build directories, caches, and `__pycache__`
-  all reappear from a single verification run. Do it after the final command, then measure, then
-  report. Where residue landed in a shared cache you did not create, say what you added and leave the
-  cache alone.
+- **Leave no residue, and always offer to clean up.** Temporary files, deliberately-broken code used
+  to prove a test can fail, and scratch branches are yours to remove without asking. Everything
+  *verifying the gate* created — installs, caches, build output, containers — is yours to **offer**:
+  say what you made and how much space it took, in the same reply that reports the gate result. It is
+  a real cost the user did not ask for and cannot see. **Only ever remove what you created**; an
+  install that was already there is the user's working environment. Clean up **last**, after the final
+  command, or one more check puts the residue back and your report is wrong on arrival. `git status`
+  at the end should show only what you intended. Detail in `references/discovery.md`.
 
 If you cannot tell whether something is safe to run or safe to change: ask. In a foreign repo, one
 question costs a minute and guessing can cost a day of someone else's.
@@ -154,24 +149,13 @@ says "just set it up", that still means investigate, propose, and wait.
 **A document is the weakest form of enforcement** — treat every written rule as a candidate for a
 check, and every check you add as prose you can then delete.
 
-**Default to proposing, not building.** The output of this mode is normally a short ordered list: what
-should be a check rather than a sentence, what it prevents, what it costs, and who it affects. Build
-only what the user approves, and land one check per change so each can be reviewed and reverted on its
-own merits.
+**Read `references/automation.md`** — it carries the ladder, the rules every added check must meet,
+and whose decision each one is. The procedure is not here.
 
-Read `references/automation.md`. In short: prefer the highest rung of the ladder that fits — make it
-impossible, then fail in CI, then fail at commit, then fail at deploy, then alert at runtime, and only
-then write it in a document. When you promote a rule into a check, **delete the prose it replaces** and
-say that you did.
-
-Never apply, without being asked for it in this conversation: branch protection or any repo/org
-setting, a hook that runs on other people's machines, a change to an existing pipeline's triggers, or
-anything that can fail a colleague's merge tomorrow morning. Those are proposals with a rationale
-attached, addressed to whoever owns the repo.
-
-Rules for anything you add: fast or it gets bypassed; fails with the fix, not just the failure; never
-advisory (a warning that does not block is ignored within a week); zero baseline noise; runnable
-locally with the exact command CI runs; and **verified to fail before you make it pass**.
+Two things worth holding before you open it. **Default to proposing, not building:** the output is
+normally a short ordered list, and you build only what the user picks, one check per change. And when
+you do promote a rule into a check, **delete the prose it replaces** and say that you did — otherwise
+the document grows while the enforcement does, and the two drift.
 
 ---
 
