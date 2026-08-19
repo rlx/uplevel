@@ -1,0 +1,13 @@
+# Constructs that exist in GNU coreutils/bash but not in the BSD and bash-3.2
+# tools a macOS maintainer runs. CI would pass and the commit hook would fail,
+# or the reverse. One per line; blank lines and # comments ignored.
+# Kept out of check-repo.sh so the scan cannot match its own pattern list.
+grep -P
+readlink -f
+date -d
+sort -V
+sed -i 
+-printf
+gensub
+mapfile
+declare -A
