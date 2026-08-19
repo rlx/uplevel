@@ -149,9 +149,19 @@ package manager installs a wrong tree instead of failing.
      *Unsupported* still gets said, as best practice with no support in this environment plus whatever
      substitute does work. *Unknown* is never rounded down to *absent* — a 403 is a missing permission,
      not a missing control, and treating it as one puts a false accusation in the report.
+   - **Classify everything; tabulate only what needs attention.** The seed list runs to dozens of
+     items, and a table with a row per item buries the four that matter. Give a table row to each
+     **absent**, **unsupported here**, and **unknown**; report **present** as a count with a one-line
+     list. Nothing is omitted — a reader can still see that a control was checked and passed — but the
+     rows that remain are the ones a decision hangs on.
    - **Check for an existing checklist first** (`checklist.md`). If one exists this is a
      **re-audit**: lead with the diff — resolved, **regressed**, still open and for how long. A list
      that only ever grows stops being read.
+   - **If none exists, propose creating one as a plan item.** Everything else this mode produces
+     arrives as a chat message and is gone; the checklist is the only durable artifact, and it is what
+     makes the second audit a diff instead of a fresh survey of the same ground. Propose it with the
+     statuses you just determined already filled in — the work is done, and an empty template is a
+     chore nobody completes. Where the file lives, and whether it is committed, is the user's call.
    - **Every proposed addition cites what produced it** — an incident, a revert, a near miss, a review
      comment written twice, a capability the repo has just gained. A check with no origin is an opinion
      smuggled into a list of facts, and one of those makes the whole list untrustworthy.
@@ -164,6 +174,14 @@ package manager installs a wrong tree instead of failing.
    document is even wanted, and where it should live.
 
 ### Report
+
+**Read `example-output.md` first** — one worked example conveys the shape faster than these rules do,
+and reading it after the report is written is too late to help.
+
+**Budget: about a screen of findings, plus the table, plus the plan.** There is no length at which a
+process report becomes more persuasive; past a screen it becomes a document to be skimmed and filed.
+If you cannot fit it, you are reporting things you did not verify, or reporting the same gap more than
+once — say each fact exactly once and cross-reference rather than restate.
 
 Lead with findings, not recommendations. Keep it to what you verified:
 
@@ -187,30 +205,44 @@ a document that might be published.
 
 ### Plan
 
-**Read `example-output.md` before writing your first report** — one worked example conveys
-the shape faster than these rules do.
+Then a numbered list the user can pick from — `1, 3, 5` should be a sufficient reply. **Every item
+carries all six fields, every time**, in this order:
 
-Then a numbered list the user can pick from — `1, 3, 5` should be a sufficient reply. For each item:
+```
+**N. <the concrete change, one line>**
+prevents: <the consequence it removes> · if skipped: <what leaving it costs>
+effort: <maintainer-hours, including review and consent> · affects: <one of the four values below>
+undo: <the exact command, or "not reversible"> · needs: <other item numbers, or "—">
+```
 
-| field | what it must say |
-|---|---|
-| **What** | the concrete change, in one line |
-| **Why** | what it prevents — ideally naming the incident or gap it maps to |
-| **Effort** | rough, honest |
-| **Who it affects** | just this repo's agents / everyone who commits / everyone who merges / production |
-| **Reversible** | how it is undone, or that it is not |
+`affects` takes exactly one of: **this repo's agents** / **everyone who commits** / **everyone who
+merges** / **production**. Do not invent a fifth; the value is what makes the list sortable and
+skimmable, and a phrase like "nobody's correctness" tells the reader nothing about who to consult.
+
+Two of these fields exist because a chooser cannot proceed without them:
+
+- **`if skipped`** is the cost of inaction, and it is what makes an item declinable on purpose rather
+  than by omission. "Nothing yet, but the next contributor pays" is a legitimate answer.
+- **`needs`** is what keeps the pick-list contract honest. If item 1 is unsafe without item 2, then
+  `1, 3, 5` is not a sufficient reply and the numbering was a lie. Say `needs: 2` and let the user
+  pick both.
 
 Rules for the plan itself:
 
-- **Rank every finding by blast radius, never by tally.** This is not a rule about action pinning; it
-  applies to all of them. The question is always *what can the thing reach* — which credentials, which
-  branch, whose machine, how many users downstream. Ninety mutable refs in comment bots matter less
-  than one on the release path. A hundred workflows missing a timeout matter less than one missing
-  permission check on a job holding a key. A count tells you how much work a fix is, not how much
-  damage it prevents, and reporting the count as the severity inverts the answer often enough to be a
-  habit worth breaking.
-- **Order by damage prevented per unit of effort**, not by what is interesting to build.
-- **Cheapest genuine win first.** If item 1 is a week of work, the plan will not be started.
+- **Sort by damage prevented per maintainer-hour.** One rule, not four. *Damage prevented* means blast
+  radius — what the thing can reach: which credentials, which branch, whose machine, how many users
+  downstream. Ninety mutable refs in comment bots matter less than one on the release path; a hundred
+  workflows missing a timeout matter less than one missing permission check on a job holding a key. A
+  count tells you how much work a fix is, not how much damage it prevents, and reporting the count as
+  the severity inverts the answer often enough to be a habit worth breaking.
+- **One adjustment to that sort, and only one.** If the top item would take more than an hour or needs
+  someone else's consent, promote the cheapest safe item above it **and say that you did, and why**.
+  A plan whose first item is a week of work does not get started. Anything beyond this one move means
+  you are sorting by taste.
+- **Effort is the maintainer's cost, not your keystrokes.** Count review, the consent you need, and
+  the time to land it. A five-minute edit that requires a maintainer to reason about branch protection
+  is not a five-minute item. Put a figure on *every* item including the ones you flag as someone
+  else's decision — those are precisely the ones where the denominator decides the order.
 - **Separate what is definitely broken from what you would merely prefer.** Never blend a taste
   preference into a list of fixes; the reader must be able to trust the whole list.
 - **Writing the process document is a plan item only when nothing already fills the role**, and
@@ -222,10 +254,9 @@ Rules for the plan itself:
 - **Anything affecting other people is flagged as needing a maintainer's decision**, not yours.
 - **Say what you would do first if only one item were picked**, and why.
 - **Cap it at five to seven items.** Put the rest in an appendix. A forty-item plan is a way of not
-  being acted on, and it reads as a verdict on the team rather than an offer of help.
-- **Make item one small, obviously safe, and clearly valuable** — pinning actions to SHAs, adding a
-  `pull_request` trigger, an explicit `permissions:` block. Earning the right to propose a second
-  change matters more than the first being the biggest.
+  being acted on, and it reads as a verdict on the team rather than an offer of help. Earning the
+  right to propose a second change matters more than the first being the biggest — which is what the
+  one permitted adjustment above is for.
 - **Name the constraint you can see.** Missing CI on a small internal tool is a defensible trade-off;
   missing CI on a service with weekly incidents is not. Say which you think this is.
 

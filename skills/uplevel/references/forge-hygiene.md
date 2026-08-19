@@ -122,6 +122,11 @@ about it.
   a missing control from a 403 is how a report acquires a false accusation.
 - **present** — verified, with what you ran to verify it.
 
+**Classify all of them; give a table row only to what needs attention.** This list is long, and a
+row per item buries the few that matter. Tabulate *absent*, *unsupported here* and *unknown*;
+report *present* as a count plus a one-line list. `mode-a-investigate.md` states the same rule for
+the report, and the two must not drift.
+
 A plan item aimed at an *unsupported* control is not actionable and should not be numbered as though
 it were. Put it in the report as a stated limitation of the environment, and — where one exists —
 propose the substitute that does work: a pre-push hook where there are no required checks, a
