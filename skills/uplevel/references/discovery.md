@@ -128,8 +128,8 @@ and anywhere mise, asdf, direnv, pyenv, or rbenv is in play — the toolchain is
 directory, not of the machine, and the same shell gives two different answers:
 
 ```sh
-cd /tmp && yarn --version        # 1.22.22  — the global install
-cd repo && yarn --version        # 4.12.0   — the version this repo actually uses
+cd /tmp && yarn --version        # the global install
+cd repo && yarn --version        # the version this repo actually uses — often a different major
 ```
 
 Repos routinely **vendor** their package manager and delegate to it: `.yarnrc.yml` with `yarnPath:`
@@ -140,8 +140,9 @@ these before concluding a tool is missing** — `.yarnrc.yml`, `.yarn/releases/`
 `.mise.toml`, `.envrc`.
 
 **A global package manager reporting itself current is not evidence that it satisfies the project's
-pin.** The two can be unrelated: yarn's npm `latest` dist-tag is 1.22.22 and always will be — yarn 3
-and 4 are published as `@yarnpkg/cli-dist`, a different package — so `npm view yarn version`,
+pin.** The two can be unrelated: yarn's npm `latest` dist-tag is pinned to the 1.x line and stays
+there — yarn 2 and later are published as `@yarnpkg/cli-dist`, a different package — so
+`npm view yarn version`,
 `npm outdated -g`, and `brew upgrade` all report "up to date" on a machine four majors behind what the
 repo pins. Only the project's declaration, and the tool as resolved in the project's directory, count.
 
@@ -166,7 +167,7 @@ repository you were pointed at, and is exactly the kind of thing this skill asks
 
 | missing | suggest |
 |---|---|
-| a pinned package manager (yarn 2+, pnpm) | `corepack enable` — it reads `packageManager` and installs the exact pinned version. Try this first; it fixes most mismatches. **Corepack is no longer bundled from Node 25 on**, so on a recent Node it is `npm i -g corepack && corepack enable`. |
+| a pinned package manager (yarn 2+, pnpm) | `corepack enable` — it reads `packageManager` and installs the exact pinned version. Try this first; it fixes most mismatches. If `corepack` is not found, it is not bundled with that Node (true from Node 25 as of 2026-08); then it is `npm i -g corepack && corepack enable`. |
 | node at a pinned version | `nvm install` / `fnm use --install-if-missing` (reads `.nvmrc`), or `mise install` |
 | Go | `mise use -g go@<version>`, `brew install go`, or the tarball from go.dev |
 | Python | `uv python install <version>`, `pyenv install`, or `mise install` |
