@@ -98,7 +98,7 @@ package manager installs a wrong tree instead of failing.
    ```
 
    Say the window and the rate, not the raw count — "41 reverts in 3000 commits, 1.4%" is a finding;
-   "272 matches" is an artefact. Check `git log --merges` first: if the count is ~0 the project
+   "272 matches" is an artifact. Check `git log --merges` first: if the count is ~0 the project
    squash-merges, so every commit on the default branch is a PR and subject matching is reliable.
 3. **Find the real gate.** See `discovery.md`, including its rules on reading a command
    before running it. Record what passes, its runtime, and what it does *not* cover.

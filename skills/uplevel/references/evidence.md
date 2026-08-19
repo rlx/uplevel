@@ -52,7 +52,7 @@ Identical ceremony for a typo and a schema change gets the ceremony dropped for 
 if the claim is false:
 
 - **Cheap and instantly visible** (a rename, a comment) — the check *is* the compiler; say so briefly.
-- **Costly but reversible** (a behaviour change behind a flag) — run the specific test; quote it.
+- **Costly but reversible** (a behavior change behind a flag) — run the specific test; quote it.
 - **Expensive or irreversible** (migration, deploy, data change, a security control) — verify through
   the path production takes, on realistic data, and state what you could *not* cover. Proportionality
   cuts both ways: over-verifying trivia is how a rule stops being followed.
@@ -85,7 +85,7 @@ without saying anything about the repository:
   cannot reach. The gate did not run; there is no result to report either way.
 - **Infrastructure.** A runner died, the registry timed out, a network fetch failed. Re-running is the
   diagnosis, not a workaround.
-- **Superseded.** A `cancelled` run is usually the concurrency group doing its job when a newer commit
+- **Superseded.** A `canceled` run is usually the concurrency group doing its job when a newer commit
   arrived. Counting cancellations as failures makes a healthy repo look broken.
 - **A different job than the one you mean.** A "CI is 30% red" figure computed across every workflow
   can be dominated by one always-failing nightly, or diluted by a trigger job that structurally cannot
@@ -106,7 +106,7 @@ find out which case you are in, and it is ordinary for the answer to be that you
 Everything below is what to do once you know.
 
 **First, say so plainly and name what is missing.** `— unverified, needs uv 0.11.26` is a complete,
-professional report. Never substitute a neighbouring command and quote its pass as if it were the
+professional report. Never substitute a neighboring command and quote its pass as if it were the
 gate: `go build` succeeding is not the test suite, and `node --check` is not a type-check.
 
 **Then you may build a substitute — under one condition: prove it can fail.** A checker you wrote

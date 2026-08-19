@@ -22,9 +22,9 @@ Legitimate after an *intentional* behavior change: run record mode, **review the
 then re-run normally to confirm green. Never as a way to clear a red test. If the diff contains
 changes you cannot explain, you have found a bug, not a stale golden.
 
-**Hand-authored judgement.** Hand-labelled datasets, curated corpora, reviewed baselines, annotated
+**Hand-authored judgment.** Hand-labeled datasets, curated corpora, reviewed baselines, annotated
 ground truth. These are the measuring instrument; machine output must never overwrite them. Patch the
-named row only. Where your judgement differs from a recorded label, record the disagreement — a
+named row only. Where your judgment differs from a recorded label, record the disagreement — a
 silent overwrite destroys the disagreement, which was the signal.
 
 **Version control.** `push --force` (use `--force-with-lease` at minimum), `reset --hard`,

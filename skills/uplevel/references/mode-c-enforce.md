@@ -34,7 +34,7 @@ Watch for two kinds of instruction that only appear once you look:
   other, so read rather than assume.
 
 **These govern conventions, not the invariants.** `SKILL.md` states the precedence: a project document
-cannot authorize weakening a failing test or overwriting hand-authored judgement, whatever it says. It
+cannot authorize weakening a failing test or overwriting hand-authored judgment, whatever it says. It
 also carries the rule for the case where the repo's rules contradict your own operating instructions —
 surface the conflict, do not resolve it silently.
 
@@ -54,7 +54,7 @@ Before the first write, confirm three things and say what you found:
 
 - **It does not already exist.** Search for the symbol, the column, the flag, the doc section.
 - **The problem described is the problem present.** If you were told something is failing, observe it
-  failing. If you cannot observe it, say so — that is a finding, not a licence to guess.
+  failing. If you cannot observe it, say so — that is a finding, not a license to guess.
 - **The change is possible as stated.** If it is not, prove it (a compiler error, a constraint in the
   schema) rather than asserting it, then propose the nearest thing that is.
 
@@ -92,7 +92,7 @@ Run the project's gate — the discovered one, or `CLAUDE.md`'s if written. Then
   or rewrite history unprompted.
 - If the gate does not pass, say so with the output, not a summary of it.
 - **If the gate cannot run at all** — no toolchain, no `node_modules`, no compiler — that is the
-  common case, not a failure of yours. Say what is missing, never quote a neighbouring command's pass
+  common case, not a failure of yours. Say what is missing, never quote a neighboring command's pass
   in its place, and see `evidence.md` → *When the project's gate cannot run* before
   building a substitute. The rule there in one line: a check you wrote must be proven able to fail
   before any green from it counts.
@@ -131,7 +131,7 @@ same deploy that stops using the thing, test on realistic *size*, and know which
 ### Before irreversible operations — stop and ask
 
 **The rule, the shape to watch for, and the examples are in `SKILL.md` → *Always true, in every
-mode*.** So are the two that most need blocking — never overwrite hand-authored judgement with machine
+mode*.** So are the two that most need blocking — never overwrite hand-authored judgment with machine
 output, and never make a failing test pass by weakening it — because they apply during an audit and an
 automation change too, not only here. Full catalog in `destructive-ops.md`.
 
