@@ -2,6 +2,9 @@
 
 **Only reach for this once the user has picked the document off the plan.** Writing it is a proposed
 item, not a default outcome — some teams do not want an agent-specific file in their repo at all.
+Where an agent-facing document already exists, the usual outcome is a section appended to it rather
+than a file of your own: see *New file, or a section in theirs?* below, and settle that before
+filling anything in.
 
 Fill in from what you discovered and **delete every section that does not apply**. Target 60–120 lines;
 this loads into every session, so length is a tax paid on every future turn. Every command must be one
@@ -155,13 +158,53 @@ honest is what stops the document from being mistaken for a safety net.*
 
 ---
 
+## New file, or a section in theirs?
+
+**Decide this before writing a line, and from what the existing document contains — not from whether
+one exists.** Most repositories already have somewhere this belongs.
+
+| what you found | what to propose |
+|---|---|
+| a document that names the gate command, the branching rule, and the path to production (or the repo has no deployed environment) | **nothing.** Say it covers the ground and move on |
+| a document that covers some of that and is silent on the rest | **a section appended to it**, carrying only the missing parts |
+| nothing, or a stub that names none of the project's own commands | **a new file**, placed where they say |
+
+The middle row is the common one, and appending is right there for a reason a new file cannot fix:
+two agent-facing documents in one repository will drift, and the reader has no way to know which one
+lost. Adding to the weaker document keeps one canonical place.
+
+### Find the canonical file first
+
+`CLAUDE.md` and `AGENTS.md` are frequently the same file, or maintained as copies. Writing to the
+wrong one produces the duplication you were trying to avoid:
+
+```sh
+ls -l CLAUDE.md AGENTS.md .github/copilot-instructions.md 2>/dev/null
+cmp -s CLAUDE.md AGENTS.md && echo "same content"
+```
+
+`ls -l` shows a symlink as `CLAUDE.md -> AGENTS.md`; **edit the target, never the link.** `cmp`
+catches the copies, which a symlink check alone misses. If both exist independently and differ, ask
+which one they maintain — and write to one of them, never to both.
+
+### Appending, without taking the file over
+
+- **Add at the end, or where they say.** Never interleave your material through theirs.
+- **Match their headings** — same depth, same style, same vocabulary. A section that reads as though
+  a different author bolted it on invites reverting the whole thing.
+- **Never rewrite, reorder, retitle, or delete what is already there.** If something in it is wrong,
+  say so in your reply; do not fix it as a side effect of adding.
+- **Do not restate what the document already says.** A rule written twice drifts, and then the file
+  contradicts itself. Reference their existing heading instead.
+- **One diff a maintainer can read in a minute.** If your addition is longer than the document it is
+  joining, that document is a stub — go back and propose a new file instead, and say why you changed
+  your mind.
+- Ask whether the result should be committed. Default to uncommitted.
+
 ## Before you write it into someone else's repo
 
-- Ask where it should live and whether it should be committed: root `CLAUDE.md`, alongside their
-  existing agent/contributor docs, or local-only and gitignored. Default to uncommitted.
 - Describe their process in their vocabulary. Anything you think is *missing* goes in a separate
   proposals list, clearly marked — never blended into the description as if it were current practice.
-- Additive only. Do not restructure or rewrite their existing docs to make room for this one.
 
 ## Checks before you hand it over
 
