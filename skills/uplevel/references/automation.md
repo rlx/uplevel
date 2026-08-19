@@ -68,6 +68,17 @@ A check is a policy, not a patch. Before adding or tightening one in a repo you 
   baseline it — a check that is already red teaches everyone to ignore red.
 - **Add the check in the same change as the fix it enforces**, so the check is proven to catch it.
   Verify it fails before you make it pass.
+- **Make sure it cannot match itself.** A check that searches the tree is *in* the tree, so its own
+  pattern list, its test fixtures, and the commit that adds it are all inside the search scope. The
+  failure is loud and embarrassing rather than silent: the gate goes red for a defect it invented,
+  and whoever inherits it deletes it. Keep the patterns in a data file outside the scanned set, or
+  exclude the checker's own path — then confirm a clean tree stays clean *before* trusting the first
+  failure it reports.
+- **Verify the skip path too, not just red and green.** A check that degrades — skipping when an
+  interpreter, a library, or a credential is missing — has three outcomes, and the third is the one
+  nobody exercises. Run it with the dependency absent and confirm it skips loudly and exits zero,
+  rather than erroring, hanging, or reporting a pass. An unexercised skip is how a check becomes
+  vacuous on exactly the machines that needed it most, and it will read as green.
 - **Make it runnable locally** with the exact command CI uses. "Push and wait for CI" is not a
   development loop.
 
