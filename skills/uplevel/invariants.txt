@@ -1,0 +1,22 @@
+# The rules that prevent damage rather than improve output. Each must be stated
+# in SKILL.md, which loads on every trigger -- an invariant that survives only in
+# a reference has been demoted behind a read, and the read may not happen.
+#
+# Fixed strings, one per line. Blank lines and # comments ignored. Kept in .txt
+# because the leak scan covers *.md and *.sh, so this list cannot match itself.
+#
+# What this CANNOT check: several of these are deliberately restated in
+# mode-c-enforce.md, production.md and claude-md-template.md, in different words
+# for a different audience. Paraphrases cannot be diffed mechanically, so an edit
+# that makes two copies disagree is still a review responsibility.
+Never read secret values
+posture is advisory
+Print where you are pointed
+Production is read-only unless the user names production in this turn
+Ambiguous environment
+Stop and ask before anything irreversible
+Never make a failing test pass by weakening it
+Never overwrite hand-authored judgment with machine output
+Never print, log, or commit a secret
+Surface a rules conflict; never resolve it silently
+Never describe partially-verified work as done

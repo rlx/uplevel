@@ -169,6 +169,17 @@ checks:
       the policy previously named a channel that was not enabled, and its own
       fallback sent researchers to a public issue.
 
+  - id: invariants-stated-in-skill-md
+    status: enforced
+    by: skills/uplevel/selfcheck.sh against skills/uplevel/invariants.txt
+    note: >-
+      11 rules that must appear in SKILL.md, which loads on every trigger. An
+      invariant surviving only in a reference has been demoted behind a read,
+      and the read may not happen. Two were anchored by hand and nine were not.
+      Does NOT check that the deliberate restatements in mode-c-enforce.md and
+      production.md still agree - those are paraphrases and cannot be diffed
+      mechanically. Verified red-then-green, for deletion and for demotion.
+
   - id: leakage-scan-by-shape
     status: enforced
     by: skills/uplevel/selfcheck.sh against skills/uplevel/leak-patterns.txt
