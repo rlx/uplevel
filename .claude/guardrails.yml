@@ -262,6 +262,16 @@ checks:
       it gates the next tag while there is still time to write the entry.
       Verified red-then-green, plus the no-CHANGELOG skip path.
 
+  - id: pull-request-template
+    status: present
+    by: .github/pull_request_template.md
+    note: >-
+      prompts for what CONTRIBUTING.md requires and the gate cannot check: that a
+      new check was watched failing on the case that motivated it, that its skip
+      path was exercised, that a loosened check still catches its original
+      failure, and that every shipped command was run. A checklist, not a gate -
+      it asks, it does not enforce.
+
   - id: contributing-guide
     status: present
     by: CONTRIBUTING.md
