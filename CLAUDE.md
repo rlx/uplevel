@@ -30,6 +30,10 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
   tools, and the commit hook gates on that one. Gate scripts therefore avoid GNU-only constructs,
   listed in `scripts/gnu-only-constructs.txt` and enforced. Add to that file rather than working
   around it.
+- Commit messages and PR bodies say what was done — concise, accurate, simple — and never how it was
+  found. Anything beyond what was done is context: ask before adding it. Detail lives in the
+  untracked plan, not in public history. The shipped guidance is
+  `skills/uplevel/references/commit-hygiene.md`.
 - Prose is **en-US** throughout — behavior, license, judgment, labeled. The repository is public and
   the skill ships as text; mixed spelling reads as two authors who never compared notes.
 - `.claude/guardrails.yml` is public, so it records only what is **in place**. Absent, unverified, and
