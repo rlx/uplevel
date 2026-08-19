@@ -88,28 +88,18 @@ Promotion from a repo's checklist into the shared seed is gated on one question:
 make sense in a repo that shares none of this one's code, team, or stack?* Promote sparingly and
 sanitize the origin — the check travels, the incident narrative stays home.
 
-## Prior art
-
-Surveyed 2026-08-19 against 344 public Claude Code skills. The ecosystem covers incident response and
-deploy-time risk well; **CI and forge governance is near-absent** — across those 344 skills, zero
-mention `pull_request_target`, required status checks, action SHA-pinning, or secret scanning. That
-gap is what this skill is for. Full survey, including the checks it borrowed back, in
-`research/prior-art.md` of the source repository.
-
 ## Known limitations
 
-Stated plainly, because the skill demands the same of its users:
-
-- **It has not been run end to end.** Discovery has been dry-run against a real repository; the
-  report-and-plan output has never been produced in anger, and the execute path is untested.
-- **It assumes one service, one gate, one path to production.** A monorepo of twenty services, or one
-  service split across repos, will produce a plan that reads as confident and is wrong in shape.
-- **It does not measure whether it helped.** Nothing re-checks incident rate after the plan is done,
-  so its value is argued rather than demonstrated.
-- **Absent domains**: disaster recovery and restore testing, API/client backwards compatibility,
+- **Settings-derived findings depend on your access.** Branch protection and org policy need
+  permissions an auditor may not have. Those are reported as unknown, never as absent.
+- **It does not measure its own effect.** Nothing re-checks incident rate after a plan is applied,
+  so the value of a change is argued rather than demonstrated.
+- **Plans assume a primary gate.** A repository with several independent pipelines will get a plan
+  weighted toward one of them.
+- **Absent domains**: disaster recovery and restore testing, API and client backwards compatibility,
   feature-flag lifecycle, runtime cost regressions, clock and timezone failures.
 
-Run `skills/uplevel/selfcheck.sh` for the structural checks it does enforce.
+Run `selfcheck.sh` for the structural checks the skill enforces on itself.
 
 ## Scope
 
