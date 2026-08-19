@@ -11,6 +11,36 @@ user asks you to "set it up", that still means investigate, propose, and wait. W
 once they have picked, which is what *Execute* below covers — and at that point you are no longer
 investigating, so branch first and build only what was chosen.
 
+### Scope it first
+
+**A full audit is not the only shape, and it is not always the right one.** Someone asking whether
+their CI is sound does not need the hazard catalog; someone about to run a migration does not need
+the release-tagging section. The full sweep reads most of `references/` before touching the
+repository, which on a large one competes with the repository for context.
+
+Ask what they want to know, and read only what answers it. `selfcheck.sh` prints what each costs.
+
+| scope | when | read, beyond this file |
+|---|---|---|
+| **forge** | "is our CI sound?", "are we exposed through Actions?" | `forge-hygiene.md` |
+| **gate** | "what actually validates a change?", "why did this reach main?" | `discovery.md`, `evidence.md` |
+| **hazards** | before a migration or a deploy; "what here is irreversible?" | `destructive-ops.md`, `production.md` |
+| **full** | an audit, a bootstrap, "set up guardrails here" | everything below |
+
+A scope costs between a third and half of the full audit — `selfcheck.sh` prints the current figures,
+which is where that range comes from. Take one when the question is narrow, and **offer the rest**:
+"I looked at the forge; the gate and the hazards are unexamined, and either is another pass."
+
+**Say the scope in the report, in the first line.** This is the same rule as naming absences, pointed
+at yourself: a reader who does not know you skipped the hazards will read your silence about them as
+approval. A scoped audit that announces its scope is a useful answer; one that does not is a misleading
+one, and the misleading version looks identical.
+
+**Two things are never scoped away.** Anything security-urgent you happen to see gets raised whatever
+you were looking for. And if the scope you were given is the wrong one for what the repository is —
+a forge audit on a service that deploys unattended to machines nobody owns — say so, then do the scope
+they asked for.
+
 ### The one hard rule: discover, never guess
 
 Every command you put in the report must have been **run once, in this repo, and observed to work**. A

@@ -12,7 +12,7 @@ description: >
   project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.42.0
+version: 0.43.0
 ---
 
 # uplevel
@@ -143,6 +143,10 @@ investigation steps, the report shape, and the rules that make a plan actionable
 
 The two things worth holding before you open it: **nothing is written in this mode**, and if the user
 says "just set it up", that still means investigate, propose, and wait.
+
+**A full audit is one shape, not the only one.** Where the question is narrow — the forge, the gate,
+the hazards — read only what answers it, say the scope in the first line of the report, and offer the
+rest. The scope table is in the mode file.
 
 ---
 
