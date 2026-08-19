@@ -118,10 +118,17 @@ done < leak-patterns.txt
 [ "$leaks" = "0" ] && echo "  $scanned leak patterns checked, none present"
 
 echo "== the skill follows its own rules =="
-# Anchored to the sentence that carries the rule, not to a word that appears
+# Anchored to the sentence that carries each rule, not to a word that appears
 # elsewhere: "advisory" alone also matches an unrelated line about warning-only
-# checks, so the old check passed even with the posture statement deleted.
-grep -q "Never read secret values" SKILL.md || note "the secrets rule is missing"
-grep -q "posture is advisory" SKILL.md || note "the advisory posture is missing"
+# checks, so an earlier version passed with the posture statement deleted. Two
+# rules were anchored by hand and the other nine were not; the list is a data
+# file so adding an invariant to SKILL.md means adding it here too.
+inv=0
+while IFS= read -r rule; do
+  case "$rule" in ''|'#'*) continue;; esac
+  inv=$((inv+1))
+  grep -qF -- "$rule" SKILL.md || note "invariant missing from SKILL.md: $rule"
+done < invariants.txt
+echo "  $inv invariants stated in SKILL.md"
 
 [ "$fail" = "0" ] && echo "OK" || { echo "FAILED"; exit 1; }

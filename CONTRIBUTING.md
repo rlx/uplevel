@@ -30,6 +30,8 @@ The gate runs in about a second. If it fails it names what to fix. Bypass it wit
   with BSD tools. The list is `scripts/gnu-only-constructs.txt` — add to it rather than working
   around it.
 - **No machine- or project-specific strings.** Patterns in `skills/uplevel/leak-patterns.txt`.
+- **Every invariant is stated in `SKILL.md`.** List in `skills/uplevel/invariants.txt`. Adding one
+  means adding it to both — a rule that lives only in a reference has been demoted behind a read.
 
 Two rules the gate does not yet enforce: prose is **en-US** (behavior, license, judgment, labeled),
 and nothing absent or unverified about this repository's own posture goes in a tracked file — that
