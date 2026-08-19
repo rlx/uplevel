@@ -30,10 +30,36 @@ package manager installs a wrong tree instead of failing.
 
 ### Investigate
 
-1. **Read what already exists.** `README`, `CONTRIBUTING`, `docs/`, runbooks, `CLAUDE.md`/`AGENTS.md`,
-   CI config, `Makefile`/`justfile`/package scripts, `.pre-commit-config.yaml`, `.git/hooks/`,
+1. **Read what already exists.** `README`, `CONTRIBUTING`, `docs/`, runbooks, CI config,
+   `Makefile`/`justfile`/package scripts, `.pre-commit-config.yaml`, `.git/hooks/`,
    `docker-compose.yml`, deployment manifests, `.env.example`. Most projects already have a process; it
    is just scattered and unenforced. **Do not propose one that competes with it.**
+
+   **Look wider than the file your own tool loads.** Agent-facing process turns up in `CLAUDE.md`,
+   `AGENTS.md`, `.claude/`, `.agents/`, `.agent/`, `.cursorrules`, and
+   `.github/copilot-instructions.md`, and projects pick different ones. Search for all of them before
+   concluding anything is missing:
+   ```sh
+   ls -d .claude .agents .agent .cursor 2>/dev/null
+   find . -maxdepth 4 \( -iname 'AGENTS.md' -o -iname 'CLAUDE.md' -o -iname 'SKILL.md' \
+     -o -iname '*instructions.md' -o -iname '.cursorrules' \) -not -path '*/node_modules/*'
+   ```
+
+   **If substantial process exists somewhere your tool will not load automatically, that is a finding
+   — and it is not "absent".** Classify it **present, not auto-loaded**: a person who already knows it
+   is there can point at it, so nothing is missing, but nothing surfaces it either. One audited
+   repository kept eight skills and over a thousand lines of review standards in a directory its
+   contributors' agent never reads; the process was thorough, committed, actively maintained, and
+   invisible by default.
+
+   The cost is onboarding, and it falls on exactly the people least able to notice: a newcomer, or a
+   fresh session, does not know to ask for a document whose existence is undocumented. Say so plainly,
+   name the path, and say which readers do and do not pick it up.
+
+   **Do not prescribe a layout.** Which file wins is the project's call and the conventions move;
+   asserting that some tool reads some path will be wrong within months, and wrong in a shipped skill
+   is worse than silent. Report the gap and note that several projects solve it by symlinking one
+   canonical file to the others — then let them choose.
 2. **Read the git log — especially the failures.** Reverts and hotfixes are incidents with the
    write-up missing. **Rules derived from what actually broke here are the only ones certain to earn
    their place** — and they are what makes the plan persuasive rather than generic.
