@@ -14,7 +14,7 @@ done
 echo "== references resolve =="
 while read -r r; do
   [ -f "$r" ] || note "SKILL.md points at missing $r"
-done < <(grep -oE 'references/[a-z-]+\.md' SKILL.md | sort -u)
+done < <(grep -oE 'references/[a-z0-9-]+\.md' SKILL.md | sort -u)
 for f in references/*.md; do
   grep -q "$(basename "$f")" SKILL.md || note "$(basename "$f") ships but is never referenced"
 done
