@@ -77,9 +77,11 @@ green tick. Loosening a check is a behavior change and needs the same evidence a
 
 ## Discovering this repo's own list
 
-- `grep -rniE -- '--(record|update|approve|bless|accept|force|reset|overwrite|fix)\b'` over scripts, CI
-  config, task runners, and test helpers.
-- `grep -rniE 'RECORD=|UPDATE_|REGEN|OVERWRITE|SEED|FORCE' -- ` env-var style flags.
+- `grep -rnE -- '--(record|update|approve|bless|accept|force|reset|overwrite|fix)\b' .` over scripts,
+  CI config, task runners and test helpers.
+- `grep -rnE '(RECORD|REGEN|OVERWRITE|SEED|FORCE|UPDATE)[A-Z_]*=' .` for the env-var form. Keep it
+  case-sensitive and require the `=`: a case-insensitive `FORCE` also matches every occurrence of
+  "enforced", which buries the real hits in noise.
 - Read `.gitignore` and ask, for each entry: *if this vanished, could we get it back?*
 - **Look for source code inside gitignored directories** — `find <ignored-dir> -name '*.py' -o -name
   '*.sh' -o -name '*.rb'`. Generation and analysis scripts written next to their output are common,

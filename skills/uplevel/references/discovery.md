@@ -77,10 +77,15 @@ Record the answer to each; the gaps are the valuable part.
 
 ## Toolchain preflight — do this before anything else
 
-**A repository analysis assumes the machine can build the repository.** That is the normal case and
-the one to design for: the checkout is there, the runtimes are installed, the gate is runnable. Run
-the preflight anyway, because when the assumption is false, everything downstream silently degrades
-to `unverified` and the report quietly stops being worth reading.
+**Do not assume the machine can build the repository.** Often it cannot, and that is ordinary rather
+than a failure on your part: a package manager, a compiler, a vendored toolchain, `node_modules` or a
+container runtime is missing, and installing it is rarely what the user asked for. Self-contained
+toolchains fare best; anything with an install step usually does not.
+
+Run the preflight **first**, because this decides how much of the audit is verifiable at all. When the
+gate cannot run, everything downstream degrades to `unverified` — and a report that does not say so
+plainly has quietly stopped being worth reading. `evidence.md` covers what to do once you
+know.
 
 **Look in every component, not just the root.** A polyglot or monorepo declares per part, and a
 root-only check silently finds nothing: memos has *no root `package.json` at all* — Go in `go.mod`,
@@ -203,7 +208,7 @@ next thing, `git status` to prove nothing changed.
 **And check the inverse: a target that cannot fail.** A generated-file check that silently skips when
 its generator is absent, a suite that reports success on the tests it could still collect, a lint step
 whose matcher no longer matches anything. These pass, cost nothing, and prove nothing. If a check has
-never been observed failing, it is not yet evidence — see `references/evidence.md`.
+never been observed failing, it is not yet evidence — see `evidence.md`.
 
 Order of attempt, stopping at the first that cannot be run safely:
 

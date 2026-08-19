@@ -18,7 +18,7 @@ detail behind them.
 ### Find the repo's own rules first — then read them for precedence
 
 Before the work, not after: the rules that govern this change are usually written down somewhere your
-tool did not load. Run the search in `references/mode-a-investigate.md` step 1 — `.claude/`, `.agents/`,
+tool did not load. Run the search in `mode-a-investigate.md` step 1 — `.claude/`, `.agents/`,
 nested `AGENTS.md`, `.cursorrules` — and **look inside the subtree you are about to edit**, not only at
 the root. A monorepo commonly has a second agent document scoped to one component, and that one is the
 binding one for work in it.
@@ -73,7 +73,7 @@ What this mode adds:
   re-runnable path, because that is the only version anyone can audit or undo. A correct one-off
   `UPDATE` is still the version nobody can review, repeat, or undo.
 
-Read `references/production.md` §1 before any command that reads credentials, connects to a datastore,
+Read `production.md` §1 before any command that reads credentials, connects to a datastore,
 or mutates deployed state.
 
 ### Before check-in
@@ -93,7 +93,7 @@ Run the project's gate — the discovered one, or `CLAUDE.md`'s if written. Then
 - If the gate does not pass, say so with the output, not a summary of it.
 - **If the gate cannot run at all** — no toolchain, no `node_modules`, no compiler — that is the
   common case, not a failure of yours. Say what is missing, never quote a neighbouring command's pass
-  in its place, and see `references/evidence.md` → *When the project's gate cannot run* before
+  in its place, and see `evidence.md` → *When the project's gate cannot run* before
   building a substitute. The rule there in one line: a check you wrote must be proven able to fail
   before any green from it counts.
 
@@ -121,7 +121,7 @@ about to contradict.
 
 ### Before shipping
 
-See `references/production.md` §3–§4. Before the change goes out, be able to answer: **how does it
+See `production.md` §3–§4. Before the change goes out, be able to answer: **how does it
 reach production, what is the rollback, how will you know it worked, and what is the blast radius if it
 is wrong?** If there is no rollback, say so explicitly — it changes how carefully this should ship.
 
@@ -133,7 +133,7 @@ same deploy that stops using the thing, test on realistic *size*, and know which
 **The rule, the shape to watch for, and the examples are in `SKILL.md` → *Always true, in every
 mode*.** So are the two that most need blocking — never overwrite hand-authored judgement with machine
 output, and never make a failing test pass by weakening it — because they apply during an audit and an
-automation change too, not only here. Full catalog in `references/destructive-ops.md`.
+automation change too, not only here. Full catalog in `destructive-ops.md`.
 
 What this mode adds is the scope of consent: **a generic "go ahead" on a task is not consent for an
 irreversible operation.** Consent attaches to what was described. It does not extend to the next
@@ -142,7 +142,7 @@ feels like it should.
 
 ### Long or irreversible runs
 
-See `references/long-runs.md`. Migrations, backfills, replays, batch jobs, and long test runs:
+See `long-runs.md`. Migrations, backfills, replays, batch jobs, and long test runs:
 
 - **Never edit source that an in-flight run reads** — the run silently mixes two versions of the code.
 - **Background it and tee to a file.** An interruption should cost the process, not the evidence.
@@ -153,7 +153,7 @@ See `references/long-runs.md`. Migrations, backfills, replays, batch jobs, and l
 
 ### When production is broken
 
-Read `references/production.md` §6. Stabilize before diagnosing; preserve evidence before restarting;
+Read `production.md` §6. Stabilize before diagnosing; preserve evidence before restarting;
 announce every change you make; one change at a time; say what you do not know. Afterwards, convert the
 incident into a test, an alert, or a check — **the loop that is missing is why the issues recur.**
 
@@ -162,21 +162,21 @@ incident into a test, an alert, or a check — **the loop that is missing is why
 The checklist earns its keep between audits, not during them. When something teaches you a rule about
 *this* repo — an incident, a near miss, a review comment you have now written twice, an assumption a
 newcomer tripped over — **offer to add it as a check**, with the origin recorded. One line, in the
-moment, while the cause is still known. See `references/checklist.md`.
+moment, while the cause is still known. See `checklist.md`.
 
 The same applies in reverse: when a check becomes a CI job or a database constraint, mark it
 `enforced` and stop asking about it by hand.
 
 **If a learned check would make sense in a repo sharing none of this one's code, team, or stack**, say
 so — it is a candidate for the skill's own seed list, where every project using the skill gets it.
-Promoting is deliberate and needs sanitizing (`references/checklist.md`): the check travels, the
+Promoting is deliberate and needs sanitizing (`checklist.md`): the check travels, the
 incident narrative does not. Promote sparingly; a check that fires everywhere and matters nowhere
 costs attention on every audit. And a check the user declined is `retired`, not a finding
 to re-raise at every audit.
 
 ### Reporting — claims and evidence
 
-See `references/evidence.md`. Every status is a promise about evidence, and the next decision — merge,
+See `evidence.md`. Every status is a promise about evidence, and the next decision — merge,
 deploy, stop looking — gets made on your word without anyone re-deriving it.
 
 Evidence has to be **fresh** (postdates your last edit to anything it depends on), **attributed** (it

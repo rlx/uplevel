@@ -101,10 +101,9 @@ repository's engineering process.
 
 ## When the project's gate cannot run
 
-This is the normal case, not the exception — assume you will land in a repo whose gate you cannot
-execute. Something is usually missing: a package manager, a compiler, a vendored toolchain,
-`node_modules`, a container runtime. Self-contained toolchains fare best; anything needing an install
-step usually does not, and installing is rarely what the user asked for.
+Expect this rather than treating it as a surprise: `discovery.md` §*Toolchain preflight* is where you
+find out which case you are in, and it is ordinary for the answer to be that you cannot run it.
+Everything below is what to do once you know.
 
 **First, say so plainly and name what is missing.** `— unverified, needs uv 0.11.26` is a complete,
 professional report. Never substitute a neighbouring command and quote its pass as if it were the

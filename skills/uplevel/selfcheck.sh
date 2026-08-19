@@ -18,6 +18,14 @@ done < <(grep -oE 'references/[a-z0-9-]+\.md' SKILL.md | sort -u)
 for f in references/*.md; do
   grep -q "$(basename "$f")" SKILL.md || note "$(basename "$f") ships but is never referenced"
 done
+# References cite each other by bare filename, because they sit in the same
+# directory -- `references/foo.md` from inside references/ would mean
+# references/references/foo.md. Uppercase names (CLAUDE.md, AGENTS.md) are repo
+# files being discussed, not citations, so the pattern deliberately excludes them.
+while read -r m; do
+  [ -f "references/$m" ] || note "a reference cites $m, which does not exist in references/"
+done < <(grep -ohE '`[a-z0-9][a-z0-9-]*\.md`' references/*.md | tr -d '`' | sort -u)
+grep -q 'references/' references/*.md && note "a reference cites another with a references/ prefix; use the bare filename"
 
 echo "== load cost =="
 w=$(wc -w < SKILL.md); tok=$((w * 4 / 3))
@@ -43,6 +51,20 @@ for f in SKILL.md references/*.md; do
     grep -E "$pat" </dev/null >/dev/null 2>&1
     [ $? -eq 2 ] && note "invalid extended regex in $f: $pat"
   done < <(grep -ohE "grep [^|]*-[a-zA-Z]*E[a-zA-Z]* '[^']+'" "$f" | sed -E "s/.*E[a-zA-Z]* '//; s/'$//")
+  # A valid regex is not a runnable command. A recursive grep shipped without a
+  # path operand, or trailing a bare `--`, compiles fine and then does nothing
+  # useful -- which is how two unrunnable commands shipped in this skill.
+  while IFS= read -r cmd; do
+    [ -z "$cmd" ] && continue
+    case "$cmd" in
+      *'--`'|*'-- `') note "shipped command ends in a bare -- with no operand in $f: $cmd" ;;
+    esac
+    # The last token before the closing backtick must not be the pattern itself.
+    # An unquoted pattern followed by a path is fine, so test the ending, not the shape.
+    case "$cmd" in
+      *"grep -r"*"'\`") note "recursive grep with no path operand in $f: $cmd" ;;
+    esac
+  done < <(grep -ohE '`grep -r[^`]*`' "$f")
 done
 for b in "$tmp"/*.sh; do
   [ -e "$b" ] || continue
