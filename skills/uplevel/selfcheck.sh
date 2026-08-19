@@ -25,7 +25,11 @@ done
 while read -r m; do
   [ -f "references/$m" ] || note "a reference cites $m, which does not exist in references/"
 done < <(grep -ohE '`[a-z0-9][a-z0-9-]*\.md`' references/*.md | tr -d '`' | sort -u)
-grep -q 'references/' references/*.md && note "a reference cites another with a references/ prefix; use the bare filename"
+# Only a citation is wrong -- `references/foo.md` from inside references/ would
+# mean references/references/. Naming the directory itself is ordinary prose, and
+# matching that flagged a sentence about how much of it an audit reads.
+grep -qE 'references/[a-z0-9-]+\.md' references/*.md \
+  && note "a reference cites another with a references/ prefix; use the bare filename"
 
 echo "== load cost =="
 w=$(wc -w < SKILL.md); tok=$((w * 4 / 3))
@@ -56,6 +60,14 @@ mode_cost "Mode A + write the doc" SKILL.md references/mode-a-investigate.md ref
   references/forge-hygiene.md references/checklist.md references/example-output.md \
   references/destructive-ops.md references/production.md references/automation.md \
   references/evidence.md references/claude-md-template.md
+# The scoped Mode A entry points. Printed next to the full audit because the
+# table in mode-a-investigate.md claims a scope is about a third of it, and a
+# claim about cost should be the measurement rather than a number someone typed.
+mode_cost "  scope: forge" SKILL.md references/mode-a-investigate.md references/forge-hygiene.md
+mode_cost "  scope: gate" SKILL.md references/mode-a-investigate.md references/discovery.md \
+  references/evidence.md
+mode_cost "  scope: hazards" SKILL.md references/mode-a-investigate.md \
+  references/destructive-ops.md references/production.md
 mode_cost "Mode B" SKILL.md references/automation.md
 mode_cost "Mode C, check-in" SKILL.md references/mode-c-enforce.md references/evidence.md \
   references/commit-hygiene.md

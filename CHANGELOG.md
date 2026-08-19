@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.43.0 — 2026-08-19
+
+- `mode-a-investigate.md`: a scope table — forge, gate, hazards, full — with the rule that a scoped
+  audit states its scope in the first line of the report.
+- `selfcheck.sh`: prints what each scope costs, and no longer flags prose that names the
+  `references/` directory as a miscitation.
+
 ## v0.42.0 — 2026-08-19
 
 - `forge-hygiene.md`: the pinning census splits first-party from third-party, which the same section
