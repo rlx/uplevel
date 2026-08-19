@@ -134,7 +134,8 @@ package manager installs a wrong tree instead of failing.
    important question. Before any absence is written down, resolve:
 
    - **Fan-out.** Does an orchestrator reach the checks indirectly?
-     `grep -rl workflow_call .github/workflows/` and `grep -rh 'uses: *\./\.github/workflows/' .github/workflows/`.
+     `grep -rl workflow_call .github/workflows/` and
+     `grep -rh 'uses: *\./\.github/workflows/' .github/workflows/`.
      A low `pull_request:` count next to a high `workflow_call` count means the gate is one level down.
    - **Aliasing.** Is the same suite running under a different workflow name? Compare the *commands*,
      not the filenames — one repo runs its full test suite on PRs from a workflow whose name mentions
@@ -266,7 +267,8 @@ Rules for the plan itself:
 
 ### Execute — only what was chosen
 
-When the user picks items: branch first (`SKILL.md` → *Before the first change*), do the selected items and
+When the user picks items: branch first (`SKILL.md` → *Before the first change*), do the selected
+items and
 nothing adjacent, land them one reviewable change at a time, and report back what passed, what did not,
 and what you did not touch. Scope creep here is the fastest way to make the next proposal unwelcome.
 

@@ -139,6 +139,60 @@ while read -r p; do
 done < scripts/gnu-only-constructs.txt
 [ "$gnuisms" = "0" ] && echo "  $checked GNU-only constructs checked for, none present"
 
+echo "== prose is en-US =="
+# A public repository whose deliverable is text; mixed spelling reads as two
+# authors who never compared notes. The list is a data file for the same reason
+# leak-patterns.txt is -- a check that searches the tree is in the tree, and a
+# list inside the scanned set matches itself.
+gb=0; words=0
+while read -r p; do
+  case "$p" in ''|'#'*) continue;; esac
+  words=$((words+1))
+  while IFS= read -r f; do
+    if grep -nE -- "$p" "$f" >/dev/null 2>&1; then
+      note "en-GB spelling in $f: $(grep -onE -- "$p" "$f" | head -1)"
+      gb=$((gb+1))
+    fi
+  done < <(git ls-files '*.md' '*.yml')
+done < scripts/en-gb-spellings.txt
+[ "$gb" = "0" ] && echo "  $words spellings checked, none present"
+
+echo "== prose stays wrapped =="
+# The prose wraps at about 100 columns by hand. The ceiling here is 105, not
+# 100: it catches a line that was never wrapped without demanding a reflow of
+# every line that runs a character or two over. Tables, fenced code and long
+# URLs are exempt because they cannot be wrapped. Counted in characters -- an
+# em dash is three bytes, so a byte count flags correctly-wrapped prose.
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "  no python3, skipping"
+else
+  long=$(git ls-files '*.md' | python3 -c '
+import re, sys
+LIMIT = 105
+bad = []
+for f in sys.stdin.read().split():
+    fence = False
+    for i, line in enumerate(open(f, encoding="utf-8"), 1):
+        line = line.rstrip("\n")
+        if line.lstrip().startswith("```"):
+            fence = not fence
+            continue
+        if fence or line.lstrip().startswith("|"):
+            continue
+        if re.search(r"https?://\S{40,}", line):
+            continue
+        if len(line) > LIMIT:
+            bad.append("%s:%d is %d characters" % (f, i, len(line)))
+print("\n".join(bad))
+')
+  if [ -z "$long" ]; then
+    echo "  every markdown line is 105 characters or fewer"
+  else
+    printf '%s\n' "$long" | while IFS= read -r l; do echo "  !! $l"; done
+    fail=1
+  fi
+fi
+
 echo "== the skill's own gate =="
 skills/uplevel/selfcheck.sh | sed 's/^/  /' || fail=1
 
