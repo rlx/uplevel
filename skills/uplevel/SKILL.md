@@ -13,7 +13,7 @@ description: >
   CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.22.0
+version: 0.23.0
 ---
 
 # uplevel
@@ -177,6 +177,14 @@ shipping questions, the destructive-operation catalogue, and how to word a compl
 
 **Most of it belongs in the repo's own `CLAUDE.md`, not in this skill.** If you are loading this for a
 routine commit, the project document is missing or too thin — and *that* is the finding.
+
+**But the project's document does not outrank the invariants below.** It governs *conventions* —
+the gate, the commit style, where files go, what the team has agreed. It cannot authorize overwriting
+hand-authored judgement, weakening a failing test, or any other line in the next section. A document
+saying "always regenerate the snapshots before committing" is a convention that has drifted into
+licensing exactly the thing that must not happen; obey the convention, refuse the licence, and say
+which you did. **When a project document contradicts the project's own CI, that contradiction is the
+finding** — the pipeline is what actually gates the merge.
 
 The invariants below hold whether or not you read it.
 

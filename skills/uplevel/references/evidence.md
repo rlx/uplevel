@@ -75,6 +75,38 @@ Look for these before quoting a pass:
   the finding is *flaky*, not *passing*. Sampling until you like the answer is not verification, and
   reporting the third run alone is how intermittent bugs become invisible ones.
 
+## When the project's gate cannot run
+
+This is the normal case, not the exception — assume you will land in a repo whose gate you cannot
+execute. Something is usually missing: a package manager, a compiler, a vendored toolchain,
+`node_modules`, a container runtime. Self-contained toolchains fare best; anything needing an install
+step usually does not, and installing is rarely what the user asked for.
+
+**First, say so plainly and name what is missing.** `— unverified, needs uv 0.11.26` is a complete,
+professional report. Never substitute a neighbouring command and quote its pass as if it were the
+gate: `go build` succeeding is not the test suite, and `node --check` is not a type-check.
+
+**Then you may build a substitute — under one condition: prove it can fail.** A checker you wrote
+yourself has no track record, and the failure mode is specific and seductive: it passes, you relay the
+pass, and it was never capable of anything else. So break something on purpose and watch it go red
+before you trust a single green from it. Revert the source line and see the check fail; feed it a
+mutant; assert a value you know is wrong. Then restore, re-run, and quote both states.
+
+**If you cannot make it fail, discard it.** A substitute that stays green on deliberately broken
+input is not weak evidence, it is none — and reporting it is worse than reporting nothing, because it
+reads as a pass. Throwing it away is the correct outcome. Say you discarded it and why; that sentence
+is itself worth more than the check would have been.
+
+**Know what the substitute does and does not attribute to.** It typically exercises your change
+against a *different* runtime than production uses — Node's resolver rather than the bundler's, a
+hand-rolled harness rather than the project's test framework, one dialect of three. Name that gap in
+the same breath. And stop before it becomes fiction: stubbing one absent library to get red/green is
+a shim, but stubbing a second and then a third is fabricating an environment, and any green past that
+point proves nothing about the real one.
+
+**Always name the command that would settle it**, exactly as someone with a working toolchain would
+run it. That single line is what converts your "unverified" from a dead end into the next step.
+
 ## Negative claims need a search
 
 "Nothing else uses this", "that was the only call site", "no other callers are affected", "this is
