@@ -1,7 +1,7 @@
 # Living checklist for this repo. Re-audit as a diff against this file.
 # status: present | absent | unsupported here | unknown | enforced
-audited: 2026-08-18
-audit: first
+audited: 2026-08-19
+audit: second (published)
 
 checks:
   - id: gate-runs-on-commit
@@ -34,17 +34,16 @@ checks:
     origin: hooks are untracked, so a fresh clone starts with no gate at all
 
   - id: ci-on-pull-request
-    status: present, unverified
+    status: enforced
     by: .github/workflows/check.yml -> scripts/check-repo.sh
-    note: the workflow is written and audited against forge-hygiene (SHA-pinned,
-      permissions {}, concurrency, timeout, persist-credentials false) but has
-      NEVER EXECUTED -- there is still no remote. It becomes verified on the
-      first run after the repo is pushed, not before.
+    note: verified on the first run after publishing (2026-08-19) -- it executed
+      the real checks, not a no-op: 4 links, 11 shell blocks, 6 regexes, REPO OK.
 
   - id: branch-protection-required-checks
-    status: unsupported here
-    note: no remote yet. On publishing, ask a maintainer to require the "Repo
-      gate" check on main. Owner decision, not ours to apply.
+    status: absent
+    note: reclassified from "unsupported here" on 2026-08-19 -- the repo now has
+      a remote, so this is a real gap rather than an impossibility. Ask an owner
+      to require the "Repo gate" check on main. Owner decision, not ours to apply.
 
   - id: licence
     status: present
