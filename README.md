@@ -88,6 +88,10 @@ Full detail in [`skills/uplevel/README.md`](skills/uplevel/README.md), which shi
 
 See [`CLAUDE.md`](CLAUDE.md) for project conventions.
 
+## Changelog
+
+[`CHANGELOG.md`](CHANGELOG.md), and the [releases](https://github.com/rlx/uplevel/releases).
+
 ## License
 
 MIT. Copyright (c) 2026 Lior Rudnik and Tracey Mercer.
