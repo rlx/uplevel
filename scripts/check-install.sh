@@ -21,31 +21,48 @@ trap 'rm -rf "$WORK"' EXIT
 # Inline-backtick commands are deliberately NOT extracted: the section quotes
 # `cp -R skills/uplevel ~/.claude/skills/` as the mistake to avoid, and running
 # the anti-pattern would be a check that asserts the bug.
-mkdir -p "$WORK/blocks"
-awk -v d="$WORK/blocks" '
-  /^## Install[ \t]*$/ { inst = 1; next }
-  /^## /               { inst = 0 }
-  inst && /^```sh[ \t]*$/ { n++; cap = 1; out = d "/block" n ".sh"; next }
-  inst && /^```[ \t]*$/   { if (cap) { close(out); cap = 0 }; next }
-  cap                     { print > out }
-' README.md
+extract() {
+  src="$1"; dest="$2"
+  mkdir -p "$dest"
+  awk -v d="$dest" '
+    /^## Install[ \t]*$/ { inst = 1; next }
+    /^## /               { inst = 0 }
+    inst && /^```sh[ \t]*$/ { n++; cap = 1; out = d "/block" n ".sh"; next }
+    inst && /^```[ \t]*$/   { if (cap) { close(out); cap = 0 }; next }
+    cap                     { print > out }
+  ' "$src"
+}
 
-blocks=0
-for b in "$WORK"/blocks/*.sh; do
-  [ -e "$b" ] || continue
-  blocks=$((blocks + 1))
-done
+count_blocks() {
+  c=0
+  for f in "$1"/*.sh; do
+    [ -e "$f" ] || continue
+    c=$((c + 1))
+  done
+  echo "$c"
+}
 
-echo "== the README's install section still has the shape this check knows =="
-# Pinned on purpose. If the section grows a third path or loses one, this check
-# silently stops covering it while still reporting green -- so it fails instead
-# and asks to be updated. The count is the contract between document and check.
-if [ "$blocks" = "2" ]; then
-  echo "  2 fenced install blocks: link, then copy"
-else
-  note "expected 2 fenced sh blocks under '## Install', found $blocks -- the section changed shape, so update this check to match"
-  echo "REPO INSTALL FAILED"; exit 1
-fi
+# Pinned counts are the contract between each document and this check. If a
+# section grows a path or loses one, the check stops covering it while still
+# reporting green -- so it fails instead and asks to be updated.
+shape_ok() {
+  file="$1"; dir="$2"; want="$3"; shape="$4"
+  got="$(count_blocks "$dir")"
+  if [ "$got" = "$want" ]; then
+    echo "  $file: $want fenced install blocks — $shape"
+    return 0
+  fi
+  note "$file: expected $want fenced sh blocks under '## Install', found $got — the section changed shape, so update this check to match"
+  return 1
+}
+
+extract README.md "$WORK/blocks"
+extract skills/uplevel/README.md "$WORK/blocks-shipped"
+
+echo "== both install sections still have the shape this check knows =="
+shape_ok "README.md" "$WORK/blocks" 2 "link, then copy" || { echo "INSTALL FAILED"; exit 1; }
+shape_ok "skills/uplevel/README.md" "$WORK/blocks-shipped" 3 "clone, then personal, then project" \
+  || { echo "INSTALL FAILED"; exit 1; }
 
 # The uninstall command is prose, in backticks, so it is pulled by shape.
 uninstall="$(grep -oE 'rm -rf ~/\.claude/skills/uplevel' README.md | head -1)"
@@ -76,8 +93,7 @@ run_block() {
 }
 
 installed_ok() {
-  sandbox="$1"; label="$2"
-  target="$sandbox/.claude/skills/uplevel"
+  target="$1"; label="$2"
   if [ ! -f "$target/SKILL.md" ]; then
     note "$label: $target/SKILL.md is missing, so the install did not resolve"
     return 1
@@ -105,13 +121,13 @@ installed_ok() {
 echo "== the documented link install, on a clean HOME and then over itself =="
 sandbox="$WORK/home-link"
 if run_block "$WORK/blocks/block1.sh" "$sandbox" "$WORK/link-1"; then
-  installed_ok "$sandbox" "link install"
+  installed_ok "$sandbox/.claude/skills/uplevel" "link install"
   # The second run is the same block, verbatim, from a fresh working directory
   # against the HOME that is already installed into. That is the case the README
   # warns about, and reaching it needs no edit to the block: a reader who clones
   # again, or who re-runs the steps after moving the clone, is in exactly it.
   if run_block "$WORK/blocks/block1.sh" "$sandbox" "$WORK/link-2"; then
-    installed_ok "$sandbox" "link install, second run"
+    installed_ok "$sandbox/.claude/skills/uplevel" "link install, second run"
     [ -L "$sandbox/.claude/skills/uplevel" ] \
       || note "link install, second run: the destination is no longer a symlink"
   else
@@ -130,9 +146,9 @@ sandbox="$WORK/home-copy"; clone="$WORK/copy-1/uplevel"
 mkdir -p "$WORK/copy-1"
 if git clone --quiet "$ROOT" "$clone" 2>/dev/null; then
   if run_block "$WORK/blocks/block2.sh" "$sandbox" "$clone"; then
-    installed_ok "$sandbox" "copy install"
+    installed_ok "$sandbox/.claude/skills/uplevel" "copy install"
     if run_block "$WORK/blocks/block2.sh" "$sandbox" "$clone"; then
-      installed_ok "$sandbox" "copy install, second run"
+      installed_ok "$sandbox/.claude/skills/uplevel" "copy install, second run"
       [ -L "$sandbox/.claude/skills/uplevel" ] \
         && note "copy install: the destination is a symlink, so the copy did not survive the clone"
     else
@@ -143,6 +159,31 @@ if git clone --quiet "$ROOT" "$clone" 2>/dev/null; then
   fi
 else
   note "could not clone this checkout to test the copy install"
+fi
+
+# --- the shipped README, which ships inside the skill --------------------------
+echo "== the shipped README's installs, from a clone, each run twice =="
+# Its blocks are sequential, not alternatives: block 1 clones, blocks 2 and 3
+# install personally and project-scoped from inside that clone. It also ships to
+# ~/.claude/skills/uplevel, where a reader is no longer in a clone at all -- so
+# the section has to say which position its commands assume, and be true from it.
+sandbox="$WORK/home-shipped"; workdir="$WORK/shipped"
+if run_block "$WORK/blocks-shipped/block1.sh" "$sandbox" "$workdir"; then
+  clone="$workdir/uplevel"
+  for pass in "" ", second run"; do
+    if run_block "$WORK/blocks-shipped/block2.sh" "$sandbox" "$clone"; then
+      installed_ok "$sandbox/.claude/skills/uplevel" "shipped README, personal install$pass"
+    else
+      note "the shipped README's personal install failed$pass"
+    fi
+    if run_block "$WORK/blocks-shipped/block3.sh" "$sandbox" "$clone"; then
+      installed_ok "$clone/.claude/skills/uplevel" "shipped README, project install$pass"
+    else
+      note "the shipped README's project install failed$pass"
+    fi
+  done
+else
+  note "the shipped README's clone step failed"
 fi
 
 # --- uninstall ----------------------------------------------------------------
