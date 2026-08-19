@@ -26,16 +26,15 @@ mkdir -p ~/.claude/skills
 ln -sfn "$PWD/skills/uplevel" ~/.claude/skills/uplevel
 ```
 
-`-sfn` matters: without it, a second run follows the existing link and creates a nested copy inside
-the clone. Linking means the working tree *is* the installed skill — `git pull` updates it, and moving
-or deleting the clone breaks it. To copy instead, so the install survives the clone:
+Linking means the working tree *is* the installed skill: `git pull` updates it, and moving the clone
+breaks it. To copy instead:
 
 ```sh
 cp -R skills/uplevel ~/.claude/skills/uplevel
 ```
 
-Name the destination explicitly there too. `cp -R skills/uplevel ~/.claude/skills/` works the first
-time and nests a copy inside itself the second.
+Name the destination explicitly in both forms — omitting it nests a copy inside itself on the second
+run.
 
 Restart Claude Code. The skill is then available as `/uplevel`. For a single project, copy it into
 that repo's `.claude/skills/` and commit it.
@@ -64,8 +63,7 @@ effort: 15 min, incl. review · affects: everyone who commits
 undo: `git revert` — one line · needs: —
 ```
 
-Reply with the numbers you want. `if skipped` is there so you can decline an item on purpose rather
-than by omission, and `needs` is there so picking `1, 3` never leaves you half-applied.
+Reply with the numbers you want. `needs` is what keeps `1, 3` from leaving you half-applied.
 
 Full worked example: [`references/example-output.md`](skills/uplevel/references/example-output.md).
 
@@ -77,29 +75,15 @@ how completion is claimed.
 
 Full detail in [`skills/uplevel/README.md`](skills/uplevel/README.md), which ships with the skill.
 
-## What it has been tested on
+## Limits
 
-22 public repositories across 9 languages, from single-purpose libraries to monorepos with thousands
-of contributors. 19 of those audits were run by agents with no prior context, and every headline
-finding was re-checked against the source file, commit or API response it rested on.
+Exercised against public repositories with real history and many contributors. **Not exercised
+against a deployed service, a production database, or an on-call rotation** — so the parts dealing
+with deploys, migrations against real data, and environment safety are the least proven, and they are
+also the parts it argues matter most.
 
-**Two limits worth knowing before you rely on it.**
-
-Every repository tested was mature, public, and multi-contributor. **None had a deployed service, a
-production database, or an on-call rotation the audit could observe** — so the parts of this skill
-that deal with deploys, migrations against real data, and environment safety are the least exercised,
-and they are also the parts it argues matter most. If your process problem is a Friday deploy nobody
-watched, this has not yet been tested on your case.
-
-The three modes are unevenly proven. Investigation and enforcement each have 22 repositories behind
-them; automation has four.
-
-**Only six of those 22 checkouts could run the project's own gate** — the rest were missing a package
-manager, a compiler, or a vendored toolchain. That is the ordinary condition of a repo you have just
-cloned, and it is the case the skill is built for: it says which commands it ran, names what is
-missing, and marks the rest unverified rather than substituting a neighbouring command that happened
-to succeed. A tool that only works on a fully provisioned machine would have reported green on
-sixteen repositories it never built.
+A repository you have just cloned usually cannot be built. The report says which commands it ran and
+marks the rest unverified, rather than substituting one that happened to succeed.
 
 ## Development
 
