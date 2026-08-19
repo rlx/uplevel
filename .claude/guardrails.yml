@@ -133,8 +133,10 @@ checks:
     status: enforced
     by: selfcheck.sh prints tokens used, budget, and remainder
     note: >-
-      3582 of 4000 at v0.24.0, 418 left. Was 3265 at v0.21.0 and v0.22.0,
-      so one merge consumed roughly 10 percent of the budget.
+      the gate prints the live figure on every run, so this entry deliberately
+      records no number - the previous version pinned one and went stale in a
+      single commit. Growth is the thing to watch: one merge has consumed about
+      10 percent of the budget before now.
     last_checked: 2026-08-19
 
   - id: checklist-parses
@@ -168,4 +170,6 @@ checks:
 
   - id: codeowners
     status: absent
-    note: single maintainer; revisit if contributors join.
+    note: >-
+      two copyright holders, one active maintainer; a CODEOWNERS file would
+      encode review routing that does not exist yet. Revisit if that changes.
