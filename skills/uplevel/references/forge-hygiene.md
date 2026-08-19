@@ -151,6 +151,15 @@ propose the substitute that does work: a pre-push hook where there are no requir
 
 ## 1. What runs, and when — trigger correctness
 
+**`on:` is a YAML 1.1 boolean, and most parsers turn it into `True`.** A workflow's trigger key is
+written bare, and `yaml.safe_load` returns `{'name': ..., True: {...}, 'jobs': ...}` — so `doc["on"]`
+finds nothing on nearly every workflow in existence. An audit that parses workflows in Python and
+looks for `"on"` counts **zero triggers in every file** and reports that nothing validates a change
+before the default branch, on a repository that gates every pull request. Read `doc.get("on",
+doc.get(True))`, or match text and skip the parser. This was reached first-hand: a naive parse
+returned zero pull-request triggers on a repository with eight, and only an independent measurement
+caught it.
+
 A pipeline that exists is not a pipeline that protects you. Read every workflow's `on:` block and
 answer: **what change could reach the default branch without this running?**
 
@@ -193,6 +202,27 @@ Failure modes to check for by name, each of which produces a green repo that val
   security scan that quietly stopped months ago is worse than none, because everyone believes it runs.
 - **Matrix covers one runtime version while production runs another.**
 - **Caches that never invalidate**, so CI passes against dependencies nobody has locally.
+
+### The trigger census, in commands
+
+**Count what triggers a workflow, not what mentions it.** A file matching `pull_request` anywhere may
+be triggered by `pull_request_target`, may reference the event in an `if:`, or may just name it in a
+comment. The two triggers are not interchangeable — `pull_request` gets a read-only token and no
+secrets, `pull_request_target` gets neither restriction — so counting them together hides the finding
+that matters. Measured on ten large repositories, `grep -l pull_request` over-reports triggers on
+eight of them, and on one it reports 7 where the reality is 2 gated and 4 on the dangerous trigger.
+
+```sh
+ls .github/workflows/*.y*ml | wc -l          # workflow FILES; `ls dir | wc -l` counts README and scripts/
+grep -lE '^[[:space:]]+pull_request:|^[[:space:]]*-[[:space:]]*pull_request$|^on:.*[[,][[:space:]]*pull_request[],]' .github/workflows/*.y*ml
+grep -lE '^[[:space:]]+pull_request_target:|^[[:space:]]*-[[:space:]]*pull_request_target$|^on:.*[[,][[:space:]]*pull_request_target[],]' .github/workflows/*.y*ml
+grep -lE '^[[:space:]]*permissions:' .github/workflows/*.y*ml | wc -l
+```
+
+The three alternatives cover the block form, the sequence form, and the inline list `on: [push,
+pull_request]` — the last is what a naive indent-anchored pattern misses, and it cost two repositories
+their correct count before it was added. **List the files, do not only count them**; the names are
+what let you say which suite gates what.
 
 ## 1b. Repository settings, not just workflow files
 
@@ -248,6 +278,19 @@ the inverse of the error this file spends most of its length preventing, and jus
 - **Third-party actions pinned to a mutable tag** (`@v4`, `@main`). A tag can be re-pointed at new
   code; pin to a full commit SHA with the version in a trailing comment. This is the cheapest real
   security improvement most repos can make.
+  ```sh
+  grep -rhoE 'uses:[[:space:]]*[^[:space:]@]+@[0-9a-fA-F]{40}' .github/workflows/ | wc -l   # pinned
+  grep -rhoE 'uses:[[:space:]]*[^[:space:]@#]+@[^[:space:]#]+' .github/workflows/ \
+    | grep -vE '@[0-9a-fA-F]{40}' | grep -vE 'uses:[[:space:]]*\.' | sort | uniq -c | sort -rn
+  ```
+
+  The second lists the mutable references with counts rather than totalling them, because the total is
+  the number least worth reporting — see the blast-radius rule below. A local `uses: ./` is not
+  third-party and is excluded. **Do not anchor the SHA filter to end-of-line**: `uses:` values are
+  often quoted, so `@<sha>'` does not end at the hex and every quoted pinned action is then reported
+  as mutable. That single character was the difference between a clean answer and a false finding on
+  a repository that pins everything.
+
 - **Audit every executable fetch, not just `uses:`.** A `uses:`-only check reports a clean bill of
   health on repos that download and run unpinned third-party code at build time — a false *clean*,
   which is worse than a false alarm. A repository can score 100% SHA-pinned on `uses:` and still
