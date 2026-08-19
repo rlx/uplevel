@@ -31,13 +31,34 @@ checks:
     status: enforced
     by: scripts/check-repo.sh; CI env var guard
 
-  - id: ci-on-pull-request
+  - id: ci-on-push
     status: enforced
     by: .github/workflows/check.yml -> scripts/check-repo.sh
 
+  - id: ci-on-pull-request
+    status: present, unverified
+    by: .github/workflows/check.yml -> scripts/check-repo.sh
+    note: the pull_request trigger is configured but has never fired; every run
+      so far was a push. Verified when a pull request first runs it.
+
   - id: branch-protection-required-checks
-    status: absent
-    note: require the "Repo gate" check on main. Owner decision.
+    status: unsupported here
+    note: the API returns 403 while the repository is private on a free plan.
+      Becomes available on going public; then require the "Repo gate" check on
+      main. Owner decision.
+
+  - id: secret-scanning-and-push-protection
+    status: unsupported here
+    note: free on public repositories, unavailable on private ones without
+      Advanced Security. Enable when visibility changes.
+
+  - id: action-update-automation
+    status: enforced
+    by: .github/dependabot.yml; github-actions ecosystem, monthly
+
+  - id: security-policy
+    status: present
+    by: SECURITY.md
 
   - id: licence
     status: present
