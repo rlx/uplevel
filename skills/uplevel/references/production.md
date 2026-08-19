@@ -46,7 +46,7 @@ Rules that follow from this:
 - **Never commit a secret.** If one is already committed, treat it as compromised: it must be rotated,
   not just deleted — git history and every clone still hold it. Say so plainly; do not quietly remove
   the line and move on.
-- Check that the repo has secret scanning before you rely on review to catch it (`references/automation.md`).
+- Check that the repo has secret scanning before you rely on review to catch it (`automation.md`).
 - **Do not add personal data to logs.** Emails, tokens, full request bodies, and identifiers end up in
   log aggregation, which is usually retained longer and read more widely than the database.
 - New environment variables need to be added to the deployment config *and* to the example/`.env.sample`

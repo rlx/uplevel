@@ -18,8 +18,8 @@ deployed environment, paid infrastructure, or **a toolchain this machine does no
 as `— unverified, needs X`. **Never run an unverified command against a deployed environment to find
 out what it does.**
 
-**Preflight the toolchain before you rely on that rule** — `references/discovery.md` §*Toolchain
-preflight*. Analysis assumes the machine can build the repo, and usually it can; when it cannot, the
+**Preflight the toolchain before you rely on that rule** — `discovery.md` §*Toolchain
+preflight*. Do not assume the machine can build the repo — often it cannot, and when it cannot the
 hard rule quietly converts the whole gate section to `unverified` and the report stops being worth
 reading. Read the repo's declared versions (`engines`, `packageManager`, `go.mod`, `.tool-versions`,
 the CI `setup-*` steps), compare them to what is installed, and **name any missing or mismatched tool
@@ -98,11 +98,11 @@ package manager installs a wrong tree instead of failing.
    Say the window and the rate, not the raw count — "41 reverts in 3000 commits, 1.4%" is a finding;
    "272 matches" is an artefact. Check `git log --merges` first: if the count is ~0 the project
    squash-merges, so every commit on the default branch is a PR and subject matching is reliable.
-3. **Find the real gate.** See `references/discovery.md`, including its rules on reading a command
+3. **Find the real gate.** See `discovery.md`, including its rules on reading a command
    before running it. Record what passes, its runtime, and what it does *not* cover.
-4. **Map the environments and the path to production.** See `references/production.md` §1 and §3. Read
+4. **Map the environments and the path to production.** See `production.md` §1 and §3. Read
    config and ask; **never probe a deployed environment.**
-5. **Find the hazards.** See `references/destructive-ops.md`. Migrations, seed/reset scripts, `--force`
+5. **Find the hazards.** See `destructive-ops.md`. Migrations, seed/reset scripts, `--force`
    and `--record` flags, precious-but-gitignored state, anything that spends money or touches customer
    data.
 
@@ -119,11 +119,11 @@ package manager installs a wrong tree instead of failing.
    it becomes a finding.
 6. **Audit what is already automated**, and what is defined but not enforced — a job that never blocks
    a merge, and one that is permanently red, are both worse than nothing.
-   See `references/automation.md`.
+   See `automation.md`.
 7. **Run the absence audit.** Discovery describes what exists; this step names what is **missing**,
    which in a repo with recurring incidents is usually where the value is. The seed list, the
    environment-capability check that must precede it, and how to report each item live in
-   `references/forge-hygiene.md` — read it here rather than working from memory.
+   `forge-hygiene.md` — read it here rather than working from memory.
 
    **Count, then confirm — and never report an absence you have only counted.** Mechanical counting
    is how this step starts, not how it ends. A low `pull_request:` count reads as a repo with no
@@ -132,7 +132,7 @@ package manager installs a wrong tree instead of failing.
    important question. Before any absence is written down, resolve:
 
    - **Fan-out.** Does an orchestrator reach the checks indirectly?
-     `grep -rl workflow_call .github/workflows/` and `grep -rh 'uses: *\./\.github/workflows/'`.
+     `grep -rl workflow_call .github/workflows/` and `grep -rh 'uses: *\./\.github/workflows/' .github/workflows/`.
      A low `pull_request:` count next to a high `workflow_call` count means the gate is one level down.
    - **Aliasing.** Is the same suite running under a different workflow name? Compare the *commands*,
      not the filenames — one repo runs its full test suite on PRs from a workflow whose name mentions
@@ -149,7 +149,7 @@ package manager installs a wrong tree instead of failing.
      *Unsupported* still gets said, as best practice with no support in this environment plus whatever
      substitute does work. *Unknown* is never rounded down to *absent* — a 403 is a missing permission,
      not a missing control, and treating it as one puts a false accusation in the report.
-   - **Check for an existing checklist first** (`references/checklist.md`). If one exists this is a
+   - **Check for an existing checklist first** (`checklist.md`). If one exists this is a
      **re-audit**: lead with the diff — resolved, **regressed**, still open and for how long. A list
      that only ever grows stops being read.
    - **Every proposed addition cites what produced it** — an incident, a revert, a near miss, a review
@@ -187,7 +187,7 @@ a document that might be published.
 
 ### Plan
 
-**Read `references/example-output.md` before writing your first report** — one worked example conveys
+**Read `example-output.md` before writing your first report** — one worked example conveys
 the shape faster than these rules do.
 
 Then a numbered list the user can pick from — `1, 3, 5` should be a sufficient reply. For each item:
