@@ -168,6 +168,26 @@ checks:
       cannot match themselves. Verified red-then-green.
     last_checked: 2026-08-19
 
+  - id: versioned-releases
+    status: enforced
+    by: git tag + GitHub release; version bump already gated at commit time
+    note: >-
+      v0.29.0 is the first tag. The version in SKILL.md frontmatter and the tag
+      are the same number, so an installed copy can be identified - before this
+      the version existed only inside the file it described, and nothing could
+      be pinned or diffed. Verified by cloning the public repository at the tag
+      into a clean HOME, installing twice, and running the shipped selfcheck.
+    last_checked: 2026-08-19
+
+  - id: contributing-guide
+    status: present
+    by: CONTRIBUTING.md
+    note: >-
+      names the gate, the rules it enforces, the one rule it cannot enforce
+      (every shipped command must have been run), and the red-then-green plus
+      skip-path requirement for any added check.
+    last_checked: 2026-08-19
+
   - id: codeowners
     status: absent
     note: >-
