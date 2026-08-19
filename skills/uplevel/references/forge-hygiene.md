@@ -71,6 +71,30 @@ Read the failures as data — they are the answer, not an error:
 | protection endpoint 404 | **ambiguous** — GitHub returns 404 rather than 403 to avoid disclosing existence, and also returns it for a branch that does not exist | **unknown**, unless `viewerPermission` is `ADMIN` *and* the branch exists — only then is it *absent* |
 | self-hosted forge with no runners registered | CI is defined and never executes | worse than absent; the badge lies |
 
+### Check what is configured against what is enforced
+
+**The most common real finding on a mature repo is a control that exists and does nothing.** It is not
+an absence — the settings page shows it, a reviewer would swear it is on — so an audit that only asks
+"is it there?" reports it as present. Ask separately whether it *bites*. Four shapes, all seen in the
+field:
+
+| shape | how to catch it |
+|---|---|
+| A ruleset or branch rule at `enforcement: disabled` or `evaluate` | read the `enforcement` field, never just the name |
+| Documentation naming required checks that the ruleset does not contain | diff the documented list against `required_status_checks` |
+| A check that is published but not required | cross-reference emitted job names against the required contexts |
+| A migration left half-done — the rule exists but the default branch is excluded, or the line is commented out pending a rollout | read `conditions.ref_name.include`/`exclude`, and grep config-as-code for commented-out rules |
+
+The tell is a **mismatch between two sources that should agree**: a doc and a ruleset, a comment and a
+condition, a job name and a required context. Whenever a repo states a control in prose *and*
+configures it, compare them — that gap is where the finding is, and it is invisible to any check that
+reads only one side.
+
+Report these as **absent in effect**, and say which two sources disagree. Where a comment shows the
+maintainers already reasoned about it — a staged rollout, a bootstrapping order — it is a **question
+for them, not an accusation**: the loop was left open, which is different from nobody having thought
+about it.
+
 **Then classify every absence in this file into one of four buckets, and use the words:**
 
 - **absent** — the forge supports it, the account can use it, nobody set it up. *A gap the team owns.*

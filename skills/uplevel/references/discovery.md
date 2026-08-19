@@ -8,6 +8,22 @@ Everything else is decoration.
 Search in this order and stop at the first that gives a real answer. Later sources describe intent;
 earlier ones describe what is enforced.
 
+0. **Confirm the gate is even in this repository.** On large projects it frequently is not, and every
+   later step is then measuring the wrong thing. Four shapes seen repeatedly:
+   - **A sibling repo.** The workflow calls a reusable pipeline, or a bot mirrors PRs elsewhere. Follow
+     `uses: <org>/<repo>/.github/workflows/…` and read it — one audit found the sole required check was
+     disarmed by a regex in a *different* repository.
+   - **A merge bot.** `bors`, `homu`, a merge queue, or an `@bot r+` convention. Then GitHub required
+     checks are legitimately **absent as a forge rule** while being strictly enforced elsewhere, and
+     GitHub review objects are empty because approval happens in comments.
+   - **A second CI system.** `.gitlab-ci.yml`, Buildkite, Jenkins, or an internal mirror. Check whether
+     it is namespace- or fork-gated; if it cannot run from this repo, that is **unsupported here**.
+   - **A mirroring bot.** Zero `pull_request:` triggers can still mean full PR coverage, if a bot pushes
+     PR heads to branches the workflows *do* trigger on. Check before reporting an absence.
+
+   A repository with hundreds of thousands of commits and three workflow files is not under-gated; it
+   is gated somewhere you have not looked yet.
+
 1. **CI config** — `.github/workflows/*.yml`, `.gitlab-ci.yml`, `Jenkinsfile`, `.circleci/`, `azure-pipelines.yml`.
    Whatever blocks a merge *is* the gate, whatever the README claims.
 2. **Hooks** — `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`, `.git/hooks/` (local, unshared —

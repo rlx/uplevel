@@ -158,6 +158,13 @@ Then a numbered list the user can pick from — `1, 3, 5` should be a sufficient
 
 Rules for the plan itself:
 
+- **Rank every finding by blast radius, never by tally.** This is not a rule about action pinning; it
+  applies to all of them. The question is always *what can the thing reach* — which credentials, which
+  branch, whose machine, how many users downstream. Ninety mutable refs in comment bots matter less
+  than one on the release path. A hundred workflows missing a timeout matter less than one missing
+  permission check on a job holding a key. A count tells you how much work a fix is, not how much
+  damage it prevents, and reporting the count as the severity inverts the answer often enough to be a
+  habit worth breaking.
 - **Order by damage prevented per unit of effort**, not by what is interesting to build.
 - **Cheapest genuine win first.** If item 1 is a week of work, the plan will not be started.
 - **Separate what is definitely broken from what you would merely prefer.** Never blend a taste
