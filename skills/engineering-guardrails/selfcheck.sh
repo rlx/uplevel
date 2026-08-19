@@ -24,6 +24,32 @@ w=$(wc -w < SKILL.md); tok=$((w * 4 / 3))
 echo "  SKILL.md ≈ $tok tokens (loaded whenever the skill triggers)"
 [ "$tok" -gt 4000 ] && note "SKILL.md is over the 4k budget — it loads on every trigger; move detail into references/"
 
+echo "== shipped commands parse =="
+# bash -n catches shell syntax. It does NOT catch a bad regex -- which is how a
+# PCRE lookahead once shipped inside a grep -E and failed on every repo it ran on.
+blocks=0; pats=0
+tmp="$(mktemp -d)"
+for f in SKILL.md references/*.md; do
+  awk -v d="$tmp" -v base="$(basename "$f")" '
+    /^[ \t]*```(sh|bash)[ \t]*$/ { c=1; n++; out=d "/" base "." n ".sh"; next }
+    /^[ \t]*```[ \t]*$/          { if (c) { close(out); c=0 }; next }
+    c                             { print > out }
+  ' "$f"
+  while IFS= read -r pat; do
+    [ -z "$pat" ] && continue
+    pats=$((pats+1))
+    grep -E "$pat" </dev/null >/dev/null 2>&1
+    [ $? -eq 2 ] && note "invalid extended regex in $f: $pat"
+  done < <(grep -ohE "grep [^|]*-[a-zA-Z]*E[a-zA-Z]* '[^']+'" "$f" | sed -E "s/.*E[a-zA-Z]* '//; s/'$//")
+done
+for b in "$tmp"/*.sh; do
+  [ -e "$b" ] || continue
+  blocks=$((blocks+1))
+  bash -n "$b" 2>/dev/null || note "unparseable shell block: $(basename "$b")"
+done
+rm -rf "$tmp"
+echo "  $blocks shell blocks, $pats extended regexes checked"
+
 echo "== no project-specific leakage =="
 if grep -rniE 'clarus|candor|tendingus|/Users/|~/dev/' --include='*.md' . >/dev/null 2>&1; then
   note "project-specific strings found:"; grep -rniE 'clarus|candor|tendingus|/Users/|~/dev/' --include='*.md' . | head -5
