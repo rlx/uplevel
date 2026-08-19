@@ -2,6 +2,11 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.45.0 — 2026-08-19
+
+- `forge-hygiene.md`: the forge measurements degrade cleanly on a repository with no workflows
+  directory, which is the case the section exists to find.
+
 ## v0.44.0 — 2026-08-19
 
 - `automation.md`: three rules for adding a check — prove it on the case that motivated it, re-prove
