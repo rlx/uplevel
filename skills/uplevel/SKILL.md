@@ -12,7 +12,7 @@ description: >
   project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.32.0
+version: 0.33.0
 ---
 
 # uplevel
@@ -102,8 +102,9 @@ unit tests before integration, `--dry-run` where it exists.
   calls through a CLI the user has already authenticated — `gh api` for rulesets, runs and settings —
   are how the forge audit works and are not what this forbids; the line is writes, spend, and
   deployed environments.*
-- **Additive only.** Create new files; do not restructure, rewrite, or "tidy" existing docs, configs,
-  or code. If an existing doc is wrong, say so in your reply — do not fix it as a side effect.
+- **Additive only.** Add — a new file, or a new section in one that already exists; never
+  restructure, rewrite, reorder, or "tidy" what is there. If an existing doc is wrong, say so in your
+  reply — do not fix it as a side effect.
 - **Document what they do before proposing what they should do.** The first draft describes their
   actual process, in their vocabulary, matching their conventions. Anything you think is missing goes
   in a clearly separated *proposals* list, not smuggled in as if it were current practice.
@@ -112,9 +113,10 @@ unit tests before integration, `--dry-run` where it exists.
 - **Nothing that affects other people without explicit consent.** Branch protection, required checks,
   org or repo settings, CI triggers, hooks that block your teammates' commits, anything that could
   make someone else's merge fail tomorrow morning. Propose these; never apply them.
-- **Where the file goes is their call.** A root `CLAUDE.md` is a claim on shared space. Ask whether
-  they want it committed, kept local (gitignored), or placed alongside their existing agent/contributor
-  docs — and default to leaving it uncommitted until they say.
+- **Where the process document goes is their call**, and where one already exists the usual answer is
+  a section added to it rather than a file of your own — two agent documents drift, and the reader
+  cannot tell which one lost. A root `CLAUDE.md` is a claim on shared space. Ask whether they want it
+  committed or kept local (gitignored), and default to uncommitted until they say.
 - **Handle findings with care.** If discovery turns up an exposed secret, a vulnerability, or customer
   data where it should not be, report it to the user **privately and directly** — never write it into
   the document, a commit message, a PR, or anything published. Say it must be rotated, not just

@@ -247,12 +247,14 @@ Rules for the plan itself:
   else's decision — those are precisely the ones where the denominator decides the order.
 - **Separate what is definitely broken from what you would merely prefer.** Never blend a taste
   preference into a list of fixes; the reader must be able to trust the whole list.
-- **Writing the process document is a plan item only when nothing already fills the role**, and
-  usually something does — an `AGENTS.md`, a `CLAUDE.md`, or a substantial `CONTRIBUTING.md`.
-  Proposing another competes with a better document. It is the right proposal only where what exists
-  is a stub that names none of the project's own commands. Read what
-  exists first; if it covers the ground, say so and propose nothing. When it *is* right, say where the
-  file would live and whether it would be committed.
+- **A process document is three different plan items, and reading what exists decides which.** Most
+  repositories have something — an `AGENTS.md`, a `CLAUDE.md`, a substantial `CONTRIBUTING.md`. If it
+  names the gate command, the branching rule and the path to production, **propose nothing** and say
+  it covers the ground. If it covers part of that, **propose appending the missing sections to it**;
+  a second document competes with the first and the two will drift. Only where nothing exists, or
+  what exists is a stub naming none of the project's own commands, **propose a new file** — and say
+  where it would live and whether it would be committed. `claude-md-template.md` carries the test and
+  the rules for adding to a file you do not own.
 - **Anything affecting other people is flagged as needing a maintainer's decision**, not yours.
 - **Say what you would do first if only one item were picked**, and why.
 - **Cap it at five to seven items.** Put the rest in an appendix. A forty-item plan is a way of not
