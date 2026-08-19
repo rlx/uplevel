@@ -77,17 +77,42 @@ Read the repo's own declarations — never guess a version:
 | `rust-toolchain.toml`, `Gemfile` → `ruby`, `.ruby-version` | Rust, Ruby |
 | the CI workflow's `setup-*` steps and `env:` version pins | what CI actually uses — the authority |
 
-Then compare against what is present (`node --version`, `go version`, …) and classify each:
+### Resolve the tool *inside the repository*, or the comparison is meaningless
+
+**Run every version check with the repository root as the working directory.** In the JS ecosystem —
+and anywhere mise, asdf, direnv, pyenv, or rbenv is in play — the toolchain is a property of the
+directory, not of the machine, and the same shell gives two different answers:
+
+```sh
+cd /tmp && yarn --version        # 1.22.22  — the global install
+cd repo && yarn --version        # 4.12.0   — the version this repo actually uses
+```
+
+Repos routinely **vendor** their package manager and delegate to it: `.yarnrc.yml` with `yarnPath:`
+pointing at a committed `.yarn/releases/yarn-*.cjs`, a corepack shim honouring `packageManager`, a
+`.tool-versions` shim. Yarn Classic reads `yarnPath` and hands over to the vendored binary, so a
+machine with "only yarn 1" runs yarn 4 inside such a repo without anything being installed. **Check for
+these before concluding a tool is missing** — `.yarnrc.yml`, `.yarn/releases/`, `.tool-versions`,
+`.mise.toml`, `.envrc`.
+
+**A global package manager reporting itself current is not evidence that it satisfies the project's
+pin.** The two can be unrelated: yarn's npm `latest` dist-tag is 1.22.22 and always will be — yarn 3
+and 4 are published as `@yarnpkg/cli-dist`, a different package — so `npm view yarn version`,
+`npm outdated -g`, and `brew upgrade` all report "up to date" on a machine four majors behind what the
+repo pins. Only the project's declaration, and the tool as resolved in the project's directory, count.
+
+Then classify each:
 
 - **satisfied** — proceed; the gate is runnable and the hard rule applies in full.
-- **missing** — the tool is absent entirely.
-- **mismatched** — present but the wrong major, or a different package manager than the repo pins.
-  This is the dangerous one: `yarn install` with yarn 1 in a repo pinned to yarn 4 does not fail
-  cleanly, it produces a wrong tree.
+- **missing** — absent, with no vendored release and no shim to resolve it.
+- **mismatched** — resolves in-repo, but to the wrong major. The dangerous one: `yarn install` with
+  yarn 1 against a yarn-4 lockfile does not fail cleanly, it produces a wrong tree.
 
 **A missing or mismatched toolchain is a finding, not a silent excuse.** Say it in the report, by
-name, with the version the repo wants and the version present — and treat it as one of the "could not
-verify" lines, never as grounds for reporting a gate you never ran as though you had.
+name, with the version the repo wants and the version that resolved — and treat it as one of the
+"could not verify" lines, never as grounds for reporting a gate you never ran as though you had.
+Equally: **do not report a mismatch you measured from outside the repo.** That is a false alarm about
+someone's project, and it is the exact error this section exists to prevent.
 
 ### Offer to install, and say what it costs
 
