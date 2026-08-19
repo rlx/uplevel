@@ -12,7 +12,7 @@ description: >
   project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.38.0
+version: 0.39.0
 ---
 
 # uplevel
@@ -219,6 +219,12 @@ These are the rules that prevent damage rather than improve output, so they are 
 
 **Read the mode file first; it names the rest.** In Mode A, `discovery.md`, `forge-hygiene.md`, and
 `checklist.md` are all needed early — read them in one turn rather than one at a time.
+
+**This skill is not free to load.** A full Mode A audit reads most of `references/` — an order of
+magnitude more than this file's own budget — before it has read anything of the user's repository. On
+a large repo that competes with the repository for context, and the failure is silent: you read less
+of *their* code, not less of this. Read the mode file and what it names, not everything.
+`selfcheck.sh` prints the current per-mode figures.
 
 | file | when to read |
 |---|---|

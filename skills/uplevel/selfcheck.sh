@@ -34,6 +34,32 @@ w=$(wc -w < SKILL.md); tok=$((w * 4 / 3))
 echo "  SKILL.md ≈ $tok tokens of 4000 ($((4000 - tok)) left; loaded whenever the skill triggers)"
 [ "$tok" -gt 4000 ] && note "SKILL.md is over the 4k budget — it loads on every trigger; move detail into references/"
 
+# SKILL.md's budget is the entry cost, not the cost. A mode reads its own file
+# and everything that file names, and nothing was measuring that -- so the number
+# people optimized was a seventh of what a Mode A audit actually spends before it
+# has read a line of the user's repository. The failure is silent: the agent
+# reads less of the repo, not less of the skill.
+mode_cost() {
+  label="$1"; shift
+  total=0
+  for f in "$@"; do
+    [ -f "$f" ] || { note "mode-cost list names a missing file: $f"; continue; }
+    total=$((total + $(wc -w < "$f") * 4 / 3))
+  done
+  printf '  %-28s ≈ %6d tokens\n' "$label" "$total"
+}
+mode_cost "Mode A, full audit" SKILL.md references/mode-a-investigate.md references/discovery.md \
+  references/forge-hygiene.md references/checklist.md references/example-output.md \
+  references/destructive-ops.md references/production.md references/automation.md \
+  references/evidence.md
+mode_cost "Mode A + write the doc" SKILL.md references/mode-a-investigate.md references/discovery.md \
+  references/forge-hygiene.md references/checklist.md references/example-output.md \
+  references/destructive-ops.md references/production.md references/automation.md \
+  references/evidence.md references/claude-md-template.md
+mode_cost "Mode B" SKILL.md references/automation.md
+mode_cost "Mode C, check-in" SKILL.md references/mode-c-enforce.md references/evidence.md \
+  references/commit-hygiene.md
+
 echo "== shipped commands parse =="
 # bash -n catches shell syntax. It does NOT catch a bad regex -- which is how a
 # PCRE lookahead once shipped inside a grep -E and failed on every repo it ran on.
