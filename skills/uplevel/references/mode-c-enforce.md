@@ -174,6 +174,12 @@ incident narrative does not. Promote sparingly; a check that fires everywhere an
 costs attention on every audit. And a check the user declined is `retired`, not a finding
 to re-raise at every audit.
 
+### Commit messages and PR bodies
+
+See `commit-hygiene.md`. Say what was done — concise, accurate, simple. Reasoning, alternatives and
+history are context, and context is the author's call: offer it and wait rather than adding it. In a
+public repository the message is a publication, so how you found the problem never goes in.
+
 ### Reporting — claims and evidence
 
 See `evidence.md`. Every status is a promise about evidence, and the next decision — merge,

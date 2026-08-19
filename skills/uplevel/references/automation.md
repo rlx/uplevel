@@ -39,6 +39,12 @@ Order by *damage prevented per hour of setup*. For a service with production iss
    than at first use, in the request path, in production.
 8. **Test coverage of the incident**: for each recent production issue, a test that reproduces it.
 
+**A forge setting often outranks the hook someone was about to write.** The clearest case is commit
+text: a `commit-msg` hook is rung 3 and bypassable, while a squash-merge setting that writes only the
+pull request title is rung 1 — the long body cannot reach the default branch at all. Check what the
+merge actually publishes before building anything to police what precedes it. See
+`commit-hygiene.md`.
+
 ## Automation changes other people's day — get consent
 
 A check is a policy, not a patch. Before adding or tightening one in a repo you do not own:
