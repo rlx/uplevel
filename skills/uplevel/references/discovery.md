@@ -88,8 +88,8 @@ plainly has quietly stopped being worth reading. `evidence.md` covers what to do
 know.
 
 **Look in every component, not just the root.** A polyglot or monorepo declares per part, and a
-root-only check silently finds nothing: memos has *no root `package.json` at all* — Go in `go.mod`,
-pnpm in `web/package.json`. Enumerate before reading:
+root-only check silently finds nothing: one audited repository had *no root `package.json` at all* —
+Go declared in `go.mod`, pnpm in `web/package.json`. Enumerate before reading:
 
 ```sh
 find . -maxdepth 3 \( -name package.json -o -name go.mod -o -name pyproject.toml \
@@ -97,7 +97,7 @@ find . -maxdepth 3 \( -name package.json -o -name go.mod -o -name pyproject.toml
   -not -path '*/node_modules/*' -not -path '*/vendor/*'
 ```
 
-On a monorepo this lists every workspace (22 in cal.com), and most declare nothing. Only the manifests
+On a monorepo this lists every workspace — twenty or more is common — and most declare nothing. Only the manifests
 carrying `packageManager`, `engines`, or a language version matter — filter to those:
 
 ```sh

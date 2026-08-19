@@ -1,9 +1,9 @@
 # What good output looks like
 
-One worked example, **real**: an audit of `hashicorp/terraform` run on 2026-08-19 by an agent with no
-prior context, trimmed to the parts that teach the shape. Every claim was verified against the file or
-API response it rests on. The repository may well have changed since — **read this for shape and tone,
-not as current fact about that project**, and never reuse its items.
+One worked example, drawn from a real audit by an agent with no prior context, trimmed to the parts
+that teach the shape and with identifying details removed. Every claim in the original was verified
+against the file or API response it rested on. **Read this for shape and tone**, never as a finding to
+reuse — the point is the form, and the findings belong to the repository in front of you.
 
 The shape: findings before recommendations, their numbers rather than your standards, absences named
 with the right word, uncertainty marked, deliberate design recognised as such, and a plan short enough
@@ -11,7 +11,7 @@ to be acted on.
 
 ---
 
-## Report — `hashicorp/terraform`
+## Report
 
 **Security: nothing urgent.** What I checked, and what I could not, is under *Could not verify*.
 
@@ -32,10 +32,9 @@ Race Tests, End-to-end Tests, Code Consistency Checks. What I ran and observed:
 - Full `go test ./...` — **not run, unverified.** Tens of minutes on this machine; I judged the cost
   not worth it for an audit, and I will not report a runtime I did not observe.
 
-**What validates a change before `main`.** Ruleset 2007970, `enforcement: active`, requiring Code
-Consistency Checks, End-to-end Tests, Race Tests, Unit Tests and `license/cla`, with
-`current_user_can_bypass: never`. An org ruleset adds a required PR, one approving review and code-owner
-review.
+**What validates a change before `main`.** One ruleset at `enforcement: active`, requiring all four
+check suites plus the contributor-agreement check, with `current_user_can_bypass: never`. An org
+ruleset adds a required PR, one approving review and code-owner review.
 
 **Their own numbers.** 0 of the last 40 merged PRs merged without an approving review. `Quick Checks`
 13/13 green on `main` over the last week. **5 subject-line reverts in the last 1000 commits — 0.5%.**
@@ -44,17 +43,17 @@ This is not a repo that keeps breaking things through process failure.
 ### Findings
 
 **1. The local gate exists as exactly one line, in a CI file, and no contributor doc names it.**
-`checks.yml:154` runs `make fmtcheck importscheck vetcheck copyright generate staticcheck exhaustive
-protobuf`, and "Code Consistency Checks" is a **required** status check. I grepped `CONTRIBUTING.md`,
-`BUILDING.md`, `README.md` and `docs/`: none of those target names appears in any of them. The single
-check most likely to bounce a PR is transcribed nowhere a human would look.
+`checks.yml:154` runs an eight-target `make` line, and the suite it belongs to is a **required**
+status check. I grepped `CONTRIBUTING.md`, `BUILDING.md`, `README.md` and `docs/`: none of those
+target names appears in any of them. The single check most likely to bounce a PR is transcribed
+nowhere a human would look.
 
 **2. `make fmtcheck` is not a check — it rewrites your working tree.** `scripts/gofmtcheck.sh:8` is
 `gofmt_files=$(go fmt ./...)`, and `go fmt` is `gofmt -l -w`: it *writes*. In CI this is harmless on an
 ephemeral checkout, which is exactly why it has survived. *Evidence, from reading the file — I did not
 run it, because it would modify the clone.*
 
-**3. Two rules that look enforced and are not.** Rulesets 2045004 and 2044810 are both
+**3. Two rules that look enforced and are not.** Two further rulesets are both
 `enforcement: evaluate` — they log and never block. One is redundant with an active org ruleset; the
 other asserts that only core team members may create version branches, and **no active ruleset enforces
 that**.

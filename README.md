@@ -67,8 +67,7 @@ undo: `git revert` — one line · needs: —
 Reply with the numbers you want. `if skipped` is there so you can decline an item on purpose rather
 than by omission, and `needs` is there so picking `1, 3` never leaves you half-applied.
 
-Full worked example, from a real audit of `hashicorp/terraform`:
-[`references/example-output.md`](skills/uplevel/references/example-output.md).
+Full worked example: [`references/example-output.md`](skills/uplevel/references/example-output.md).
 
 ## What it covers
 
@@ -80,10 +79,9 @@ Full detail in [`skills/uplevel/README.md`](skills/uplevel/README.md), which shi
 
 ## What it has been tested on
 
-22 public repositories across 9 languages — Angular, Grafana, Symfony, Airflow, Rails, Rust,
-Terraform, Django, Neovim, Redis, five NVIDIA projects and seven others. 19 of those audits were run
-by agents with no prior context, and every headline finding was re-checked against the source file,
-commit or API response it rested on.
+22 public repositories across 9 languages, from single-purpose libraries to monorepos with thousands
+of contributors. 19 of those audits were run by agents with no prior context, and every headline
+finding was re-checked against the source file, commit or API response it rested on.
 
 **Two limits worth knowing before you rely on it.**
 
