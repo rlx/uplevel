@@ -1,6 +1,7 @@
 # Repository checklist. Re-audit as a diff against this file.
 # status: present | absent | unsupported here | unknown | enforced
 audited: 2026-08-19
+visibility: public
 
 checks:
   - id: gate-runs-on-commit
@@ -42,15 +43,28 @@ checks:
       vacuously; the CI guard correctly skipped the local hook check.
 
   - id: branch-protection-required-checks
-    status: unsupported here
-    note: the API returns 403 while the repository is private on a free plan.
-      Becomes available on going public; then require the "Repo gate" check on
-      main. Owner decision.
+    status: enforced
+    by: ruleset "Protect main" (21026886), active, no bypass actors
+    note: requires a pull request, the "Repo gate" check, and branches up to
+      date; blocks force-push and deletion. Verified behaviourally on
+      2026-08-19 - a direct push to main was rejected with both the
+      pull-request and required-status-check rules cited.
 
-  - id: secret-scanning-and-push-protection
-    status: unsupported here
-    note: free on public repositories, unavailable on private ones without
-      Advanced Security. Enable when visibility changes.
+  - id: secret-scanning
+    status: enforced
+    by: repository security settings
+
+  - id: push-protection
+    status: present, unverified
+    by: repository security settings
+    note: reported enabled by the API. A behavioural test was attempted and was
+      inconclusive - the credential values used were vendor-published example
+      keys, which scanners allowlist. Not retried, because any string that would
+      prove the control also looks like a real secret in a public repository.
+
+  - id: dependabot-security-updates
+    status: enforced
+    by: vulnerability alerts + automated security fixes
 
   - id: action-update-automation
     status: enforced
