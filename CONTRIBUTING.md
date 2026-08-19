@@ -56,7 +56,9 @@ path — it degrades when a tool is absent — exercise that too: an unexercised
 becomes vacuous on exactly the machines that needed it, while still reading as green.
 
 A check that searches the tree is *in* the tree. Keep its patterns in a data file, or it will match
-itself and report a defect it invented.
+itself and report a defect it invented. This is not hypothetical and it is not only about the tree:
+the rule that counts *added checks* was first written with its patterns inline, and counted its own
+source lines as two new checks.
 
 **One leak the gate cannot catch, so review has to.** `leak-patterns.txt` matches shapes — home
 directories, drive letters, machine paths. Another project's file paths have no shape to match, and a

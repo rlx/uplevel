@@ -59,16 +59,23 @@ echo "== a new check is recorded in the checklist =="
 # entry. Commit time only, for the same reason the version rule is: "in the same
 # commit" is a question only answerable here.
 staged=$(git diff --cached --name-only 2>/dev/null)
-gates="scripts/check-repo.sh skills/uplevel/selfcheck.sh"
+gates="scripts/check-repo.sh scripts/check-install.sh skills/uplevel/selfcheck.sh"
 if [ -z "$staged" ]; then
   echo "  nothing staged, skipping"
-elif ! printf '%s\n' "$staged" | grep -qE '^(scripts/check-repo\.sh|skills/uplevel/selfcheck\.sh)$'; then
+elif ! printf '%s\n' "$staged" | grep -qE '^(scripts/check-(repo|install)\.sh|skills/uplevel/selfcheck\.sh)$'; then
   echo "  no gate script staged"
 else
+  # Count assertions, not just section headings: a check added inside an existing
+  # section netted zero, which is how the entry for this very rule came to be
+  # written by hand. The signals are a data file, because written inline they
+  # match their own source line.
+  sig="$(mktemp)"
+  grep -vE '^[[:space:]]*(#|$)' scripts/gate-check-signals.txt > "$sig"
   # shellcheck disable=SC2086
-  add=$(git diff --cached -U0 -- $gates | grep -cE '^\+echo "== ')
-  # shellcheck disable=SC2086
-  del=$(git diff --cached -U0 -- $gates | grep -cE '^-echo "== ')
+  d=$(git diff --cached -U0 -- $gates)
+  add=$(printf '%s\n' "$d" | grep '^+' | grep -v '^+++' | sed 's/^.//' | grep -cEf "$sig")
+  del=$(printf '%s\n' "$d" | grep '^-' | grep -v '^---' | sed 's/^.//' | grep -cEf "$sig")
+  rm -f "$sig"
   net=$((add - del))
   if [ "$net" -le 0 ]; then
     echo "  gate script staged, no check added ($add added, $del removed)"
