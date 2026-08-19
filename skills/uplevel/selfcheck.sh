@@ -52,13 +52,28 @@ done
 rm -rf "$tmp"
 echo "  $blocks shell blocks, $pats extended regexes checked"
 
-echo "== no project-specific leakage =="
-if grep -rniE 'clarus|candor|tendingus|/Users/|~/dev/' --include='*.md' . >/dev/null 2>&1; then
-  note "project-specific strings found:"; grep -rniE 'clarus|candor|tendingus|/Users/|~/dev/' --include='*.md' . | head -5
-fi
+echo "== no machine- or project-specific leakage =="
+# Shapes, not known names: a denylist of names you already found catches only
+# that leak. Patterns live in a data file so they cannot match themselves, and
+# .sh is scanned as well as .md -- the previous version scanned only markdown,
+# which is exactly why a leak inside this script went unnoticed.
+leaks=0; scanned=0
+while read -r p; do
+  case "$p" in ''|'#'*) continue;; esac
+  scanned=$((scanned+1))
+  if grep -rniE --include='*.md' --include='*.sh' -- "$p" . >/dev/null 2>&1; then
+    note "machine- or project-specific string found ($p):"
+    grep -rniE --include='*.md' --include='*.sh' -- "$p" . | head -3
+    leaks=$((leaks+1))
+  fi
+done < leak-patterns.txt
+[ "$leaks" = "0" ] && echo "  $scanned leak patterns checked, none present"
 
 echo "== the skill follows its own rules =="
+# Anchored to the sentence that carries the rule, not to a word that appears
+# elsewhere: "advisory" alone also matches an unrelated line about warning-only
+# checks, so the old check passed even with the posture statement deleted.
 grep -q "Never read secret values" SKILL.md || note "the secrets rule is missing"
-grep -q "advisory" SKILL.md || note "the advisory posture is missing"
+grep -q "posture is advisory" SKILL.md || note "the advisory posture is missing"
 
 [ "$fail" = "0" ] && echo "OK" || { echo "FAILED"; exit 1; }

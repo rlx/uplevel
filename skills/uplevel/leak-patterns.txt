@@ -1,0 +1,14 @@
+# Strings that must never ship in this skill: paths and names that belong to one
+# machine or one private project rather than to the skill.
+#
+# Extended regexes, one per line. Blank lines and # comments ignored.
+# Kept out of the scanned set (only *.md and *.sh are scanned) so the list
+# cannot match itself.
+#
+# These are shapes, not a list of known names. A denylist of names you already
+# know about catches only the leak you already found; the leak that matters is
+# the one nobody has thought of yet.
+/Users/
+/home/[a-z]
+C:\\Users\\
+~/(dev|src|code|work|projects|repos)/

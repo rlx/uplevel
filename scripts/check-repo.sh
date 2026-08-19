@@ -14,8 +14,9 @@ while IFS= read -r line; do
   [ -z "$t" ] && continue
   n=$((n+1))
   [ -e "$d/$t" ] || note "$f points at missing $t"
-done < <(git ls-files '*.md' | xargs grep -noE '\]\([^)h][^)]*\)' 2>/dev/null \
-         | sed -E 's/:[0-9]+:\]\(/:/; s/\)$//')
+done < <(git ls-files '*.md' | xargs grep -noE '\]\([^)]+\)' 2>/dev/null \
+         | sed -E 's/:[0-9]+:\]\(/:/; s/\)$//' \
+         | grep -vE ':(https?|mailto):')
 echo "  $n relative links checked"
 
 echo "== commit hook installed =="

@@ -110,7 +110,9 @@ checks:
       200 and silently discards the field - confirmed by sending a bogus value,
       which was also accepted. Not a permissions problem: the same token changed
       an unrelated setting on the same endpoint and the change was observed on
-      re-read. Needs the web UI, Settings > Advanced Security.
+      re-read. A dedicated PUT endpoint was also tried and does not exist for
+      either control, unlike private-vulnerability-reporting which has one.
+      Needs the web UI, Settings > Advanced Security.
     last_checked: 2026-08-19
 
   - id: secret-scanning-validity-checks
@@ -142,6 +144,26 @@ checks:
       this file shipped unparseable - an unquoted "PR #1" started a YAML comment
       mid-value and truncated the block. Nothing read the file, so nothing
       noticed. Multi-line notes now use block scalars. Verified red-then-green.
+    last_checked: 2026-08-19
+
+  - id: private-vulnerability-reporting
+    status: enforced
+    by: repository setting; SECURITY.md directs reporters to it
+    note: >-
+      enabled 2026-08-19 via PUT /repos/{owner}/{repo}/private-vulnerability-reporting,
+      confirmed by re-read. Previously disabled while SECURITY.md instructed
+      researchers to use it - the policy named a channel that did not exist, and
+      its own fallback sent them to a public issue.
+    last_checked: 2026-08-19
+
+  - id: leakage-scan-by-shape
+    status: enforced
+    by: skills/uplevel/selfcheck.sh against skills/uplevel/leak-patterns.txt
+    note: >-
+      scans *.md and *.sh for machine- and project-specific shapes. The previous
+      version was a denylist of known names scanning markdown only, so it could
+      not see the script it lived in. Patterns are held in a data file so they
+      cannot match themselves. Verified red-then-green.
     last_checked: 2026-08-19
 
   - id: codeowners

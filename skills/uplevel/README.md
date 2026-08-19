@@ -54,21 +54,21 @@ broke last quarter, who may deploy) are worth correcting before you choose.
 
 ## Contents
 
-```
-SKILL.md                          the three modes, branching, and the invariants
-references/mode-a-investigate.md  the audit procedure, report shape and plan rules
-references/mode-c-enforce.md      check-in, shipping, hazards, incidents, claims
-references/discovery.md           finding the real gate; toolchain preflight; cleanup
-references/production.md          environments, secrets, deploys, migrations, incidents
-references/forge-hygiene.md       CI triggers, Actions security, protection, releases
-references/checklist.md           the per-repo checklist and how it re-audits as a diff
-references/destructive-ops.md     the stop list, and how to derive a repo's own
-references/automation.md          the enforcement ladder — turning rules into checks
-references/claude-md-template.md  the template the bootstrap fills in
-references/long-runs.md           migrations, backfills, anything measured
-references/evidence.md            wording a completion claim to match the evidence
-references/example-output.md      one worked report and plan
-```
+| file | what it carries |
+|---|---|
+| [`SKILL.md`](SKILL.md) | the three modes, branching, and the invariants |
+| [`references/mode-a-investigate.md`](references/mode-a-investigate.md) | the audit procedure, report shape and plan rules |
+| [`references/mode-c-enforce.md`](references/mode-c-enforce.md) | check-in, shipping, hazards, incidents, claims |
+| [`references/discovery.md`](references/discovery.md) | finding the real gate; toolchain preflight; cleanup |
+| [`references/production.md`](references/production.md) | environments, secrets, deploys, migrations, incidents |
+| [`references/forge-hygiene.md`](references/forge-hygiene.md) | CI triggers, Actions security, protection, releases |
+| [`references/checklist.md`](references/checklist.md) | the per-repo checklist and how it re-audits as a diff |
+| [`references/destructive-ops.md`](references/destructive-ops.md) | the stop list, and how to derive a repo's own |
+| [`references/automation.md`](references/automation.md) | the enforcement ladder — turning rules into checks |
+| [`references/claude-md-template.md`](references/claude-md-template.md) | the template the bootstrap fills in |
+| [`references/long-runs.md`](references/long-runs.md) | migrations, backfills, anything measured |
+| [`references/evidence.md`](references/evidence.md) | wording a completion claim to match the evidence |
+| [`references/example-output.md`](references/example-output.md) | one worked report and plan |
 
 ## Limitations
 
