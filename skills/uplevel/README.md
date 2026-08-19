@@ -1,6 +1,7 @@
 # uplevel
 
-Audits a repository's engineering process and returns a ranked plan to fix it.
+Uplevels a repository's engineering process: finds the process that actually exists, names what is
+missing from it, and returns a ranked plan for raising the floor.
 
 ## What it does
 

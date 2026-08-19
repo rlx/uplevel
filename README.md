@@ -1,18 +1,18 @@
 # uplevel
 
-A Claude Code skill that audits your repository's engineering process and returns a ranked plan to
-fix it.
-
-Most repositories keep their process in people's heads: which command is the real gate, which
-environment a script points at, which operation cannot be undone. That knowledge does not survive a
+**Uplevel your repository's engineering process.** Your repo isn't broken — its process is
+undocumented, unenforced, and living in three people's heads: which command is the real gate, which
+environment a script points at, which operation cannot be undone. That knowledge doesn't survive a
 new joiner, a busy week, or an agent working unattended.
 
-uplevel finds the process that actually exists, writes it down, and names what is missing — no CI on
-pull requests, actions pinned to mutable tags, a check that reports green having run nothing, a
-deploy with no tested rollback. It reports what it verified and marks what it could not.
+Most tools tell you what is wrong. **uplevel tells you what is not there** — no CI on pull requests,
+actions pinned to mutable tags, a check that reports green having run nothing, a deploy with no tested
+rollback. Absence is the finding nothing else surfaces, because a missing control produces no error to
+detect. It reports what it verified and marks what it could not.
 
-Then it hands back a numbered plan. Every item says what it prevents, what it costs, who it affects,
-and how to undo it, ordered by damage prevented per unit of effort. Reply with the numbers you want.
+Then it hands back a numbered plan: what each item prevents, what skipping it costs, the effort in
+maintainer-hours, who it affects, how to undo it, and what it depends on. Reply with the numbers you
+want.
 
 It changes nothing until you pick. Anything that could fail a colleague's merge — branch protection,
 required checks, shared hooks — is proposed for a maintainer, never applied.
@@ -94,10 +94,14 @@ and they are also the parts it argues matter most. If your process problem is a 
 watched, this has not yet been tested on your case.
 
 The three modes are unevenly proven. Investigation and enforcement each have 22 repositories behind
-them; automation has four. The enforcement runs asked for a real change in each repository — a
-migration, a public API addition, a release-path check — and only six of the 22 could run the
-project's own gate, the rest lacking a toolchain. That is the ordinary condition, and the reports say
-so rather than substituting a command that happened to run.
+them; automation has four.
+
+**Only six of those 22 checkouts could run the project's own gate** — the rest were missing a package
+manager, a compiler, or a vendored toolchain. That is the ordinary condition of a repo you have just
+cloned, and it is the case the skill is built for: it says which commands it ran, names what is
+missing, and marks the rest unverified rather than substituting a neighbouring command that happened
+to succeed. A tool that only works on a fully provisioned machine would have reported green on
+sixteen repositories it never built.
 
 ## Development
 
