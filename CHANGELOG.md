@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.41.0 — 2026-08-19
+
+- `forge-hygiene.md`: commands for the trigger census, the pinning census and the workflow file
+  count, calibrated against ten large repositories.
+- `forge-hygiene.md`: `on:` parses as a YAML boolean, so a parser looking for `"on"` reports zero
+  triggers everywhere.
+
 ## v0.40.0 — 2026-08-19
 
 - `forge-hygiene.md`: `gh` not being installed, and which half of the forge audit still works without it.
