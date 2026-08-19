@@ -8,7 +8,11 @@ in the same way a wrong line of code is. Most of what follows exists to keep tha
 ```sh
 ./scripts/install-hooks.sh   # once, after cloning
 ./scripts/check-repo.sh      # the gate; runs on every commit and in CI
+./scripts/check-install.sh   # only if you touched README.md's install section
 ```
+
+`check-install.sh` extracts the install commands from `README.md` and runs them against a clean
+`HOME`. It takes about two seconds, so CI runs it on every change and the commit hook does not.
 
 The gate takes well under a second. If it fails it names what to fix. Bypass it with
 `git commit --no-verify` only when you know why, and say so in the pull request.
@@ -51,7 +55,18 @@ itself and report a defect it invented.
 
 ## Commits and pull requests
 
-State what changed and why in the code's own terms. Keep it concise; no AI attribution.
+**Say what was done.** Concise, accurate, simple. Most changes need only a subject line. No AI
+attribution.
+
+**Anything beyond what was done needs approval first.** Reasoning, alternatives, what a change
+supersedes — that is context. Offer it and wait; do not add it unasked.
+
+Never include how you found it: which command surfaced the bug, which API returned what, what a past
+commit got wrong, how a check was proven able to fail. That is working-notes material, and this
+repository is public.
+
+Squash merge writes only the pull request title into `main`. Pull request bodies follow the same rule
+and can be edited after merge; a commit message cannot.
 
 ## Scope
 

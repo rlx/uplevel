@@ -29,3 +29,8 @@ jobs:
           persist-credentials: false
       - name: scripts/check-repo.sh
         run: ./scripts/check-repo.sh
+      - name: scripts/check-install.sh
+        # A step in this job rather than a job of its own, so it is covered by
+        # the required status check that already exists. Too slow for the commit
+        # hook at ~2s; run it by hand when touching the install section.
+        run: ./scripts/check-install.sh

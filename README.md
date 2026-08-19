@@ -28,11 +28,16 @@ the clone. Linking means the working tree *is* the installed skill — `git pull
 moving or deleting the clone breaks it. To copy instead, so the install survives the clone:
 
 ```sh
+mkdir -p ~/.claude/skills
+rm -rf ~/.claude/skills/uplevel
 cp -R skills/uplevel ~/.claude/skills/uplevel
 ```
 
-Name the destination explicitly there too. `cp -R skills/uplevel ~/.claude/skills/` works the first
-time and nests a copy inside itself the second.
+The `rm -rf` is what makes it repeatable, and it is why the destination is named explicitly on both
+lines. `cp -R` into a path that already exists copies *into* it, so re-running without the removal
+nests a copy inside the install — and so does `cp -R skills/uplevel ~/.claude/skills/`, which works
+the first time and nests the second. Updating a copy install means running the block again, so this
+is the second run, every time.
 
 Restart Claude Code. The skill is then available as `/uplevel`. For a single project, copy it into
 that repo's `.claude/skills/` and commit it.
