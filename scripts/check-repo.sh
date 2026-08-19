@@ -37,10 +37,13 @@ echo "== skill version bumped with skill changes =="
 # The rule lives in references/mode-c-enforce.md: bump the version marker in the
 # same commit as the change it invalidates. Enforced at commit time, which is the
 # only point where "same commit" is a question that can be answered.
+# Everything under skills/uplevel/ ships, not only SKILL.md and references/ --
+# the shipped README, the selfcheck and its data files reach an installed copy
+# too, and a version that does not move cannot identify what someone installed.
 staged=$(git diff --cached --name-only 2>/dev/null)
 if [ -z "$staged" ]; then
   echo "  nothing staged, skipping"
-elif ! printf '%s\n' "$staged" | grep -qE '^skills/uplevel/(SKILL\.md|references/)'; then
+elif ! printf '%s\n' "$staged" | grep -qE '^skills/uplevel/'; then
   echo "  no skill content staged"
 elif git diff --cached -U0 -- skills/uplevel/SKILL.md | grep -q '^+version:'; then
   echo "  skill content changed, version bumped"

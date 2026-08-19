@@ -30,18 +30,37 @@ keep backfills resumable, and report results honestly.
 
 ## Install
 
-From the repository root:
+**These commands run from a clone of the repository**, not from an installed copy of the skill:
 
 ```sh
-# personal — available in every project
-mkdir -p ~/.claude/skills && cp -R skills/uplevel ~/.claude/skills/uplevel
-
-# project — checked in, shared with the team
-mkdir -p .claude/skills && cp -R skills/uplevel .claude/skills/uplevel
+git clone https://github.com/rlx/uplevel.git
+cd uplevel
 ```
 
-Name the destination explicitly: `cp -R skills/uplevel ~/.claude/skills/` works the first time and
-nests a copy inside itself the second. Restart Claude Code; the skill is then available as `/uplevel`.
+Personal — available in every project:
+
+```sh
+mkdir -p ~/.claude/skills
+rm -rf ~/.claude/skills/uplevel
+cp -R skills/uplevel ~/.claude/skills/uplevel
+```
+
+Project — checked in, shared with the team:
+
+```sh
+mkdir -p .claude/skills
+rm -rf .claude/skills/uplevel
+cp -R skills/uplevel .claude/skills/uplevel
+```
+
+The `rm -rf` is what makes both repeatable, and updating a copy install means running the block
+again. `cp -R` into a path that already exists copies *into* it, so without the removal the second run
+nests a copy inside the install — and naming the destination explicitly does not prevent that, only
+the removal does.
+
+To link rather than copy, so that `git pull` updates the install, see
+[the repository README](https://github.com/rlx/uplevel#install). Restart Claude Code; the skill is
+then available as `/uplevel`.
 
 ## Use
 
@@ -81,6 +100,10 @@ broke last quarter, who may deploy) are worth correcting before you choose.
 - **It does not measure its own effect.** Nothing re-checks incident rate after a plan is applied.
 - **Plans assume a primary gate.** A repository with several independent pipelines gets a plan
   weighted toward one of them.
+- **The forge audit is GitHub-first.** CI triggers, Actions supply chain, rulesets, repository
+  settings and releases are read through `gh`. GitLab, Bitbucket, Forgejo and Gitea have equivalents
+  for nearly all of it, and the skill establishes what the forge can do before auditing — but on a
+  non-GitHub host it will name those checks rather than run them.
 - **Absent domains**: disaster recovery and restore testing, API and client backwards compatibility,
   feature-flag lifecycle, runtime cost regressions, clock and timezone failures.
 
@@ -89,5 +112,5 @@ Run `selfcheck.sh` for the structural checks it enforces on itself.
 ## Scope
 
 Language-, stack- and deployment-agnostic, weighted toward services that run somewhere and can page
-someone. Sections that do not apply are meant to be deleted; a small library's `CLAUDE.md` should
+someone. The forge audit assumes GitHub; see *Limitations*. Sections that do not apply are meant to be deleted; a small library's `CLAUDE.md` should
 come out a few lines long.
