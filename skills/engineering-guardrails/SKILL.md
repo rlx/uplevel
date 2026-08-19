@@ -11,7 +11,7 @@ description: >
   environment or production data, before running migrations or backfills, and during an incident.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.8.0
+version: 0.9.0
 ---
 
 # Engineering guardrails
@@ -175,6 +175,11 @@ unverified command against a deployed environment to find out what it does.**
    - a knowable deployed commit, a deploy gate, a tested rollback, a post-deploy smoke test
    - `CODEOWNERS`, PR template, `CONTRIBUTING.md`, `SECURITY.md`
    - one command that takes a newcomer to a passing test run
+   - coverage measured on **changed** lines rather than a global percentage; a flaky-test policy that
+     is not blanket retries
+   - a signal that would visibly change if this service broke — and someone who knows where it is
+   - the deploy-time questions: is an incident open, is anyone on call to watch, does this change
+     touch code that has caused an incident before
 
    Then **propose additions specific to this repo** — from incidents and reverts since the last audit,
    near misses, a repeated review comment, whatever a reviewer had to explain by hand on a newcomer's

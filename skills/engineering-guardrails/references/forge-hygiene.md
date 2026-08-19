@@ -114,10 +114,46 @@ are reverted. **A team that argues with a recommendation rarely argues with its 
 - **Release built from a dirty or unpinned toolchain**, so the artifact cannot be reproduced.
 - **No freeze or ownership convention** for risky periods, if the team wants one.
 
-## 5. Repository basics
+## 5. Deploy-time risk — what is true *right now*
+
+Distinct from everything above: those ask whether the pipeline is sound, these ask whether **this
+change, at this moment** should go out. Cheap to check, and the ecosystem's incident tooling covers
+them precisely because they keep causing outages.
+
+- **Is an incident open on this service?** Shipping during an ongoing incident adds a variable to a
+  system somebody is already debugging, and muddles the timeline they will use to diagnose it.
+- **Is anyone watching?** An on-call handoff minutes away, or a gap in the rotation, means the change
+  lands with nobody who knows about it looking. Deploying into that is a choice, not a default.
+- **Has this code hurt before?** The revert and hotfix history already tells you which files are
+  incident-prone; a change touching them deserves more care than its diff size suggests. This is the
+  highest-value warning available from data every repo already has.
+- **Can you see it work?** Not "is there a dashboard" — is there a signal that would *change* if this
+  specific thing broke, and does anyone know where it is? Watching after a deploy is worthless if
+  nothing observable moves.
+- **Does the service shed load and drain gracefully?** Requests dropped mid-deploy are invisible,
+  constant, and fixable — and almost nobody checks until a customer reports it.
+
+## 6. Tests, and what they are actually measuring
+
+- **Coverage on changed lines, not global percentage.** A repo-wide number is a bad gate: it barely
+  moves, so it never blocks anything, and it punishes people who touch large old files. Coverage of
+  *new and modified* code is the version that changes behaviour.
+- **Do the tests exercise the path a real request takes**, or only units around it?
+- **Flaky-test policy**: quarantine with an owner and a deadline. Blanket retries convert real
+  intermittent bugs into invisible ones.
+- **Load and chaos testing** — usually absent, and often reasonably so. Name it as a deliberate
+  decision rather than leave it unmentioned, so nobody assumes it happened.
+- **A structured security lens** (OWASP Top 10, STRIDE) beats ad-hoc "check security", especially for
+  a first pass on unfamiliar code.
+
+## 7. Repository basics
 
 Cheap, and their absence is usually a symptom rather than the disease:
 
+- **SLOs and an error budget**, if reliability is contested. It is the mechanism that decides whether
+  the next sprint is features or fixes, and its absence is why that argument recurs monthly.
+- **Conventional commits** — only where the repo already trends that way; it automates changelog and
+  version selection. Never impose it on a log that reads otherwise.
 - `CONTRIBUTING.md` (how to propose a change), `CODEOWNERS`, a PR template that asks for test evidence
   and a rollback note, `SECURITY.md` (where to report a vulnerability), `LICENSE`.
 - `.gitignore` gaps — committed build output, `.env` files, credentials, large binaries in history.

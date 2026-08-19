@@ -75,7 +75,11 @@ Then:
    you did not watch is a deploy someone else will discover.
 4. **Deploy one change at a time** when it matters. Bundled deploys make attribution impossible exactly
    when you need it most.
-5. **Do not deploy what you cannot watch** — end of day, before being away, during a freeze — unless it
+5. **Check what is true right now before shipping**: is an incident already open on this service, is
+   an on-call handoff imminent or the rotation short-staffed, and does this change touch code that has
+   caused an incident before? All three are answerable in a minute from the repo and the incident
+   channel, and all three change the answer to "should this go out now".
+6. **Do not deploy what you cannot watch** — end of day, before being away, during a freeze — unless it
    is fixing something already broken.
 
 ---
@@ -116,6 +120,8 @@ Changes that touch production should leave it easier to operate, not harder:
   exist; idempotent handling is the substitute.
 - **Bound everything that can grow**: queries without `LIMIT`, unpaginated endpoints, unbounded queues
   and in-memory caches. These are fine until the day the data grows, and then they are an outage.
+- **Graceful shutdown**: drain in-flight requests and deregister from the load balancer before exit,
+  or every deploy drops a handful of requests — invisible in aggregate, and a real user each time.
 - **Alert on symptoms users feel** (error rate, latency, queue age), not on causes (CPU). An alert
   nobody acts on should be deleted — a noisy alert trains people to ignore the real one.
 

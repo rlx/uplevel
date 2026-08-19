@@ -88,6 +88,14 @@ Promotion from a repo's checklist into the shared seed is gated on one question:
 make sense in a repo that shares none of this one's code, team, or stack?* Promote sparingly and
 sanitize the origin — the check travels, the incident narrative stays home.
 
+## Prior art
+
+Surveyed 2026-08-19 against 344 public Claude Code skills. The ecosystem covers incident response and
+deploy-time risk well; **CI and forge governance is near-absent** — across those 344 skills, zero
+mention `pull_request_target`, required status checks, action SHA-pinning, or secret scanning. That
+gap is what this skill is for. Full survey, including the checks it borrowed back, in
+`research/prior-art.md` of the source repository.
+
 ## Scope
 
 Language-, stack-, and deployment-agnostic; weighted toward services that run somewhere and can page
