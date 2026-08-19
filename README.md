@@ -1,21 +1,18 @@
 # uplevel
 
 **Uplevel your repository's engineering process.** Your repo isn't broken — its process is
-undocumented, unenforced, and living in three people's heads: which command is the real gate, which
-environment a script points at, which operation cannot be undone. That knowledge doesn't survive a
-new joiner, a busy week, or an agent working unattended.
+undocumented, unenforced, and living in three people's heads. That knowledge doesn't survive a new
+joiner, a busy week, or an agent working unattended.
 
-Most tools tell you what is wrong. **uplevel tells you what is not there** — no CI on pull requests,
-actions pinned to mutable tags, a check that reports green having run nothing, a deploy with no tested
-rollback. Absence is the finding nothing else surfaces, because a missing control produces no error to
-detect. It reports what it verified and marks what it could not.
+Most tools tell you what is wrong. **uplevel tells you what is not there** — no CI on pull
+requests, or a check that reports green having run nothing. Absence is the finding nothing else
+surfaces, because a missing control produces no error to detect. It reports what it verified and
+marks what it could not.
 
-Then it hands back a numbered plan: what each item prevents, what skipping it costs, the effort in
-maintainer-hours, who it affects, how to undo it, and what it depends on. Reply with the numbers you
-want.
+Then it hands back a numbered plan, reply with the numbers you want upleveled.
 
-It changes nothing until you pick. Anything that could fail a colleague's merge — branch protection,
-required checks, shared hooks — is proposed for a maintainer, never applied.
+It changes nothing until you pick. Anything that could fail a colleague's merge is proposed, never
+applied.
 
 ## Install
 
@@ -27,8 +24,8 @@ ln -sfn "$PWD/skills/uplevel" ~/.claude/skills/uplevel
 ```
 
 `-sfn` matters: without it, a second run follows the existing link and creates a nested copy inside
-the clone. Linking means the working tree *is* the installed skill — `git pull` updates it, and moving
-or deleting the clone breaks it. To copy instead, so the install survives the clone:
+the clone. Linking means the working tree *is* the installed skill — `git pull` updates it, and
+moving or deleting the clone breaks it. To copy instead, so the install survives the clone:
 
 ```sh
 cp -R skills/uplevel ~/.claude/skills/uplevel
@@ -76,30 +73,6 @@ branch protection, release and deploy gates, destructive operations, migrations 
 how completion is claimed.
 
 Full detail in [`skills/uplevel/README.md`](skills/uplevel/README.md), which ships with the skill.
-
-## What it has been tested on
-
-22 public repositories across 9 languages, from single-purpose libraries to monorepos with thousands
-of contributors. 19 of those audits were run by agents with no prior context, and every headline
-finding was re-checked against the source file, commit or API response it rested on.
-
-**Two limits worth knowing before you rely on it.**
-
-Every repository tested was mature, public, and multi-contributor. **None had a deployed service, a
-production database, or an on-call rotation the audit could observe** — so the parts of this skill
-that deal with deploys, migrations against real data, and environment safety are the least exercised,
-and they are also the parts it argues matter most. If your process problem is a Friday deploy nobody
-watched, this has not yet been tested on your case.
-
-The three modes are unevenly proven. Investigation and enforcement each have 22 repositories behind
-them; automation has four.
-
-**Only six of those 22 checkouts could run the project's own gate** — the rest were missing a package
-manager, a compiler, or a vendored toolchain. That is the ordinary condition of a repo you have just
-cloned, and it is the case the skill is built for: it says which commands it ran, names what is
-missing, and marks the rest unverified rather than substituting a neighbouring command that happened
-to succeed. A tool that only works on a fully provisioned machine would have reported green on
-sixteen repositories it never built.
 
 ## Development
 
