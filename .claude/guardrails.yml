@@ -34,18 +34,29 @@ checks:
     origin: hooks are untracked, so a fresh clone starts with no gate at all
 
   - id: ci-on-pull-request
-    status: unsupported here
-    note: no git remote is configured, so there is no forge to host CI. Not a gap
-      this repo can close by configuring; revisit if it is ever pushed.
+    status: present, unverified
+    by: .github/workflows/check.yml -> scripts/check-repo.sh
+    note: the workflow is written and audited against forge-hygiene (SHA-pinned,
+      permissions {}, concurrency, timeout, persist-credentials false) but has
+      NEVER EXECUTED -- there is still no remote. It becomes verified on the
+      first run after the repo is pushed, not before.
 
   - id: branch-protection-required-checks
     status: unsupported here
-    note: same reason as above.
+    note: no remote yet. On publishing, ask a maintainer to require the "Repo
+      gate" check on main. Owner decision, not ours to apply.
 
   - id: licence
-    status: absent
-    note: README carries install instructions that cannot lawfully be followed
-      without one. Owner's decision, open.
+    status: present
+    by: LICENSE — MIT, (c) 2026 Lior Rudnik and Tracey Mercer
+    origin: audit 2026-08-18 — README shipped install instructions that could
+      not lawfully be followed
+
+  - id: hook-check-skipped-in-ci
+    status: enforced
+    by: scripts/check-repo.sh — CI env var guard
+    origin: the hook check would have made CI red on its first run, since
+      runners have no git hooks. Verified in both directions.
 
   - id: selfcheck-covers-research-docs
     status: partial

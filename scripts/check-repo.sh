@@ -19,7 +19,9 @@ done < <(git ls-files '*.md' | xargs grep -noE '\]\([^)h][^)]*\)' 2>/dev/null \
 echo "  $n relative links checked"
 
 echo "== commit hook installed =="
-if [ -d .git ]; then
+if [ -n "${CI:-}" ]; then
+  echo "  CI run — hooks are a local concern, skipping"
+elif [ -d .git ]; then
   if [ -x .git/hooks/pre-commit ]; then
     cmp -s .git/hooks/pre-commit scripts/hooks/pre-commit \
       || note "the installed pre-commit hook differs from scripts/hooks/pre-commit — rerun scripts/install-hooks.sh"

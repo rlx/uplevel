@@ -34,3 +34,16 @@ research/                        evidence behind the design: prior-art survey, g
 
 `research/corpus/` is gitignored — it holds shallow clones of other people's skill repos used for
 the survey, and is reproducible from `research/prior-art.md`.
+
+## Contributing
+
+```sh
+./scripts/install-hooks.sh   # after a fresh clone — hooks are not tracked by git
+./scripts/check-repo.sh      # the gate; also runs on every commit and in CI
+```
+
+See [`CLAUDE.md`](CLAUDE.md) for what a session here needs to know that the code does not say.
+
+## License
+
+MIT — see [`LICENSE`](LICENSE). Copyright (c) 2026 Lior Rudnik and Tracey Mercer.
