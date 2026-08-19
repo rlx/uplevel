@@ -75,6 +75,30 @@ Look for these before quoting a pass:
   the finding is *flaky*, not *passing*. Sampling until you like the answer is not verification, and
   reporting the third run alone is how intermittent bugs become invisible ones.
 
+## Red, and meaning nothing
+
+The mirror of the section above, and the one that inflates audit findings rather than hiding them. A
+failed run is not a finding until you have **read the step that failed**. Several things go red
+without saying anything about the repository:
+
+- **The checkout never happened.** A deleted or renamed repo, a revoked token, a submodule the runner
+  cannot reach. The gate did not run; there is no result to report either way.
+- **Infrastructure.** A runner died, the registry timed out, a network fetch failed. Re-running is the
+  diagnosis, not a workaround.
+- **Superseded.** A `cancelled` run is usually the concurrency group doing its job when a newer commit
+  arrived. Counting cancellations as failures makes a healthy repo look broken.
+- **A different job than the one you mean.** A "CI is 30% red" figure computed across every workflow
+  can be dominated by one always-failing nightly, or diluted by a trigger job that structurally cannot
+  fail. Compute the rate over the jobs that actually gate a merge, and say which those are.
+- **Stale.** A red run from before the fix, still the newest on that branch because nothing has pushed
+  since.
+
+**A failure rate is a number the team will be asked to react to**, so being wrong in the alarming
+direction costs the room in the first minute. Before quoting one: name the workflow and job, open at
+least the most recent failure and the oldest, and say what the failing step was. If the answer is
+"checkout" or "runner", it belongs in a footnote about CI reliability, not in a finding about the
+repository's engineering process.
+
 ## When the project's gate cannot run
 
 This is the normal case, not the exception — assume you will land in a repo whose gate you cannot

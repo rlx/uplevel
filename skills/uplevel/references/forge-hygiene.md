@@ -84,6 +84,22 @@ field:
 | Documentation naming required checks that the ruleset does not contain | diff the documented list against `required_status_checks` |
 | A check that is published but not required | cross-reference emitted job names against the required contexts |
 | A migration left half-done — the rule exists but the default branch is excluded, or the line is commented out pending a rollout | read `conditions.ref_name.include`/`exclude`, and grep config-as-code for commented-out rules |
+| A `SECURITY.md` naming a reporting channel that is switched off | ask the API whether the channel exists, below |
+
+**The security policy is the one document whose accuracy is load-bearing for a stranger.** A
+`SECURITY.md` that says "use the Security tab and choose *Report a vulnerability*" is wrong if private
+reporting is disabled: the researcher finds no such button, and the policy's own fallback then sends
+them to a public issue — publishing the vulnerability, which is the single outcome the file exists to
+prevent. Check it rather than reading it:
+
+```sh
+gh api repos/OWNER/REPO/private-vulnerability-reporting --jq '.enabled'
+```
+
+`true` or `false`, and a repo with no `SECURITY.md` at all is a smaller problem than one with a policy
+that misdirects. If the file names an email address or a form instead, say that you could not verify
+it — an address is not checkable from here, and claiming otherwise is the shape of finding this
+section exists to catch.
 
 The tell is a **mismatch between two sources that should agree**: a doc and a ruleset, a comment and a
 condition, a job name and a required context. Whenever a repo states a control in prose *and*
