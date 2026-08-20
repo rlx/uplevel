@@ -68,6 +68,24 @@ advantage over a commit message is that it stays editable after merge, so it is 
 context can be added later without rewriting history — and only if the forge is not configured to
 copy it into the commit.
 
+## Write the body to a file, not through the shell
+
+A pull request body is prose full of backticks, and a backtick is command substitution. Passing one as
+a shell argument runs the contents and publishes the wreckage — the words vanish and what is left
+still reads as a sentence, so nothing looks wrong:
+
+```sh
+cat > /tmp/body.md <<'BODY'
+A field that is `null` inside a `200` is unknown, not absent.
+BODY
+gh pr create --body-file /tmp/body.md
+```
+
+Written as `--body "... `null` inside a `200` ..."` that sentence publishes as *"A field that is
+inside a is unknown"*, and the shell reports `command not found: null` after the pull request has
+already been created. **Read back what you published**, whatever route you used; the failure is
+silent by construction, and a body is durable text held to the same standard as the commit.
+
 ## The forge settings that undo all of it
 
 Per-commit discipline is worthless if the merge writes something else into history. Establish what

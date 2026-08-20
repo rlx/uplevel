@@ -2,6 +2,11 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.47.0 — 2026-08-19
+
+- `commit-hygiene.md`: write a pull request body to a file. Passed as a shell argument, backticked
+  text is run as command substitution and the words are silently published as nothing.
+
 ## v0.46.0 — 2026-08-19
 
 - `mode-a-investigate.md`: establish what kind of repository this is before the audit is weighted —
