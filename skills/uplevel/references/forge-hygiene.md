@@ -1,29 +1,28 @@
 # Repository, CI, and release hygiene
 
-Written GitHub-first because that is the common case; GitLab/Bitbucket/Forgejo have equivalents for
-nearly all of it. **Everything here is read-only to discover and a proposal to change.** Settings that
-affect other people are never yours to apply.
+Written GitHub-first; GitLab/Bitbucket/Forgejo have equivalents for nearly all of it. **Everything here
+is read-only to discover and a proposal to change.** Settings that affect other people are never yours
+to apply.
 
-**This is the seed, not the whole list.** What follows applies to nearly any repository. A given repo
-then grows its own checks from its own incidents — see `checklist.md` for how that list is stored,
-extended, and re-audited as a diff. Never write repo-specific checks back into this file: it is shared
-by every project the skill is used on.
+**This is the seed, not the whole list.** What follows applies to nearly any repository; a repo then
+grows its own checks from its own incidents — see `checklist.md` for how that list is stored, extended,
+and re-audited as a diff. Never write repo-specific checks back into this file: it is shared by every
+project the skill is used on.
 
-**Absence is a finding.** Most of this file is a list of things that should exist. In a repo with
-recurring production issues, the highest-value findings are usually the missing ones — no CI on pull
-requests, no required checks, no rollback, no dependency updates. Say so explicitly, by name. "There is
-no workflow that runs on `pull_request`, so nothing validates a change before it reaches `main`" is a
-finding. Silence about it reads as approval.
+**Absence is a finding.** Most of this file lists things that should exist, and in a repo with
+recurring production issues the highest-value findings are usually the missing ones — no CI on pull
+requests, no required checks, no rollback, no dependency updates. Say so by name. "There is no workflow
+that runs on `pull_request`, so nothing validates a change before it reaches `main`" is a finding.
+Silence about it reads as approval.
 
 ---
 
 ## 0. What this environment can even do — establish before auditing anything
 
 **Run this first.** Every check below assumes a forge that offers the feature and an account permitted
-to use it. That assumption is often false, and when it is, the whole audit misreads: a repo with no
-Actions workflows because Actions are *unavailable here* is a completely different finding from one
-that simply never set them up, and proposing "add a `pull_request` workflow" to the first is advice
-that cannot be taken.
+to use it. That assumption is often false, and then the whole audit misreads: a repo with no Actions
+workflows because Actions are *unavailable here* is a different finding from one that never set them
+up, and proposing "add a `pull_request` workflow" to the first is advice that cannot be taken.
 
 Discover, read-only:
 
@@ -43,12 +42,12 @@ on a branch that does not exist.
 
 **Query rulesets before branch protection.** Rulesets are the current mechanism and, unlike the legacy
 protection endpoint, `GET /repos/{o}/{r}/rulesets` and the per-ruleset detail are **readable with plain
-READ access**. That single call often converts the audit's most consequential line from *unknown* to a
-verified answer. Then check two things beyond existence:
+READ access** — often converting the audit's most consequential line from *unknown* to a verified
+answer. Then check two things beyond existence:
 
 - **`enforcement`** — `active` or `disabled`. A ruleset with `enforcement: disabled` is a control that
-  looks real in the settings UI and stops nothing. That is a finding, and it is invisible if you only
-  check whether a ruleset exists.
+  looks real in the settings UI and stops nothing — a finding, and invisible if you only check whether
+  a ruleset exists.
 - **`bypass_actors`** — a required check that an admin, app, or team can bypass is a different
   guarantee from one nobody can. An empty list is worth stating.
 
@@ -74,12 +73,12 @@ Read the failures as data — they are the answer, not an error:
 | protection endpoint 404 | **ambiguous** — GitHub returns 404 rather than 403 to avoid disclosing existence, and also returns it for a branch that does not exist | **unknown**, unless `viewerPermission` is `ADMIN` *and* the branch exists — only then is it *absent* |
 | self-hosted forge with no runners registered | CI is defined and never executes | worse than absent; the badge lies |
 
-**Without `gh`, most of this file still works.** The distinction is *on disk* versus *settings*, and
-it is worth stating in the report rather than abandoning the section:
+**Without `gh`, most of this file still works.** The distinction is *on disk* versus *settings*; state
+it in the report rather than abandoning the section:
 
 - **Still auditable** — everything in `.github/workflows/`: triggers, `permissions:` blocks, action
-  pinning and mutable tags, `timeout-minutes`, `concurrency`, fork-PR trigger choice. That is
-  sections 1 and 2 nearly in full, and it is where most workflow findings live anyway.
+  pinning and mutable tags, `timeout-minutes`, `concurrency`, fork-PR trigger choice. That is sections
+  1 and 2 nearly in full, where most workflow findings live anyway.
 - **Needs `gh`** — rulesets and branch protection, repository and Actions settings, secret scanning,
   code scanning, run history and review statistics. Sections 1b and 3, and the *their own numbers*
   evidence throughout.
@@ -104,11 +103,10 @@ that has never seen one. Read `.gitlab-ci.yml` and translate:
 | untrusted code from a fork running in CI | fork-PR approval policy | fork merge-request pipelines, plus whether the job holds `CI_REGISTRY_PASSWORD` or `CI_JOB_TOKEN` |
 
 **`allow_failure: true` is the single highest-value grep on a GitLab repository.** It is the exact
-analogue of `continue-on-error` — the job reports, the pipeline stays green, and the badge agrees.
-On one audited GitLab project the lint job carried it
-and **had failed on the last three pipelines while all three reported success**, with two reproducible
-formatting violations sitting on the default branch behind a green badge. Grep for it before
-concluding a pipeline gates anything:
+analogue of `continue-on-error`: the job reports and the pipeline stays green. On one audited GitLab
+project the lint job carried it and **had failed on the last three pipelines while all three reported
+success**, with two reproducible formatting violations sitting on the default branch behind a green
+badge. Grep for it before concluding a pipeline gates anything:
 
 ```sh
 grep -rn 'allow_failure' .gitlab-ci.yml .gitlab/ 2>/dev/null
@@ -117,11 +115,11 @@ grep -rn 'allow_failure' .gitlab-ci.yml .gitlab/ 2>/dev/null
 **Fork merge requests deserve the same question as fork pull requests**, and the blast-radius rule
 below applies unchanged: judge them by what the job can reach. A job that builds a contributor-authored
 `Dockerfile` while holding a registry password is the GitLab shape of the finding, and the setting that
-governs it lives in project settings — so without API access it is **unknown**, never absent.
+governs it lives in project settings.
 
-**`include: remote:` and an unpinned `component:` are the supply-chain finding here**, and they are
-the analogue of a mutable `uses:` tag. A real project's file carried four includes — three vendor
-templates and one component pinned to a version — which is the shape to look for.
+**`include: remote:` and an unpinned `component:` are the supply-chain finding here**, the analogue of
+a mutable `uses:` tag. A real project's file carried four includes — three vendor templates and one
+component pinned to a version — which is the shape to look for.
 
 **Settings live in the project's UI and API, not the file**, exactly as on GitHub: approval rules,
 protected branches and `CI_JOB_TOKEN` scope are invisible to a clone. Without API access they are
@@ -130,9 +128,8 @@ protected branches and `CI_JOB_TOKEN` scope are invisible to a clone. Without AP
 ### Check what is configured against what is enforced
 
 **The most common real finding on a mature repo is a control that exists and does nothing.** It is not
-an absence — the settings page shows it, a reviewer would swear it is on — so an audit that only asks
-"is it there?" reports it as present. Ask separately whether it *bites*. Six shapes, all seen in the
-field:
+an absence — the settings page shows it — so an audit that only asks "is it there?" reports it as
+present. Ask separately whether it *bites*. Seven shapes, all seen in the field:
 
 | shape | how to catch it |
 |---|---|
@@ -145,38 +142,32 @@ field:
 | A check that runs, reports green, and validated nothing | the run conclusion cannot tell you; read the step conclusions and the inputs the job actually received |
 
 **`[skip ci]` deserves its own look on the release path.** It produces no check run at all, so the
-commit is not red — it is blank, and a required check that never reports is a different problem from
-one that fails. One audited repository carried it on forty-four commits including changes to the
-workflow files themselves; another puts it on the version-bump commit its release tool tags, so **the
-tagged commit — the one that becomes the published artifact — has no test run against it**, while the
-branch it came from is green.
+commit is blank rather than red — a different problem from a check that fails. One repository carried
+it on forty-four commits, including edits to the workflow files; another stamps it on the version-bump
+commit its release tool then tags, so **the commit that becomes the published artifact has no test run
+against it** while the branch it came from is green.
 
 ```sh
 git log --format='%h %s' -200 | grep -iE '\[(skip ci|ci skip)\]'
 ```
 
-**The last shape is the one an audit is most likely to miss, because every signal it produces says
-pass.** A required check that never ran and a required check that ran vacuously are indistinguishable
-from the outside, and only the second leaves the badge green. Four mechanisms, each measured on a real
-repository:
+**This last shape is the one an audit is most likely to miss: every signal it produces says pass.** A
+check that never ran and one that ran vacuously are indistinguishable from outside, and only the second
+leaves the badge green. Four mechanisms, each measured:
 
-- **`continue-on-error: true` at *job* level.** The job reports, the run stays green, and the failure
-  is discarded. One audited repository carried it on its driver test job: **sixty of sixty runs
-  reported success and thirteen of them contained a failed matrix job** — a twenty-two percent masked
-  failure rate. Its *step* carried `continue-on-error: false`, which reads as rigor and changes
-  nothing, because the job had already thrown the result away. Check the job before trusting the step.
-- **A matrix axis that silently never varies.** One repository declared `go-versions:` while every step
-  read `${{ matrix.go-version }}`; the input resolved empty, the action fell back to the runner's
-  default, and **nine advertised versions were one version for three years and ten months**. Compare
-  the matrix key against every `matrix.*` reference — a typo here does not fail, it narrows.
-- **A failing threshold scoped to one trigger.** A vulnerability scanner set `exit-code: 1` only when
-  `github.event_name == 'schedule'`, so the nightly went red for four weeks while every release
-  published straight past the same findings.
-- **A scheduled job green because its real work was skipped.** A gating step decided there was nothing
-  to do, the build step reported `skipped`, and the run concluded `success` — for thirty-seven days.
+- **`continue-on-error` at *job* level** — the failure is discarded. One repository reported success on
+  sixty of sixty runs while **thirteen contained a failed matrix job**. Its *step* carried
+  `continue-on-error: false`, which reads as rigor and changes nothing once the job has thrown the
+  result away. Check the job before trusting the step.
+- **A matrix axis that silently never varies** — a key spelled `go-versions:` against steps reading
+  `matrix.go-version` resolved empty, so **nine advertised versions were one, for three years**. A typo
+  here does not fail, it narrows. Compare the key against every `matrix.*` reference.
+- **A failing threshold scoped to one trigger** — `exit-code: 1` only when the event was `schedule`, so
+  the nightly went red while every release published past the same findings.
+- **A job green because its real work was skipped** — a gating step found nothing to do, the build
+  reported `skipped`, and the run concluded `success` for thirty-seven days.
 
-`grep -rn 'continue-on-error' .github/workflows/` is the GitHub half of the `allow_failure` grep above,
-and it is worth the same one minute.
+`grep -rn 'continue-on-error' .github/workflows/` is the GitHub half of the `allow_failure` grep above.
 
 **The security policy is the one document whose accuracy is load-bearing for a stranger.** A
 `SECURITY.md` that says "use the Security tab and choose *Report a vulnerability*" is wrong if private
@@ -219,8 +210,8 @@ row per item buries the few that matter. Tabulate *absent*, *unsupported here* a
 report *present* as a count plus a one-line list. `mode-a-investigate.md` states the same rule for
 the report, and the two must not drift.
 
-A plan item aimed at an *unsupported* control is not actionable and should not be numbered as though
-it were. Put it in the report as a stated limitation of the environment, and — where one exists —
+A plan item aimed at an *unsupported* control is not actionable and should not be numbered. Put it in
+the report as a stated limitation of the environment, and — where one exists —
 propose the substitute that does work: a pre-push hook where there are no required checks, a
 `CODEOWNERS` convention where review cannot be enforced, a local gate where there is no CI at all.
 
@@ -255,9 +246,8 @@ written bare, and `yaml.safe_load` returns `{'name': ..., True: {...}, 'jobs': .
 finds nothing on nearly every workflow in existence. An audit that parses workflows in Python and
 looks for `"on"` counts **zero triggers in every file** and reports that nothing validates a change
 before the default branch, on a repository that gates every pull request. Read `doc.get("on",
-doc.get(True))`, or match text and skip the parser. This was reached first-hand: a naive parse
-returned zero pull-request triggers on a repository with eight, and only an independent measurement
-caught it.
+doc.get(True))`, or match text and skip the parser. Measured: a naive parse returned zero pull-request
+triggers on a repository with eight, and only an independent measurement caught it.
 
 A pipeline that exists is not a pipeline that protects you. Read every workflow's `on:` block and
 answer: **what change could reach the default branch without this running?**
@@ -273,18 +263,14 @@ Failure modes to check for by name, each of which produces a green repo that val
   (a workflow file, a lockfile, a migration). Worse: if a *required* check is skipped by a path filter
   it may never report, and the PR is blocked or waved through depending on configuration.
 - **`branches:` filters that no longer name the branch that matters.** The workflow is present, the
-  trigger is present, and neither applies where the work happens. Two directions, both measured: one
-  repository renamed its default branch and left the filter naming the old one, so **the default
-  branch has had no CI since the day it became default**; another triggered only on its default branch
-  while cutting release tags from `release/*` branches, so **every release was built from a branch CI
-  never ran on**. Compare the filter against `git branch -a --sort=-committerdate` and against the
-  branch the last release was tagged from — not against the branch you happen to be on.
-- **`continue-on-error: true`, `|| true`, `set +e`, `if: always()` on a check step.** The job is green
-  while the step failed. Grep for these before believing any status badge. **PowerShell fails open by
-  default and needs the same look** — a script with no `$ErrorActionPreference = 'Stop'` and no
-  `$LASTEXITCODE` test carries on past a failed native command. One audited publish script did exactly
-  that: when the build failed it copied the *previous* binary still sitting in the output directory,
-  signed it, and shipped it to an auto-updating channel.
+  trigger is present, and neither applies where the work happens — a renamed default branch left
+  behind, or releases cut from `release/*` while the filter names only the default. Both measured, and
+  a trigger census counts both as covered. Compare the filter against
+  `git branch -a --sort=-committerdate` **and** against the branch the last release was tagged from.
+- **`continue-on-error: true`, `|| true`, `set +e`, `if: always()` on a check step** — and in
+  PowerShell, no `$ErrorActionPreference = 'Stop'` and no `$LASTEXITCODE` test, which fails open the
+  same way. The job is green while the step failed. See *a control that exists and does nothing*,
+  above, for what each one costs.
 - **No `timeout-minutes`.** A hung job consumes the runner for hours and teaches people to ignore
   pending checks.
 - **No `concurrency:` group.** Superseded runs keep executing — wasted minutes, and racing deploys if
@@ -338,7 +324,7 @@ question here is whether the *workflow* sets a restrictive default: one audited 
 exists to find, and without the redirections every command below it fails with `No such file or
 directory` instead of returning zero — noise at exactly the moment the answer is *"nothing runs on a
 pull request, because nothing runs at all"*. Observed on a repository with six figures of stars and no
-CI whatsoever.
+CI at all.
 
 The three alternatives cover the block form, the sequence form, and the inline list `on: [push,
 pull_request]` — the last is what a naive indent-anchored pattern misses, and it cost two repositories
@@ -373,9 +359,9 @@ gh api repos/{o}/{r} --jq '{delete_branch_on_merge, allow_auto_merge}'
 
 **Judge a fork PR by what it can reach, not by whether it runs your code.** Any repository whose CI
 runs a checked-in script executes the PR author's version of that script — that is inherent, not a
-defect. What decides severity is the trigger (`pull_request` gets a read-only token and no secrets;
-`pull_request_target` does not), the secret count, and whether a self-hosted runner is involved. Say
-the blast radius out loud rather than reporting the mechanism as though it were a finding.
+defect. What decides severity is the trigger, the secret count, and whether a self-hosted runner is
+involved. Say the blast radius out loud rather than reporting the mechanism as though it were a
+finding.
 
 **Some of these need scopes an audit may not hold.** The code-scanning endpoints require
 `security_events`; a token without it returns `404`, which is indistinguishable from *not configured*.
@@ -388,11 +374,11 @@ dropping the field, and `GET` can report `disabled` for a control the settings p
 Observed on a repository where the same token successfully changed an unrelated field on that same
 endpoint, so it is not a permissions problem.
 
-The rule that follows generalizes past these two fields: **a `200` is not a write, and a read is only
-evidence if a write through the same surface would have been honored.** Re-read after every settings
-change you make, and where a control is UI-only, say that the settings page is the source of truth and
-name the path. Reporting `disabled` here would be reporting a control as absent when it is present —
-the inverse of the error this file spends most of its length preventing, and just as wrong.
+The rule generalizes past these two fields: **a `200` is not a write, and a read is only evidence if a
+write through the same surface would have been honored.** Re-read after every settings change you make,
+and where a control is UI-only, say that the settings page is the source of truth and name the path.
+Reporting `disabled` here reports a control as absent when it is present — the inverse of the error
+this file spends most of its length preventing, and just as wrong.
 
 ## 2. Actions supply chain and permissions
 
@@ -410,13 +396,12 @@ the inverse of the error this file spends most of its length preventing, and jus
 
   **Match the workflow files, not the directory.** `grep -r` over `.github/workflows/` reads whatever
   else lives there. One audited repository keeps markdown sources beside the YAML they compile to, and
-  two of them carry `uses:` references — inflating its pinned count by four. It is the same trap as
-  counting directory entries instead of files, one measurement further down.
+  two of them carry `uses:` references — inflating its pinned count by four.
 
-  **Report the third-party number, not the total.** They differ by more than the rounding: on one
-  audited repository the combined figure was 66 and the third-party figure 28, and it is the 28 that
-  the finding is about. A first-party `actions/checkout@v5` on a mutable tag is a different risk from
-  a third-party action on one, and quoting the total inflates the finding while burying it.
+  **Report the third-party number, not the total.** On one audited repository the combined figure was
+  66 and the third-party figure 28, and it is the 28 the finding is about. A first-party
+  `actions/checkout@v5` on a mutable tag is a different risk from a third-party action on one, and
+  quoting the total inflates the finding while burying it.
 
   The listing gives counts per reference rather than a total, because the total is the number least
   worth reporting — see the blast-radius rule below. A local `uses: ./` is not
@@ -437,11 +422,10 @@ the inverse of the error this file spends most of its length preventing, and jus
 - **Restoring a cache in a release job is a supply-chain path.** Cache entries can be written by a less
   privileged workflow and restored by a privileged one, so a release that restores build state is
   trusting whatever wrote it. Check which jobs restore caches and what those jobs can reach.
-- **Audit every executable fetch, not just `uses:`.** A `uses:`-only check reports a clean bill of
-  health on repos that download and run unpinned third-party code at build time — a false *clean*,
-  which is worse than a false alarm. A repository can score 100% SHA-pinned on `uses:` and still
-  execute unpinned code — `go install …@latest`, or `curl … | bash` off a third party's default
-  branch, sometimes inside a production workflow. Grep the `run:` steps too:
+- **Audit every executable fetch, not just `uses:`.** A repository can score 100% SHA-pinned on
+  `uses:` and still execute unpinned code — `go install …@latest`, or `curl … | bash` off a third
+  party's default branch, sometimes inside a production workflow. A `uses:`-only check then reports a
+  clean bill of health: a false *clean*, which is worse than a false alarm. Grep the `run:` steps too:
   ```sh
   grep -rnE 'curl[^|]*\|[[:space:]]*(ba)?sh|bash <\(curl' .github/workflows/
   grep -rnE '(go|cargo|pipx|uv tool) install[^|&;]*@(latest|main|master)' .github/workflows/
@@ -462,8 +446,8 @@ the inverse of the error this file spends most of its length preventing, and jus
   rather than inheriting a read token nobody re-examined. Where the workflow genuinely needs nothing —
   a linter, a formatter, a docs build — `{}` is also the honest description of it.
 - **No `permissions:` block.** The default `GITHUB_TOKEN` may carry write scope to the whole
-  repository, handed to every action including third-party ones. Set `permissions: contents: read` at
-  workflow level and widen per-job only where needed.
+  repository, handed to every action including third-party ones. Set the workflow-level floor above
+  and widen per-job only where needed.
 - **Long-lived cloud credentials in secrets** where the provider supports OIDC federation. Prefer
   short-lived tokens minted per run.
 - **Secrets reachable by untrusted code**, printed into logs, or passed wholesale to an action that
@@ -475,8 +459,8 @@ the inverse of the error this file spends most of its length preventing, and jus
 
 ## 3. Getting to `main` safely
 
-Read the protection on the default branch — note that this API needs admin rights and may 404 for you;
-if so, say it is unknown rather than assuming:
+Read the protection on the default branch — this API needs admin rights and may 404 for you; if so,
+say it is unknown rather than assuming:
 
 ```sh
 gh api repos/{owner}/{repo}/branches/{branch}/protection 2>/dev/null

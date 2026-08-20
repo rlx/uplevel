@@ -8,8 +8,7 @@ safety rules that apply regardless of mode; this file is the procedure.
 
 **Nothing is written while you are investigating.** The mode ends with a report and a plan; if the
 user asks you to "set it up", that still means investigate, propose, and wait. Writing begins only
-once they have picked, which is what *Execute* below covers — and at that point you are no longer
-investigating, so branch first and build only what was chosen.
+once they have picked — *Execute*, below: branch first and build only what was chosen.
 
 ### Establish what kind of repository this is
 
@@ -51,27 +50,23 @@ difference between an audit and a checklist read aloud.
   distribution channel is.
 
 **Ask whether anyone is still there, before writing a plan addressed to them.** A repository can be
-dormant or archived while its artifact is still being installed daily, and then every maintainer-facing
-proposal in your plan is void. Check the last commit date, the last release, and whether the forge
-reports the repository archived — then check the registry's download figures, which is the half people
-skip. Seen five times across four rounds of auditing: an **archived** repository whose package was
-downloaded eighty-five thousand times in a week with fifty dependents, where no pull request can be
-opened and no workflow can ever be fixed; a container image still pulled while its lock file froze
-three years ago; a library five years unreleased still shipping a vulnerable dependency today.
+dormant or archived while its artifact is still installed daily, and then every maintainer-facing
+proposal is void. Check the last commit, the last release, and whether the forge reports it archived —
+then check the registry's download figures, the half people skip. One **archived** repository still
+served eighty-five thousand downloads a week to fifty dependents, where no pull request can be opened
+and no workflow can ever be fixed.
 
-**When that is the answer, the report is addressed to consumers, not maintainers.** Say plainly that
-the project is not accepting changes, and make the plan a decision about depending on it — pin it,
-vendor it, fork it, or leave. A seven-item plan for a maintainer who is gone is a document nobody can
-act on, and writing one is how an audit reads as boilerplate.
+**Then the report is addressed to consumers, not maintainers.** Say the project is not accepting
+changes, and make the plan a decision about depending on it — pin, vendor, fork, or leave. A seven-item
+plan for a maintainer who is gone is a document nobody can act on.
 
 **When it is not obvious, ask.** One line, before you spend the context.
 
 ### Scope it first
 
 **A full audit is not the only shape, and it is not always the right one.** Someone asking whether
-their CI is sound does not need the hazard catalog; someone about to run a migration does not need
-the release-tagging section. The full sweep reads most of `references/` before touching the
-repository, which on a large one competes with the repository for context.
+their CI is sound does not need the hazard catalog. The full sweep reads most of `references/` before
+touching the repository, which on a large one competes with the repository for context.
 
 Ask what they want to know, and read only what answers it. `selfcheck.sh` prints what each costs.
 
@@ -88,8 +83,8 @@ which is where that range comes from. Take one when the question is narrow, and 
 
 **Say the scope in the report, in the first line.** This is the same rule as naming absences, pointed
 at yourself: a reader who does not know you skipped the hazards will read your silence about them as
-approval. A scoped audit that announces its scope is a useful answer; one that does not is a misleading
-one, and the misleading version looks identical.
+approval. A scoped audit that announces its scope is useful; one that does not is misleading, and the
+two look identical.
 
 **Two things are never scoped away.** Anything security-urgent you happen to see gets raised whatever
 you were looking for. And if the scope you were given is the wrong one for what the repository is —
@@ -125,15 +120,15 @@ deployed environment, paid infrastructure, or **a toolchain this machine does no
 as `— unverified, needs X`. **Never run an unverified command against a deployed environment to find
 out what it does.**
 
-**Preflight the toolchain before you rely on that rule** — `discovery.md` §*Toolchain
-preflight*. Do not assume the machine can build the repo — often it cannot, and when it cannot the
-hard rule quietly converts the whole gate section to `unverified` and the report stops being worth
-reading. Read the repo's declared versions (`engines`, `packageManager`, `go.mod`, `.tool-versions`,
-the CI `setup-*` steps), compare them to what is installed, and **name any missing or mismatched tool
-in the report**. Offer the install command — `corepack enable` first, since a pinned package manager
-is the most common gap — and let the user decide; installing a runtime is a change to their machine,
-not to the repo you were pointed at. A version *mismatch* is the trap, not absence: the wrong major
-package manager installs a wrong tree instead of failing.
+**Preflight the toolchain before you rely on that rule** — `discovery.md` §*Toolchain preflight*. Do
+not assume the machine can build the repo: often it cannot, and then the hard rule quietly converts
+the whole gate section to `unverified` and the report stops being worth reading. Read the repo's
+declared versions (`engines`, `packageManager`, `go.mod`, `.tool-versions`, the CI `setup-*` steps),
+compare them to what is installed, and **name any missing or mismatched tool in the report**. Offer
+the install command — `corepack enable` first, since a pinned package manager is the most common gap —
+and let the user decide; installing a runtime is a change to their machine, not to the repo you were
+pointed at. A version *mismatch* is the trap, not absence: the wrong major package manager installs a
+wrong tree instead of failing.
 
 ### Investigate
 
@@ -156,8 +151,7 @@ package manager installs a wrong tree instead of failing.
    — and it is not "absent".** Classify it **present, not auto-loaded**: a person who already knows it
    is there can point at it, so nothing is missing, but nothing surfaces it either. One audited
    repository kept eight skills and over a thousand lines of review standards in a directory its
-   contributors' agent never reads; the process was thorough, committed, actively maintained, and
-   invisible by default.
+   contributors' agent never reads; the process was thorough, committed, and invisible by default.
 
    The cost is onboarding, and it falls on exactly the people least able to notice: a newcomer, or a
    fresh session, does not know to ask for a document whose existence is undocumented. Say so plainly,
@@ -165,13 +159,13 @@ package manager installs a wrong tree instead of failing.
 
    **Search the subtree, not only the root.** Large repositories commonly carry a second agent
    document scoped to one component — a monorepo with a root `AGENTS.md` and another governing its
-   storage layer, with different and stricter rules. For work inside that subtree, the nested one is
+   storage layer, with stricter rules. For work inside that subtree, the nested one is
    the binding document, and a root-only search reports it as absent.
 
    **Note what is addressed to agents specifically.** A growing number of projects now write rules at
    automated contributors rather than about them: *"if you are a coding agent, stop here and ask"* above
-   a golden-file regeneration command, *"don't fix golden-value drift by hand"*, or an explicit list of
-   prohibited output categories with an instruction to stop and name the category. Report these as
+   a golden-file regeneration command, or an explicit list of prohibited output categories with an
+   instruction to stop and name the category. Report these as
    present and binding — they are a repository consenting in advance to some operations and refusing
    others, which is exactly the signal this audit is looking for, and they belong in the process
    document you propose.
@@ -230,7 +224,7 @@ package manager installs a wrong tree instead of failing.
    step later: a `find` naming `.sql .go .py .rb` returns **zero** on a repository with thirty-two
    Elixir migrations containing forty-eight `ALTER TABLE` and thirty `DROP CONSTRAINT` statements, and
    zero destructive DDL reads as *no data hazard here* — a reassuring false clean on the hazard class
-   that matters most. Measured, on a real repository.
+   that matters most.
 
    **And destructive schema change is not spelled in SQL.** Ecto writes `remove(`, Rails
    `remove_column`, Django `RemoveField` and `DeleteModel`, Knex `dropColumn`. Searching for SQL
@@ -263,7 +257,7 @@ package manager installs a wrong tree instead of failing.
    A count is a lead. Only a read is a finding — and **a security-urgent claim may reach the first
    paragraph only after the file has been read end to end.**
 
-   Three rules that decide whether the output is trustworthy:
+   Five rules that decide whether the output is trustworthy:
 
    - **Classify, never omit.** Every item is **present / absent / unsupported here / unknown**.
      *Unsupported* still gets said, as best practice with no support in this environment plus whatever
@@ -324,14 +318,13 @@ Lead with findings, not recommendations. Keep it to what you verified:
   moment. Say that in the report rather than proposing a rollback that cannot exist.
 
   **"Teaching" is a weighting, never a reason to look less hard.** No rollback is not the same as
-  nothing to gate, and the row above is the one most often misread as permission to stop. A teaching
+  nothing to gate, and this row is the one most often misread as permission to stop. A teaching
   repository that also serves a page, publishes a package, or ships a container has a live artifact
-  with users, and it inherits that kind's gate in full. One audited teaching repository — a browser
-  game with seven hundred forks — deployed to its host's pages straight from the default branch, and
-  its deploy finished **twenty-five seconds before its own test suite did**, every time; the same
-  audit found contributor-supplied translation strings reaching `innerHTML` on the live page. Both are
-  gate findings on a repository whose kind says there is nothing to gate. Establish the kind to decide
-  *what an absence costs*; never to decide whether to check.
+  with users and inherits that kind's gate in full. One — a browser game with seven hundred forks —
+  deployed straight from the default branch **twenty-five seconds ahead of its own test suite**, with
+  contributor-supplied strings reaching `innerHTML` on the live page. Both are gate findings on a
+  repository whose kind says there is nothing to gate. Establish the kind to decide *what an absence
+  costs*, never whether to check.
 - **The gaps**, each tied to something real: an incident in the log, an unenforced rule in a doc, a
   hazard with no guard. Say which are *evidence* and which are *inference*.
 - **Absences, named** — see the absence audit. Present / absent / unknown, never silently omitted.
@@ -361,8 +354,7 @@ maintainer who applies patches by hand.
 
 **Do not try to measure this by counting merge commits.** A squash merge produces none, so
 `grep -c 'Merge pull request'` reports zero on a repository with seventy-five merged pull requests and
-reads as a catastrophic disagreement. This was the first version of this rule, and one repository in
-the corpus falsified it immediately.
+reads as a catastrophic disagreement.
 
 **Anything security-urgent is raised first and directly to the user** — not filed as plan item nine.
 An exposed secret, `pull_request_target` running untrusted code with secrets, or an unpinned
@@ -402,10 +394,9 @@ Rules for the plan itself:
 
 - **Sort by damage prevented per maintainer-hour.** One rule, not four. *Damage prevented* means blast
   radius — what the thing can reach: which credentials, which branch, whose machine, how many users
-  downstream. Ninety mutable refs in comment bots matter less than one on the release path; a hundred
-  workflows missing a timeout matter less than one missing permission check on a job holding a key. A
-  count tells you how much work a fix is, not how much damage it prevents, and reporting the count as
-  the severity inverts the answer often enough to be a habit worth breaking.
+  downstream. Ninety mutable refs in comment bots matter less than one on the release path. A count
+  tells you how much work a fix is, not how much damage it prevents, and reporting the count as the
+  severity inverts the answer often enough to be a habit worth breaking.
 - **One adjustment to that sort, and only one.** If the top item would take more than an hour or needs
   someone else's consent, promote the cheapest safe item above it **and say that you did, and why**.
   A plan whose first item is a week of work does not get started. Anything beyond this one move means
@@ -436,10 +427,10 @@ Rules for the plan itself:
 
 ### Execute — only what was chosen
 
-When the user picks items: branch first (`SKILL.md` → *Before the first change*), do the selected
-items and
-nothing adjacent, land them one reviewable change at a time, and report back what passed, what did not,
-and what you did not touch. Scope creep here is the fastest way to make the next proposal unwelcome.
+When the user picks items: branch first (`SKILL.md` → *Before the first change*), do the selected items
+and nothing adjacent, land them one reviewable change at a time, and report back what passed, what did
+not, and what you did not touch. Scope creep here is the fastest way to make the next proposal
+unwelcome.
 
 **Find the repository's conventions before you write, not after the gate rejects you.** Up to here you
 have been reading; the moment you write, this repository's rules bind you the same as any contributor,

@@ -2,6 +2,16 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.69.0 — 2026-08-20
+
+- `forge-hygiene.md`: the shape count matched the table again, and two adjacent bullets stopped
+  contradicting each other about whether the workflow-level floor is `permissions: {}` or
+  `contents: read`.
+- `mode-a-investigate.md`: the count of the rules that decide whether the output is trustworthy
+  matched the list.
+- `forge-hygiene.md`, `mode-a-investigate.md`, `discovery.md`: duplicate examples and restating tails
+  removed. The mechanism behind a discarded failure is stated once, where the shape is named.
+
 ## v0.68.0 — 2026-08-20
 
 - `mode-a-investigate.md`: ask whether anyone is still there before writing a plan addressed to them.
