@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.51.0 — 2026-08-19
+
+- `automation.md`: propose a workflow analyzer rather than reimplementing one. Names `zizmor`,
+  OpenSSF Scorecard and `actionlint`, and what this skill adds that they cannot.
+- `forge-hygiene.md`: a pinned SHA can still be an impostor commit; `actions/checkout` persists a
+  credential on disk by default; restoring a cache in a release job is a supply-chain path.
+
 ## v0.50.0 — 2026-08-19
 
 - `mode-a-investigate.md`: the report's second gate is named by repository kind — production, the

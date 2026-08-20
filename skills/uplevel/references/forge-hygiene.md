@@ -338,6 +338,18 @@ the inverse of the error this file spends most of its length preventing, and jus
   as mutable. That single character was the difference between a clean answer and a false finding on
   a repository that pins everything.
 
+- **A pinned SHA can still be an impostor.** GitHub presents a repository and its forks as one commit
+  network, so a SHA that resolves through `owner/action@<sha>` may be a commit that exists only in a
+  fork and never in the action's own repository. It looks pinned, reviews as pinned, and is not. This
+  cannot be checked by reading the workflow — it needs the API, or a tool that does it. Say pinning is
+  necessary and not sufficient rather than treating a SHA as the end of the question.
+- **`actions/checkout` persists a credential on disk by default.** It lands in the working directory,
+  and any step that packages or uploads that directory can carry it out of the job. `persist-credentials:
+  false` is the fix wherever the token is not needed after checkout, which is most jobs. Measured across
+  five audited repositories: four leave it on, two of them in every checkout they have.
+- **Restoring a cache in a release job is a supply-chain path.** Cache entries can be written by a less
+  privileged workflow and restored by a privileged one, so a release that restores build state is
+  trusting whatever wrote it. Check which jobs restore caches and what those jobs can reach.
 - **Audit every executable fetch, not just `uses:`.** A `uses:`-only check reports a clean bill of
   health on repos that download and run unpinned third-party code at build time — a false *clean*,
   which is worse than a false alarm. A repository can score 100% SHA-pinned on `uses:` and still
