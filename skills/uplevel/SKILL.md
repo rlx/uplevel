@@ -12,7 +12,7 @@ description: >
   project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.53.0
+version: 0.54.0
 ---
 
 # uplevel
@@ -34,6 +34,12 @@ not in changed files. You then execute only the items the user picks, in the ord
 You may read anything and run what you have read and judged safe. Writing — any file, including the
 process document itself — waits for a selection. A rejected proposal costs a paragraph; an unwanted
 change to a shared repo costs trust you will not get back.
+
+**Judgment at the entry, determinism after.** Deciding what a repository *is*, what could hurt it, and
+which questions are worth asking is judgment, and it is yours — no table of signals does it as well.
+Everything downstream of that should be mechanical: the checks the judgment selects, how evidence is
+classified, and what each finding turns into. Two audits of the same repository should differ in what
+they noticed, never in what a finding costs or what fixing it involves.
 
 The whole value is **specificity**. A process doc that says "run the tests and be careful" changes no
 behavior. One that names the exact command, the exact file whose version marker must be bumped
@@ -243,5 +249,6 @@ of *their* code, not less of this. Read the mode file and what it names, not eve
 | `references/claude-md-template.md` | only once the user picks the document off the plan |
 | `references/long-runs.md` | migrations, backfills, batch jobs, anything measured |
 | `references/example-output.md` | before writing the first report — the shape, in one example |
+| `references/remedies.md` | when writing the plan — what each finding turns into |
 | `references/evidence.md` | before any completion claim, and before writing a PR body or changelog |
 | `references/commit-hygiene.md` | before writing a commit message, PR body, or release note |
