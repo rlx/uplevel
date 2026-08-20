@@ -2,6 +2,14 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.68.0 — 2026-08-20
+
+- `mode-a-investigate.md`: ask whether anyone is still there before writing a plan addressed to them.
+  A dormant or archived repository whose artifact is still installed daily makes every maintainer-facing
+  proposal void, and the report is then addressed to consumers.
+- `forge-hygiene.md`: `[skip ci]` produces no check run at all, so the commit is blank rather than red
+  — and a release tool that puts it on the version commit tags the one commit nothing ran against.
+
 ## v0.67.0 — 2026-08-20
 
 - `forge-hygiene.md`: PowerShell fails open by default, so a publish script with no
