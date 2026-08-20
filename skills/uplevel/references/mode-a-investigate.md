@@ -18,20 +18,24 @@ and can page someone. Most repositories are not that, and the same finding means
 depending on which one you are looking at. Decide early, say it in the report, and let it set the
 weighting — deciding late means writing a report and then discovering it was aimed wrong.
 
-| kind | tell | what changes |
+**One question settles it: when this changes, who is exposed, and can anyone take it back?** Read the
+README and answer that. It is faster and more reliable than any list of signals — a manifest, a
+Dockerfile and a workflow name are all ambiguous, and the README is not.
+
+| kind | who is exposed when it changes | what changes in the audit |
 |---|---|---|
-| **service** | deploy config, migrations, environments, an on-call anything | the default. Weight deploys, rollback, migrations, environment safety |
-| **library** | published to a registry, semver, consumers you cannot see | weight release integrity and backwards compatibility; deploys are irrelevant |
-| **reference or teaching** | the artifact is the code being read, forks are the point | weight reproducibility and cost-to-run. Missing CI may be entirely defensible |
-| **tooling or config** | CI definitions, infrastructure, dotfiles, prompts | the repository *is* the process; its own gate is the product |
-| **application, not deployed by you** | shipped as source or an image someone else runs | **you cannot roll back.** Weight upgrade and migration safety hardest |
+| **service** | the operators, on their own infrastructure | the default. Weight deploys, rollback, migrations, environment safety |
+| **library** | consumers you cannot see, at a time you do not choose | weight release integrity and compatibility; **the published version is permanent** |
+| **reference or teaching** | readers, and whoever forks it | weight reproducibility and cost-to-run. Missing CI may be entirely defensible |
+| **tooling or config** | every repository it governs | the repository *is* the process; its own gate is the product |
+| **application, not deployed by you** | your users, on machines you cannot reach | **you cannot roll back.** Weight upgrade and migration safety hardest |
 
 **The kind decides whether an absence is a finding.** Missing CI on a teaching repository whose test
 suite needs rented GPUs is a defensible trade-off; missing CI on a service with weekly incidents is
 not. Both are *absent*; only one is a *problem*. Saying which you think it is — and why — is the
 difference between an audit and a checklist read aloud.
 
-**Reading the tells, from running them against real repositories:**
+**Three things that question does not settle on its own:**
 
 - **A repository can be two kinds, and then it inherits both weightings.** One audited project
   publishes to PyPI *and* ships `docker run` self-host instructions: it has a permanent published
@@ -77,6 +81,27 @@ one, and the misleading version looks identical.
 you were looking for. And if the scope you were given is the wrong one for what the repository is —
 a forge audit on a service that deploys unattended to machines nobody owns — say so, then do the scope
 they asked for.
+
+### Form a hypothesis before walking the list
+
+The eight steps below are a net, not a route. An auditor who walks them in order produces a complete
+report that took four times as long as it needed to and buries its two real findings among thirty
+verified non-problems. Spend two minutes first:
+
+1. **Who is exposed when this changes?** — the kind, above. It decides what counts as a finding.
+2. **What has already gone wrong here?** — the revert and hotfix history, and any incident named in a
+   commit. Rules derived from what actually broke are the only ones certain to earn their place.
+3. **Given those two, what would have to be true for this repository to be fine?** Name it, then go
+   and check exactly that.
+
+That third question is the whole difference between an audit and a checklist read aloud. "Sixty-two
+contributors, no CI, one maintainer merging everything" makes the hypothesis obvious: *the only thing
+standing between a bad change and the default branch is one person's attention.* Now you know what to
+verify, and the thirty other checks are either confirmation or noise.
+
+**Then walk the list anyway**, but fast, and looking for what contradicts you. A hypothesis you never
+tried to falsify is a prejudice, and the steps below are how you try. Report the finding you set out
+to check *and* whatever contradicted you — the second is usually the more valuable half.
 
 ### The one hard rule: discover, never guess
 
