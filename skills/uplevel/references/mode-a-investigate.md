@@ -86,18 +86,17 @@ they asked for.
 
 The eight steps below are a net, not a route. An auditor who walks them in order produces a complete
 report that took four times as long as it needed to and buries its two real findings among thirty
-verified non-problems. Spend two minutes first:
+verified non-problems.
 
-1. **Who is exposed when this changes?** — the kind, above. It decides what counts as a finding.
-2. **What has already gone wrong here?** — the revert and hotfix history, and any incident named in a
-   commit. Rules derived from what actually broke are the only ones certain to earn their place.
-3. **Given those two, what would have to be true for this repository to be fine?** Name it, then go
-   and check exactly that.
+**You should arrive here with the three orienting questions from `SKILL.md` already answered** — who
+is exposed, what has already gone wrong, and what would have to be true for this repository to be
+fine. If you do not have a sentence for the third, go back and get one before spending the context
+below.
 
-That third question is the whole difference between an audit and a checklist read aloud. "Sixty-two
-contributors, no CI, one maintainer merging everything" makes the hypothesis obvious: *the only thing
-standing between a bad change and the default branch is one person's attention.* Now you know what to
-verify, and the thirty other checks are either confirmation or noise.
+A worked example of what that sentence buys you, from a real audit: *sixty-two contributors, no CI,
+one maintainer merging everything* makes the hypothesis obvious — the only thing standing between a
+bad change and the default branch is one person's attention. That is now the thing to verify, and the
+thirty other checks are either confirmation or noise.
 
 **Then walk the list anyway**, but fast, and looking for what contradicts you. A hypothesis you never
 tried to falsify is a prejudice, and the steps below are how you try. Report the finding you set out

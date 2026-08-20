@@ -12,7 +12,7 @@ description: >
   project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.55.0
+version: 0.56.0
 ---
 
 # uplevel
@@ -143,9 +143,26 @@ question costs a minute and guessing can cost a day of someone else's.
 
 ## Mode A — investigate, then propose
 
-**Read `references/mode-a-investigate.md`.** Do not work from memory: the procedure carries the one
-hard rule (every reported command must have been run here and observed to work), the eight
-investigation steps, the report shape, and the rules that make a plan actionable.
+**Answer three questions before you open anything.** They cost two minutes, they decide what the rest
+of the audit is *for*, and answering them late means writing a report and then finding it was aimed
+wrong. They are the judgment this skill depends on; nothing downstream recovers from getting them
+wrong.
+
+1. **When this repository changes, who is exposed — and can anyone take it back?** A service's
+   operators on their own infrastructure; a library's consumers, invisible and on their own schedule;
+   readers and forkers of a teaching repository; users on machines you cannot reach. **This decides
+   whether an absence is a finding at all.** Missing CI on a teaching repository whose tests need
+   rented GPUs is a defensible trade-off; on a service with weekly incidents it is not.
+2. **What has already gone wrong here?** Reverts, hotfixes, an incident named in a commit message.
+   Rules derived from what actually broke are the only ones certain to earn their place, and they are
+   what makes a plan persuasive rather than generic.
+3. **Given those two, what would have to be true for this repository to be fine?** Name it in a
+   sentence. That is what you go and check. The rest of the list is confirmation or noise, and
+   knowing which is which is the difference between an audit and a checklist read aloud.
+
+**Then read `references/mode-a-investigate.md`.** Do not work from memory: the procedure carries the
+one hard rule (every reported command must have been run here and observed to work), the kind table,
+the eight investigation steps, the report shape, and the rules that make a plan actionable.
 
 The two things worth holding before you open it: **nothing is written in this mode**, and if the user
 says "just set it up", that still means investigate, propose, and wait.
