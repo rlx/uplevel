@@ -8,6 +8,21 @@ Everything else is decoration.
 Search in this order and stop at the first that gives a real answer. Later sources describe intent;
 earlier ones describe what is enforced.
 
+**A repository that teaches CI contains CI files that are not its CI.** Tutorials, examples, test
+fixtures and golden files look exactly like configuration, and a scan that does not exclude them
+reports a shape the project does not have. One audited repository matched a self-hosted-runner search
+on workflow files under `course/content/` — teaching material, not its pipeline. Another keeps
+markdown sources inside `.github/workflows/` beside the YAML they compile to. Exclude the obvious
+homes and check where a match actually lives before it becomes a finding:
+
+```sh
+-not -path '*/node_modules/*' -not -path '*/vendor/*' -not -path '*/.git/*' \
+-not -path '*/testdata/*' -not -path '*/fixtures/*' -not -path '*/examples/*'
+```
+
+The exclusion list is never complete — `course/`, `docs/`, `samples/`, `templates/` all host the same
+trap — so the durable habit is the second half: **read the path of the match, not only its count.**
+
 **A shallow clone silently answers "nothing has ever gone wrong here."** `git clone --depth 1` — the
 default for CI checkouts, container builds, and anyone cloning a large repository quickly — leaves one
 commit. Every history question then returns zero: zero reverts, zero hotfixes, zero incidents, no
@@ -23,6 +38,13 @@ git fetch --unshallow --filter=blob:none    # or --depth 3000 if the full histor
 This is the highest-consequence measurement error available, because *what has already gone wrong
 here* is one of the three questions the whole audit is aimed by. Getting a false clean there aims
 everything downstream at the wrong thing.
+
+**But a repository can genuinely have no history, and the two look identical until you check.** A
+project that publishes squashed snapshots has three commits and `is-shallow-repository` returns
+`false` — observed on a repository with five thousand stars and three commits. The remedies differ
+completely: a shallow clone is fixed by fetching, and a snapshot repository is a **finding** — nobody
+can mine its incidents, including its maintainers, and no amount of fetching changes that. Say which
+one you found; "no revert history" means opposite things in the two cases.
 
 0. **Confirm the gate is even in this repository.** On large projects it frequently is not, and every
    later step is then measuring the wrong thing. Four shapes seen repeatedly:

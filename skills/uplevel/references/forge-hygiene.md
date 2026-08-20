@@ -62,7 +62,7 @@ Read the failures as data — they are the answer, not an error:
 |---|---|---|
 | `gh` not installed | the **CLI** is absent, not the controls. `gh auth status` fails as "command not found", which is not the unauthenticated case below | everything settings-derived is **unknown**. Offer the install, audit what is on disk, and never report a control missing because you could not look |
 | no remote at all | local-only repo; **no forge CI is possible** | not a gap the team can close by configuring; say so |
-| host is not github.com | GitLab / Gitea / Forgejo / Bitbucket / GHES — different CI system, different feature set | audit their equivalent; do not propose Actions |
+| host is not github.com | GitLab / Gitea / Forgejo / Bitbucket / GHES — different CI system, different feature set | audit their equivalent; do not propose Actions. The GitLab map is below |
 | `gh auth status` unauthenticated | you cannot see settings, protection, or runs | everything settings-derived is **unknown**, never *absent* |
 | Actions `disabled` at repo or org level | workflows will not run even if written | **missing support**, not missing configuration |
 | `actions/permissions` returns a permissions error | you are not an admin | **unknown** — *not* "Actions are disabled" |
@@ -86,6 +86,28 @@ it is worth stating in the report rather than abandoning the section:
 
 Say which half you ran. A report that covers the workflows and marks the settings **unknown** is a
 useful half; one that says nothing because the first command failed is not.
+
+### On GitLab, the same questions have different names
+
+Most of this file transfers; the vocabulary does not, and "audit their equivalent" strands an agent
+that has never seen one. Read `.gitlab-ci.yml` and translate:
+
+| the question | on GitHub | on GitLab |
+|---|---|---|
+| what triggers a pipeline | `on: pull_request` | `rules:` / `workflow:` testing `CI_PIPELINE_SOURCE == "merge_request_event"` |
+| what is pulled in from elsewhere | `uses:` and `workflow_call` | `include:` — `template:`, `component:`, `project:`, `remote:` |
+| a third-party dependency, and is it pinned | `uses: owner/action@sha` | `component: .../name@version` — a version string, and **rarely a SHA** |
+| token scope for the job | `permissions:` | `CI_JOB_TOKEN` scope, set in project settings rather than in the file |
+| deploy gates | environments with reviewers | `environment:` plus protected environments |
+| who may merge | rulesets and required checks | protected branches, approval rules, and *Merge when pipeline succeeds* |
+
+**`include: remote:` and an unpinned `component:` are the supply-chain finding here**, and they are
+the analogue of a mutable `uses:` tag. A real project's file carried four includes — three vendor
+templates and one component pinned to a version — which is the shape to look for.
+
+**Settings live in the project's UI and API, not the file**, exactly as on GitHub: approval rules,
+protected branches and `CI_JOB_TOKEN` scope are invisible to a clone. Without API access they are
+**unknown**, never absent.
 
 ### Check what is configured against what is enforced
 
