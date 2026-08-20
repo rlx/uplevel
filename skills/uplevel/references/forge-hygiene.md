@@ -301,7 +301,7 @@ eight of them, and on one it reports 7 where the reality is 2 gated and 4 on the
 
 ```sh
 ls .github/workflows/ >/dev/null 2>&1 || echo "no workflows directory — the finding is absence"
-ls .github/workflows/*.y*ml 2>/dev/null | wc -l   # FILES; `ls dir | wc -l` counts README and scripts/
+find .github/workflows -maxdepth 1 \( -name '*.yml' -o -name '*.yaml' \) 2>/dev/null | wc -l
 grep -lE '^[[:space:]]+pull_request:|^[[:space:]]*-[[:space:]]*pull_request$|^on:.*[[,][[:space:]]*pull_request[],]' .github/workflows/*.y*ml 2>/dev/null
 grep -lE '^[[:space:]]+pull_request_target:|^[[:space:]]*-[[:space:]]*pull_request_target$|^on:.*[[,][[:space:]]*pull_request_target[],]' .github/workflows/*.y*ml 2>/dev/null
 grep -lE '^permissions:' .github/workflows/*.y*ml 2>/dev/null | wc -l   # TOP-LEVEL only
@@ -498,6 +498,15 @@ are reverted. **A team that argues with a recommendation rarely argues with its 
 - **No smoke test after deploy** — a pipeline that reports success when the process started, not when
   the change works.
 - **No tag, release, or changelog**, so "what shipped" is reconstructed from memory during an incident.
+- **A tag that exists and does not identify what shipped.** Absence is the easy case; the tag that is
+  present and wrong is the one an audit calls fine. Four ways it lies, each measured on a real
+  repository: a **version published with no tag at all** — ten of forty-one releases on one registry,
+  so the code for those versions is not in the history; **two tags per release** (`1.2.3` and `v1.2.3`)
+  that silently diverged, leaving consumers of one pinned to a commit **reachable from no branch**;
+  **tags the registry ignores** because they are not valid semver, so "latest" is not the newest tag;
+  and a **floating major tag force-pushed before the release is known good**, handing consumers new
+  code against an old artifact. Compare the registry's version list against `git tag`, in both
+  directions — neither is authoritative alone.
 - **Release built from a dirty or unpinned toolchain**, so the artifact cannot be reproduced.
 - **No freeze or ownership convention** for risky periods, if the team wants one.
 
