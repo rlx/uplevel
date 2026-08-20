@@ -2,6 +2,16 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.60.0 — 2026-08-20
+
+- `forge-hygiene.md`: a GitLab map — the same questions under different names, and `include: remote:`
+  with an unpinned `component:` as the supply-chain finding there. "Audit their equivalent" stranded
+  anyone who had not seen one.
+- `discovery.md`: a repository that teaches CI contains CI files that are not its CI. Exclude the
+  obvious homes, and read the path of a match rather than only its count.
+- `discovery.md`: no history has two causes. A shallow clone is fixed by fetching; a repository that
+  publishes squashed snapshots is a finding, and they look identical until you check.
+
 ## v0.59.0 — 2026-08-19
 
 - `mode-a-investigate.md`: hazard discovery no longer names four languages. An extension list returned
