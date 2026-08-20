@@ -302,12 +302,22 @@ Lead with findings, not recommendations. Keep it to what you verified:
   |---|---|---|
   | service | production | rollback, if it has been exercised |
   | library | the registry | **nothing.** A published version is permanent; see `destructive-ops.md` |
-  | reference or teaching | readers and forks | nothing to roll back, and nothing to gate |
+  | reference or teaching | readers and forks | nothing to roll back — but see below before writing "nothing to gate" |
   | tooling or config | the repositories it governs | their gates, which yours now sets |
   | application others run | other people's machines | **nothing you control** |
 
   For three of those five, *there is no rollback at all*, and the release gate is the last reversible
   moment. Say that in the report rather than proposing a rollback that cannot exist.
+
+  **"Teaching" is a weighting, never a reason to look less hard.** No rollback is not the same as
+  nothing to gate, and the row above is the one most often misread as permission to stop. A teaching
+  repository that also serves a page, publishes a package, or ships a container has a live artifact
+  with users, and it inherits that kind's gate in full. One audited teaching repository — a browser
+  game with seven hundred forks — deployed to its host's pages straight from the default branch, and
+  its deploy finished **twenty-five seconds before its own test suite did**, every time; the same
+  audit found contributor-supplied translation strings reaching `innerHTML` on the live page. Both are
+  gate findings on a repository whose kind says there is nothing to gate. Establish the kind to decide
+  *what an absence costs*; never to decide whether to check.
 - **The gaps**, each tied to something real: an incident in the log, an unenforced rule in a doc, a
   hazard with no guard. Say which are *evidence* and which are *inference*.
 - **Absences, named** — see the absence audit. Present / absent / unknown, never silently omitted.
@@ -416,6 +426,35 @@ When the user picks items: branch first (`SKILL.md` → *Before the first change
 items and
 nothing adjacent, land them one reviewable change at a time, and report back what passed, what did not,
 and what you did not touch. Scope creep here is the fastest way to make the next proposal unwelcome.
+
+**Find the repository's conventions before you write, not after the gate rejects you.** Up to here you
+have been reading; the moment you write, this repository's rules bind you the same as any contributor,
+and most of them are unwritten in the sense that matters — they are visible in the last ten commits and
+enforced by a script. An audit that lands a change violating three of them has demonstrated the exact
+carelessness it was hired to fix. Spend the two minutes:
+
+```sh
+git log -10 --format='%s'                      # subject mood, length, prefix, issue refs
+git log -50 --format='%(trailers:only)' | sort -u
+git log -10 --stat | grep -iE 'changelog|version|\.md'   # what a change here normally touches
+find . .github -maxdepth 1 \( -iname 'contributing.md' -o -iname 'changelog.md' \
+  -o -iname 'pull_request_template.md' \) 2>/dev/null
+```
+
+*Use `find -iname` rather than a shell glob: an unmatched glob is an error in zsh rather than an empty
+result, and on a case-insensitive filesystem `ls` will happily report both spellings of a file that
+exists once.*
+
+Then read the project's own gate script rather than guessing what it enforces. The recurring set, all
+of which have bounced a first attempt somewhere: **a version marker that must move with the change**, a
+**changelog entry written in the same commit** rather than at release, a **line-wrap width**, a
+**spelling variant**, a **trailer the project uses and no other**, and where new prose is allowed to
+live. `commit-hygiene.md` covers the message itself.
+
+**Match, do not improve.** If their subjects are lowercase and yours is capitalized, you are wrong and
+they are right — house style is not a defect, and a contribution that quietly restyles it will be read
+as not having looked. Where a convention genuinely conflicts with something you must do, that is the
+rules-conflict invariant in `SKILL.md`: say it and let the maintainer choose.
 
 ### Calibration
 
