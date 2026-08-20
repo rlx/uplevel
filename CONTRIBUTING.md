@@ -67,6 +67,9 @@ subject repository's package paths and script line numbers still in it, and no p
 seen them. When editing `references/example-output.md`, or adding any example drawn from a real
 repository, check by hand that nothing identifies it.
 
+The pull request template asks for the parts of this the gate cannot see. It is a prompt, not a
+check — nothing enforces the answers, which is why they are worth reading.
+
 ## Commits and pull requests
 
 **Say what was done.** Concise, accurate, simple. Most changes need only a subject line. No AI
