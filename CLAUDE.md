@@ -17,8 +17,10 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
 
 - `skills/uplevel/` is symlinked into `~/.claude/skills/`. The working tree is the installed skill;
   an edit takes effect in the next session.
-- `SKILL.md` has a 4000-token budget, enforced by the gate. It loads on every trigger; `references/`
-  load only when read. New detail goes in a reference.
+- `SKILL.md` has a token budget, currently 6000, enforced by the gate. It loads on every trigger;
+  `references/` load only when read. New detail goes in a reference by default. The budget makes
+  growth deliberate rather than capping quality — raise it in the same change when something belongs
+  in the always-loaded file, and say why.
 - Every command in the skill should have been run and observed to work before it is written down.
   This is a discipline, not an enforced rule: the gate parses fenced blocks and validates `grep -E`
   patterns, which proves they are well-formed, not that they do what the text claims.

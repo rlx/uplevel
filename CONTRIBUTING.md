@@ -20,8 +20,11 @@ The gate runs in about a second. If it fails it names what to fix. Bypass it wit
 
 ## The rules the gate enforces
 
-- **`SKILL.md` has a 4000-token budget.** It loads on every trigger; `references/` load only when
-  read. New detail goes in a reference, not in `SKILL.md`.
+- **`SKILL.md` has a token budget**, currently 6000. It loads on every trigger; `references/` load
+  only when read. New detail belongs in a reference by default — but **the budget is a visibility
+  mechanism, not a quality cap.** If something genuinely belongs in the always-loaded file, put it
+  there and raise the number in the same change, saying why. Never cut something worth saying to fit
+  a figure.
 - **Bump `version:` in `SKILL.md`** in the same commit as any change to `SKILL.md` or `references/`.
 - **Write the `CHANGELOG.md` entry in the same change**, not in a follow-up. A release was published
   once from a commit that documented every version except the one it released.

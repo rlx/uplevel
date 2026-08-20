@@ -2,6 +2,12 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.55.0 — 2026-08-19
+
+- `selfcheck.sh`: the `SKILL.md` budget is 6000 rather than 4000, and is documented as a visibility
+  mechanism rather than a quality cap — raise it deliberately when something belongs in the
+  always-loaded file.
+
 ## v0.54.0 — 2026-08-19
 
 - New `references/remedies.md`: what each finding turns into, so the four remedy-shaped plan fields are
