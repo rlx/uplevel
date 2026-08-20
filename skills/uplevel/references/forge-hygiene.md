@@ -69,6 +69,7 @@ Read the failures as data — they are the answer, not an error:
 | `viewerPermission` is `READ` | no settings or org policy; **rulesets are still readable** | query rulesets anyway before recording *unknown* |
 | `rulesets` returns `[]` | readable and genuinely empty | **absent** — real evidence, though legacy branch protection may still exist unseen |
 | ruleset present with `enforcement: disabled` | a control that enforces nothing | **absent in effect** — say it plainly; the settings page implies otherwise |
+| a settings field is `null` inside a `200` | the response succeeded and the field is withheld — `security_and_analysis` and `delete_branch_on_merge` do this without admin | **unknown**, exactly like a 403. A successful response is not a complete one |
 | protection endpoint 403 | needs admin | **unknown** |
 | protection endpoint 404 | **ambiguous** — GitHub returns 404 rather than 403 to avoid disclosing existence, and also returns it for a branch that does not exist | **unknown**, unless `viewerPermission` is `ADMIN` *and* the branch exists — only then is it *absent* |
 | self-hosted forge with no runners registered | CI is defined and never executes | worse than absent; the badge lies |
