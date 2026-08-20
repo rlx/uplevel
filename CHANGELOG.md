@@ -2,6 +2,12 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.52.0 — 2026-08-19
+
+- `mode-a-investigate.md`: how to read the kind tells, from running them against ten repositories. A
+  repository can be two kinds; packaging metadata is not publishing; a missing publish job is a
+  finding rather than an absence; a CLI shipped as binaries is still something others run.
+
 ## v0.51.0 — 2026-08-19
 
 - `automation.md`: propose a workflow analyzer rather than reimplementing one. Names `zizmor`,
