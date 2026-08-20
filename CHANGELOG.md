@@ -2,6 +2,15 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.46.0 — 2026-08-19
+
+- `mode-a-investigate.md`: establish what kind of repository this is before the audit is weighted —
+  service, library, reference, tooling, or an application someone else runs. The kind decides whether
+  an absence is a finding.
+- `mode-a-investigate.md`: cross-check the pull request API against the git log; where they disagree,
+  how work reaches the default branch is the finding.
+- `forge-hygiene.md`: a settings field that is `null` inside a `200` is unknown, not absent.
+
 ## v0.45.0 — 2026-08-19
 
 - `forge-hygiene.md`: the forge measurements degrade cleanly on a repository with no workflows

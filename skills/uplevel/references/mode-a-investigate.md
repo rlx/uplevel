@@ -11,6 +11,28 @@ user asks you to "set it up", that still means investigate, propose, and wait. W
 once they have picked, which is what *Execute* below covers — and at that point you are no longer
 investigating, so branch first and build only what was chosen.
 
+### Establish what kind of repository this is
+
+**Before anything else, and in one line.** This skill is weighted toward services that run somewhere
+and can page someone. Most repositories are not that, and the same finding means different things
+depending on which one you are looking at. Decide early, say it in the report, and let it set the
+weighting — deciding late means writing a report and then discovering it was aimed wrong.
+
+| kind | tell | what changes |
+|---|---|---|
+| **service** | deploy config, migrations, environments, an on-call anything | the default. Weight deploys, rollback, migrations, environment safety |
+| **library** | published to a registry, semver, consumers you cannot see | weight release integrity and backwards compatibility; deploys are irrelevant |
+| **reference or teaching** | the artifact is the code being read, forks are the point | weight reproducibility and cost-to-run. Missing CI may be entirely defensible |
+| **tooling or config** | CI definitions, infrastructure, dotfiles, prompts | the repository *is* the process; its own gate is the product |
+| **application, not deployed by you** | shipped as source or an image someone else runs | **you cannot roll back.** Weight upgrade and migration safety hardest |
+
+**The kind decides whether an absence is a finding.** Missing CI on a teaching repository whose test
+suite needs rented GPUs is a defensible trade-off; missing CI on a service with weekly incidents is
+not. Both are *absent*; only one is a *problem*. Saying which you think it is — and why — is the
+difference between an audit and a checklist read aloud.
+
+**When it is not obvious, ask.** One line, before you spend the context.
+
 ### Scope it first
 
 **A full audit is not the only shape, and it is not always the right one.** Someone asking whether
@@ -231,6 +253,28 @@ Lead with findings, not recommendations. Keep it to what you verified:
 merges reached the default branch without review, how often its CI is red, and how often work is
 reverted. A team rarely argues with its own history, and often argues with a best practice.
 
+**Check that pull requests are how work actually arrives, before computing statistics about them.**
+On a repository where they are not, review statistics are meaningless rather than merely wrong: one
+audited project had **one merged pull request against sixty-one closed unmerged**, because
+contributions arrive as pull requests and the maintainer then applies the work by pushing directly.
+"0 of 1 merged PRs had an approving review" is a number dressed as evidence.
+
+The signal is the ratio of closed-unmerged to merged, which does not care how the repository merges:
+
+```sh
+gh pr list --state all --limit 100 --json state,mergedAt \
+  --jq '{merged: ([.[]|select(.mergedAt)]|length), closed_unmerged: ([.[]|select(.state=="CLOSED" and .mergedAt==null)]|length)}'
+```
+
+Around **0.2–0.3** is a project where pull requests are the way in. Above **1** most of them are not
+landing, and that — not the review rate — is the finding: contribution friction, an unstated bar, or a
+maintainer who applies patches by hand.
+
+**Do not try to measure this by counting merge commits.** A squash merge produces none, so
+`grep -c 'Merge pull request'` reports zero on a repository with seventy-five merged pull requests and
+reads as a catastrophic disagreement. This was the first version of this rule, and one repository in
+the corpus falsified it immediately.
+
 **Anything security-urgent is raised first and directly to the user** — not filed as plan item nine.
 An exposed secret, `pull_request_target` running untrusted code with secrets, or an unpinned
 third-party action holding write permissions belong in the first paragraph of your reply, and never in
@@ -292,8 +336,9 @@ Rules for the plan itself:
   being acted on, and it reads as a verdict on the team rather than an offer of help. Earning the
   right to propose a second change matters more than the first being the biggest — which is what the
   one permitted adjustment above is for.
-- **Name the constraint you can see.** Missing CI on a small internal tool is a defensible trade-off;
-  missing CI on a service with weekly incidents is not. Say which you think this is.
+- **Name the constraint you can see**, and weigh it against the repository kind you established at the
+  start. The same absence is a trade-off in one kind and a defect in another; say which you think this
+  is, and why.
 
 ### Execute — only what was chosen
 
