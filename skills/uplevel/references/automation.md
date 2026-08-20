@@ -46,6 +46,22 @@ For a service with production issues, the usual order is:
    than at first use, in the request path, in production.
 8. **Test coverage of the incident**: for each recent production issue, a test that reproduces it.
 
+**For the Actions audit specifically, propose a tool rather than a checklist.** Static analyzers for
+workflows already encode dozens of specific vulnerability classes, they run in CI as a blocking check,
+and they stay current without anyone re-reading a reference file. That is rung 2 replacing a manual
+pass, which is the whole point of this ladder:
+
+- **`zizmor`** — around thirty workflow audits: impostor commits, cache poisoning in release jobs,
+  credential persistence, `secrets: inherit`, spoofable bot conditions, `$GITHUB_ENV` injection.
+- **OpenSSF Scorecard** — repository-level posture across twenty checks, several of which this skill
+  covers by hand: branch protection, token permissions, pinned dependencies, signed releases.
+- **`actionlint`** — syntax and expression errors, which are the boring half and still worth catching.
+
+**Propose one, do not reimplement it.** An audit that hand-checks what a tool checks better is a
+checklist competing with a program, and the program wins on coverage and on staying current. What this
+skill adds is the part they cannot do: deciding which findings matter for *this* repository's kind, and
+saying what is absent rather than what is wrong.
+
 **A forge setting often outranks the hook someone was about to write.** The clearest case is commit
 text: a `commit-msg` hook is rung 3 and bypassable, while a squash-merge setting that writes only the
 pull request title is rung 1 — the long body cannot reach the default branch at all. Check what the
