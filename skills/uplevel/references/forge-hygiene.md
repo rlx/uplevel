@@ -268,7 +268,11 @@ Failure modes to check for by name, each of which produces a green repo that val
   never ran on**. Compare the filter against `git branch -a --sort=-committerdate` and against the
   branch the last release was tagged from — not against the branch you happen to be on.
 - **`continue-on-error: true`, `|| true`, `set +e`, `if: always()` on a check step.** The job is green
-  while the step failed. Grep for these before believing any status badge.
+  while the step failed. Grep for these before believing any status badge. **PowerShell fails open by
+  default and needs the same look** — a script with no `$ErrorActionPreference = 'Stop'` and no
+  `$LASTEXITCODE` test carries on past a failed native command. One audited publish script did exactly
+  that: when the build failed it copied the *previous* binary still sitting in the output directory,
+  signed it, and shipped it to an auto-updating channel.
 - **No `timeout-minutes`.** A hung job consumes the runner for hours and teaches people to ignore
   pending checks.
 - **No `concurrency:` group.** Superseded runs keep executing — wasted minutes, and racing deploys if
@@ -504,6 +508,13 @@ are reverted. **A team that argues with a recommendation rarely argues with its 
   anything enforces it.
 - **No smoke test after deploy** — a pipeline that reports success when the process started, not when
   the change works.
+- **Nothing orders the deploy after the gate.** Two workflows on the same trigger are concurrent, not
+  sequential, and the deploy is usually the shorter one — so the change is live before the suite that
+  validates it has finished. Measured on two repositories: one published a median twenty-two seconds
+  ahead of its own CI across every commit that ran both, the other about twenty-five. Neither is a
+  race that *sometimes* loses; the ordering is structural. `needs:` in one workflow, or a deploy that
+  is a job rather than a second trigger, is the fix — and *"CI runs on every push"* is not the answer
+  to *"what runs before users see it?"*
 - **No tag, release, or changelog**, so "what shipped" is reconstructed from memory during an incident.
 - **A tag that exists and does not identify what shipped.** Absence is the easy case; the tag that is
   present and wrong is the one an audit calls fine. Four ways it lies, each measured on a real
