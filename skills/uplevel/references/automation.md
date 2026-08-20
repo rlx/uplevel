@@ -125,6 +125,22 @@ A check is a policy, not a patch. Before adding or tightening one in a repo you 
   quadrupled it, however reasonable it looked in isolation. Then **update whatever documents the
   runtime** — a contributor guide claiming "well under a second" for a gate that now takes five is
   wrong in the file people read to learn the process.
+- **A commit hook nobody installed runs for nobody.** Git does not populate `.git/hooks/` from a
+  tracked directory, and it never will — a hook committed to the repository is inert until each
+  contributor copies it into place. If you propose a hook, propose the installer with it and a check
+  that the installed copy still matches the tracked source. Otherwise you have added a rung-3 control
+  that exists in the tree and fires on nobody's machine, which is worse than no hook because everyone
+  believes it is running.
+- **Say how the hook is bypassed, and that saying why is the price.** `--no-verify` exists, people
+  will use it, and a convention that pretends otherwise gets ignored rather than followed. "Bypass
+  when you know why, and say so in the pull request" is a rule that survives contact.
+- **Skip the local-only checks when `CI` is set.** A gate that verifies a developer's machine — hooks
+  installed, a tool present locally — has nothing to check on a runner, and failing there teaches
+  people the gate is noise. Guard those on `${CI:-}` and print that they were skipped.
+- **A gate script runs on more than one machine's tooling.** CI is usually GNU coreutils and a current
+  bash; a maintainer may be on BSD tools and bash 3.2. A GNU-only flag passes for whoever wrote it and
+  fails for everyone else, or the reverse, and the failure looks like a broken check rather than a
+  portability problem. Keep the forbidden constructs in a data file and check for them.
 - **Make it runnable locally** with the exact command CI uses. "Push and wait for CI" is not a
   development loop.
 

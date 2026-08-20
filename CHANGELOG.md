@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.58.0 — 2026-08-19
+
+- `automation.md`: four rules this project follows and the skill never taught — a committed hook is
+  inert until installed, `--no-verify` needs a convention rather than a pretence, local-only checks
+  must skip in CI, and a gate script runs on more than one machine's tooling.
+- `forge-hygiene.md`: `permissions: {}` is the floor worth proposing, not `contents: read`.
+
 ## v0.57.0 — 2026-08-19
 
 - `SKILL.md`, `discovery.md`: check the clone is not shallow before answering what has already gone

@@ -370,6 +370,10 @@ the inverse of the error this file spends most of its length preventing, and jus
   misreports in both directions: one repository has it in 7 of 17 files but only 7 of 57 jobs, another
   in 6 of 7 files but 14 of 15 jobs. The first looks half-covered and is not; the second looks patchy
   and is nearly complete.
+- **`permissions: {}` at workflow level is the floor worth proposing**, not `contents: read`. Empty
+  grants nothing and each job widens to exactly what it needs, so a job added later starts closed
+  rather than inheriting a read token nobody re-examined. Where the workflow genuinely needs nothing —
+  a linter, a formatter, a docs build — `{}` is also the honest description of it.
 - **No `permissions:` block.** The default `GITHUB_TOKEN` may carry write scope to the whole
   repository, handed to every action including third-party ones. Set `permissions: contents: read` at
   workflow level and widen per-job only where needed.
