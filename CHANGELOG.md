@@ -4,18 +4,15 @@ Versions match `version:` in `skills/uplevel/SKILL.md`.
 
 ## v0.62.0 — 2026-08-20
 
-- `mode-a-investigate.md`: find the repository's conventions before writing, not after the gate
-  rejects the change. The recurring set is a version marker, a changelog entry in the same commit, a
-  wrap width, a spelling variant, and a trailer — match them rather than improve them.
-
-## v0.61.0 — 2026-08-20
-
 - `mode-a-investigate.md`: "teaching" is a weighting, never a reason to look less hard. No rollback is
   not the same as nothing to gate, and a teaching repository that serves a page or ships a package
   inherits that kind's gate in full.
 - `forge-hygiene.md`: `allow_failure: true` is GitLab's `continue-on-error`, and the map named every
   other translation but that one. It is the highest-value grep on a GitLab repository.
 - `forge-hygiene.md`: fork merge requests get the same blast-radius question as fork pull requests.
+- `mode-a-investigate.md`: find the repository's conventions before writing, not after the gate
+  rejects the change. The recurring set is a version marker, a changelog entry in the same commit, a
+  wrap width, a spelling variant, and a trailer — match them rather than improve them.
 
 ## v0.60.0 — 2026-08-20
 
