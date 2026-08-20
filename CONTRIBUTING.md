@@ -88,6 +88,18 @@ repository is public.
 Squash merge writes only the pull request title into `main`. Pull request bodies follow the same rule
 and can be edited after merge; a commit message cannot.
 
+## Does the skill say what this repository does?
+
+Periodically, diff the two. This project learns things by running its own gate, and those lessons
+have repeatedly stayed in a commit message or a research note instead of reaching the file that
+ships. The shallow-clone trap sat in the validation notes for the length of the project before the
+skill said it; a later sweep found five more practices followed here and taught nowhere.
+
+The pass is cheap: list what this repository *does* — its workflow settings, its gate's guards, the
+conventions in this file — and for each, grep `skills/uplevel/` for whether it is taught. Anything
+followed here and absent there is either a lesson worth shipping or a habit worth dropping, and both
+answers are useful.
+
 ## Scope
 
 Repository-specific checks belong in that repository's own checklist, never in the shipped skill —
