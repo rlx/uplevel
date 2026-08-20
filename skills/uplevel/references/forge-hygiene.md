@@ -260,6 +260,13 @@ Failure modes to check for by name, each of which produces a green repo that val
 - **`paths:` / `paths-ignore:` filters** that skip the job for exactly the change that breaks things
   (a workflow file, a lockfile, a migration). Worse: if a *required* check is skipped by a path filter
   it may never report, and the PR is blocked or waved through depending on configuration.
+- **`branches:` filters that no longer name the branch that matters.** The workflow is present, the
+  trigger is present, and neither applies where the work happens. Two directions, both measured: one
+  repository renamed its default branch and left the filter naming the old one, so **the default
+  branch has had no CI since the day it became default**; another triggered only on its default branch
+  while cutting release tags from `release/*` branches, so **every release was built from a branch CI
+  never ran on**. Compare the filter against `git branch -a --sort=-committerdate` and against the
+  branch the last release was tagged from — not against the branch you happen to be on.
 - **`continue-on-error: true`, `|| true`, `set +e`, `if: always()` on a check step.** The job is green
   while the step failed. Grep for these before believing any status badge.
 - **No `timeout-minutes`.** A hung job consumes the runner for hours and teaches people to ignore

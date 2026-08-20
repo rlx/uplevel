@@ -2,6 +2,12 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.66.0 — 2026-08-20
+
+- `forge-hygiene.md`: a `branches:` filter that no longer names the branch that matters. One repository
+  renamed its default branch and left the filter on the old name; another triggered only on its default
+  branch while cutting releases from `release/*`. The workflow is present and applies nowhere.
+
 ## v0.65.0 — 2026-08-20
 
 - `forge-hygiene.md`: a tag can exist and still not identify what shipped — a version published with
