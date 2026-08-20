@@ -336,6 +336,11 @@ a document that might be published.
 
 ### Plan
 
+**Read `remedies.md` before writing this.** Four of the six fields — prevents, effort, affects, undo —
+are properties of the remedy, not of the repository, and are given there. Authoring them fresh is how
+the same fix ends up described three ways across three audits, with three different effort figures.
+What is yours: which findings earn a place, in what order, `if skipped`, and `needs`.
+
 Then a numbered list the user can pick from — `1, 3, 5` should be a sufficient reply. **Every item
 carries all six fields, every time**, in this order:
 

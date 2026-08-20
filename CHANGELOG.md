@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.54.0 — 2026-08-19
+
+- New `references/remedies.md`: what each finding turns into, so the four remedy-shaped plan fields are
+  looked up rather than authored. Read at plan time only.
+- `SKILL.md`: states the shape — judgment at the entry, determinism after. Two audits of the same
+  repository should differ in what they noticed, never in what a finding costs.
+
 ## v0.53.0 — 2026-08-19
 
 - `mode-a-investigate.md`: form a hypothesis before walking the eight steps — who is exposed, what has
