@@ -8,6 +8,22 @@ Everything else is decoration.
 Search in this order and stop at the first that gives a real answer. Later sources describe intent;
 earlier ones describe what is enforced.
 
+**A shallow clone silently answers "nothing has ever gone wrong here."** `git clone --depth 1` — the
+default for CI checkouts, container builds, and anyone cloning a large repository quickly — leaves one
+commit. Every history question then returns zero: zero reverts, zero hotfixes, zero incidents, no
+contributor count, no cadence. It reads exactly like a healthy repository and it is an artifact of how
+the clone was made. Check before trusting any of it:
+
+```sh
+git rev-list --count HEAD          # 1, or suspiciously round, means shallow
+git rev-parse --is-shallow-repository
+git fetch --unshallow --filter=blob:none    # or --depth 3000 if the full history is large
+```
+
+This is the highest-consequence measurement error available, because *what has already gone wrong
+here* is one of the three questions the whole audit is aimed by. Getting a false clean there aims
+everything downstream at the wrong thing.
+
 0. **Confirm the gate is even in this repository.** On large projects it frequently is not, and every
    later step is then measuring the wrong thing. Four shapes seen repeatedly:
    - **A sibling repo.** The workflow calls a reusable pipeline, or a bot mirrors PRs elsewhere. Follow
