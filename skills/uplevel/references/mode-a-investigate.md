@@ -31,6 +31,21 @@ suite needs rented GPUs is a defensible trade-off; missing CI on a service with 
 not. Both are *absent*; only one is a *problem*. Saying which you think it is — and why — is the
 difference between an audit and a checklist read aloud.
 
+**Reading the tells, from running them against real repositories:**
+
+- **A repository can be two kinds, and then it inherits both weightings.** One audited project
+  publishes to PyPI *and* ships `docker run` self-host instructions: it has a permanent published
+  version *and* an upgrade path running on other people's data, and an audit that picks one misses
+  half of what can hurt it. Say both, and weight both.
+- **Find the release path before describing it, rather than inferring one from a manifest.** A
+  `pyproject.toml` can exist to make code installable for reproduction and never reach a registry. And
+  no publish job does not mean no publishing — it often means someone runs `npm publish` from a
+  laptop, which is a finding rather than the absence of one: the release path exists and nothing
+  guards it. Look for the publish job, or the package on the registry, and say which you found.
+- **A CLI shipped as binaries through releases** has no registry and no image, and is still something
+  other people run and you cannot roll back. Weight it as *application others run*, whatever the
+  distribution channel is.
+
 **When it is not obvious, ask.** One line, before you spend the context.
 
 ### Scope it first
