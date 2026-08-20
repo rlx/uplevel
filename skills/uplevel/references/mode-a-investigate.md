@@ -302,12 +302,22 @@ Lead with findings, not recommendations. Keep it to what you verified:
   |---|---|---|
   | service | production | rollback, if it has been exercised |
   | library | the registry | **nothing.** A published version is permanent; see `destructive-ops.md` |
-  | reference or teaching | readers and forks | nothing to roll back, and nothing to gate |
+  | reference or teaching | readers and forks | nothing to roll back — but see below before writing "nothing to gate" |
   | tooling or config | the repositories it governs | their gates, which yours now sets |
   | application others run | other people's machines | **nothing you control** |
 
   For three of those five, *there is no rollback at all*, and the release gate is the last reversible
   moment. Say that in the report rather than proposing a rollback that cannot exist.
+
+  **"Teaching" is a weighting, never a reason to look less hard.** No rollback is not the same as
+  nothing to gate, and the row above is the one most often misread as permission to stop. A teaching
+  repository that also serves a page, publishes a package, or ships a container has a live artifact
+  with users, and it inherits that kind's gate in full. One audited teaching repository — a browser
+  game with seven hundred forks — deployed to its host's pages straight from the default branch, and
+  its deploy finished **twenty-five seconds before its own test suite did**, every time; the same
+  audit found contributor-supplied translation strings reaching `innerHTML` on the live page. Both are
+  gate findings on a repository whose kind says there is nothing to gate. Establish the kind to decide
+  *what an absence costs*; never to decide whether to check.
 - **The gaps**, each tied to something real: an incident in the log, an unenforced rule in a doc, a
   hazard with no guard. Say which are *evidence* and which are *inference*.
 - **Absences, named** — see the absence audit. Present / absent / unknown, never silently omitted.

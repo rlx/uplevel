@@ -100,6 +100,24 @@ that has never seen one. Read `.gitlab-ci.yml` and translate:
 | token scope for the job | `permissions:` | `CI_JOB_TOKEN` scope, set in project settings rather than in the file |
 | deploy gates | environments with reviewers | `environment:` plus protected environments |
 | who may merge | rulesets and required checks | protected branches, approval rules, and *Merge when pipeline succeeds* |
+| a check that runs and never blocks | `continue-on-error: true` | **`allow_failure: true`** — grep every job for it |
+| untrusted code from a fork running in CI | fork-PR approval policy | fork merge-request pipelines, plus whether the job holds `CI_REGISTRY_PASSWORD` or `CI_JOB_TOKEN` |
+
+**`allow_failure: true` is the single highest-value grep on a GitLab repository.** It is the exact
+analogue of `continue-on-error` — the job reports, the pipeline stays green, and the badge agrees.
+On one audited GitLab project the lint job carried it
+and **had failed on the last three pipelines while all three reported success**, with two reproducible
+formatting violations sitting on the default branch behind a green badge. Grep for it before
+concluding a pipeline gates anything:
+
+```sh
+grep -rn 'allow_failure' .gitlab-ci.yml .gitlab/ 2>/dev/null
+```
+
+**Fork merge requests deserve the same question as fork pull requests**, and the blast-radius rule
+below applies unchanged: judge them by what the job can reach. A job that builds a contributor-authored
+`Dockerfile` while holding a registry password is the GitLab shape of the finding, and the setting that
+governs it lives in project settings — so without API access it is **unknown**, never absent.
 
 **`include: remote:` and an unpinned `component:` are the supply-chain finding here**, and they are
 the analogue of a mutable `uses:` tag. A real project's file carried four includes — three vendor

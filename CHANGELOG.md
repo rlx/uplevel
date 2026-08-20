@@ -2,6 +2,15 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.61.0 — 2026-08-20
+
+- `mode-a-investigate.md`: "teaching" is a weighting, never a reason to look less hard. No rollback is
+  not the same as nothing to gate, and a teaching repository that serves a page or ships a package
+  inherits that kind's gate in full.
+- `forge-hygiene.md`: `allow_failure: true` is GitLab's `continue-on-error`, and the map named every
+  other translation but that one. It is the highest-value grep on a GitLab repository.
+- `forge-hygiene.md`: fork merge requests get the same blast-radius question as fork pull requests.
+
 ## v0.60.0 — 2026-08-20
 
 - `forge-hygiene.md`: a GitLab map — the same questions under different names, and `include: remote:`
