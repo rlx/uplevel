@@ -2,6 +2,15 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.53.0 — 2026-08-19
+
+- `mode-a-investigate.md`: form a hypothesis before walking the eight steps — who is exposed, what has
+  already gone wrong, and what would have to be true for this repository to be fine. Then walk the
+  list looking for what contradicts you.
+- `mode-a-investigate.md`: the kind is settled by one question — when this changes, who is exposed and
+  can anyone take it back — rather than by a list of signals to match. Signals are ambiguous and the
+  README is not.
+
 ## v0.52.0 — 2026-08-19
 
 - `mode-a-investigate.md`: how to read the kind tells, from running them against ten repositories. A
