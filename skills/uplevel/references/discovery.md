@@ -121,6 +121,14 @@ Read the repo's own declarations — never guess a version:
 | `rust-toolchain.toml`, `Gemfile` → `ruby`, `.ruby-version` | Rust, Ruby |
 | the CI workflow's `setup-*` steps and `env:` version pins | what CI actually uses — the authority |
 
+**A floating toolchain in CI makes the gate non-deterministic, which is a different finding from an
+unreproducible artifact.** An action pinned to a moving channel — `rust-toolchain@stable`,
+`setup-go@latest`, an unpinned linter — means the lint and type rules change under the project without
+a commit. The gate then goes red for a toolchain release rather than for the change, contributors
+learn that red is ambient, and the signal is spent. Look for a `rust-toolchain.toml`, `.nvmrc`,
+`.python-version` or equivalent alongside the CI step; where CI floats and the repository pins
+nothing, say so — it is cheap to fix and it is upstream of trusting any other check.
+
 ### Resolve the tool *inside the repository*, or the comparison is meaningless
 
 **Run every version check with the repository root as the working directory.** In the JS ecosystem —

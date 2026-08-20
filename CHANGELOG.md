@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.49.0 — 2026-08-19
+
+- `destructive-ops.md`: a package registry publish named as the irreversible operation for a library,
+  with the per-registry rules and what they leave you able to propose.
+- `discovery.md`: a floating toolchain in CI makes the gate non-deterministic, which is distinct from
+  an unreproducible release artifact.
+
 ## v0.48.0 — 2026-08-19
 
 - `forge-hygiene.md`: the pinning census matches workflow files rather than recursing the directory,

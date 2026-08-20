@@ -67,6 +67,23 @@ State the estimated cost before starting, not after.
 mail, posting to any external service. Publishing is not reversible in practice: caches and indexes
 outlive deletion.
 
+**A package registry publish, specifically.** For a library this is *the* irreversible operation — the
+one a deployed service's rollback story has no equivalent for — and it is irreversible by policy, not
+merely in practice. The rules differ and are worth naming exactly, because they decide what you can
+propose afterward:
+
+- **crates.io** — a version is permanent. `yank` stops new dependants resolving it and removes
+  nothing.
+- **PyPI** — a version number can never be reused, even after deletion. There is no second attempt at
+  `1.4.0`.
+- **npm** — unpublish only within 72 hours, and refused outright once anything depends on it.
+
+So for a library the **release gate is the last reversible moment**, and the only remedy after it is a
+new version. That inverts the usual advice: on a service you weight rollback, and here there is none
+to weight — you weight what runs *before* the publish job, whether it needs a human, and what
+credentials it holds. A repository that gates publishing behind a named environment and a manual
+trigger has solved this; one that publishes on tag push from a job holding write permissions has not.
+
 **Bulk edits.** Repo-wide `sed`/codemods, `--fix` on a linter across everything, mass renames,
 auto-formatting a codebase that was not formatted. Do a scoped run first, read the diff, then widen.
 
