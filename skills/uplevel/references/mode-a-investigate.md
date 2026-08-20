@@ -241,8 +241,22 @@ once — say each fact exactly once and cross-reference rather than restate.
 Lead with findings, not recommendations. Keep it to what you verified:
 
 - **The gate as it exists** — the command, its runtime, and what it does not cover.
-- **What validates a change before it reaches the default branch, and before it reaches production.**
-  If the answer to either is "nothing", that is the headline, not a footnote.
+- **What validates a change before it reaches the default branch, and before it reaches whatever this
+  repository's *downstream* is.** If the answer to either is "nothing", that is the headline, not a
+  footnote. **The second half is not always production** — name the one that matches the kind you
+  established, because a report that asks a service's question of a library reads as boilerplate and
+  gets treated as such:
+
+  | kind | the second gate is | and behind it |
+  |---|---|---|
+  | service | production | rollback, if it has been exercised |
+  | library | the registry | **nothing.** A published version is permanent; see `destructive-ops.md` |
+  | reference or teaching | readers and forks | nothing to roll back, and nothing to gate |
+  | tooling or config | the repositories it governs | their gates, which yours now sets |
+  | application others run | other people's machines | **nothing you control** |
+
+  For three of those five, *there is no rollback at all*, and the release gate is the last reversible
+  moment. Say that in the report rather than proposing a rollback that cannot exist.
 - **The gaps**, each tied to something real: an incident in the log, an unenforced rule in a doc, a
   hazard with no guard. Say which are *evidence* and which are *inference*.
 - **Absences, named** — see the absence audit. Present / absent / unknown, never silently omitted.

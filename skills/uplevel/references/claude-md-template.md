@@ -82,13 +82,27 @@ runs on pull requests" is more useful than an empty section.*
 
 ## Releasing
 
-- **Which commit is in production**: `<how anyone can tell>`
+*Which sections below apply depends on the repository kind. A deployed service keeps Releasing,
+Environments, Shipping and When production is broken. **A library keeps this section and deletes the
+other three** — there is no environment and no rollback, so this is where its weight goes. Delete
+what does not apply rather than leaving a heading with a placeholder under it.*
+
+- **Which commit is released**: `<how anyone can tell — a tag, a lockfile, a deployed SHA>`
 - **Gate before release**: `<approval, environment reviewers, manual checklist — or none>`
 - **After release**: `<smoke test, the signal watched, who watches it>`
 
+*For a published package, add — this is the part with no undo:*
+
+- **Registry and what it allows**: `<crates.io: permanent · PyPI: version never reusable · npm: 72h>`
+- **What runs before the publish job**, and whether anything needs a human
+- **What the publish job can reach**: `<token scope, environment gate, OIDC or a long-lived secret>`
+- **Version and deprecation policy**: `<semver, what a breaking change requires, how one is announced>`
+
 ## Environments
 
-*The single highest-value section for a deployed service. Delete only if nothing is deployed.*
+*The single highest-value section for a deployed service, and **not applicable to a library, a
+reference repository, or anything you do not deploy yourself**. Delete it there rather than filling it
+in with placeholders.*
 
 | environment | how to tell you are pointed at it | who can write | how a change gets here |
 |---|---|---|---|

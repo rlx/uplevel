@@ -2,6 +2,17 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.50.0 — 2026-08-19
+
+- `mode-a-investigate.md`: the report's second gate is named by repository kind — production, the
+  registry, readers, the repositories it governs, or other people's machines. For three of the five
+  there is no rollback behind it.
+- `forge-hygiene.md`: which sections apply, per kind, plus the two checks that exist only for a
+  published package — provenance and a version policy.
+- `automation.md`: what to automate first depends on the kind; the existing order is a service's.
+- `claude-md-template.md`: which sections apply is decided by kind. `Releasing` gains the
+  published-package fields; `Environments` says plainly it does not apply to a library.
+
 ## v0.49.0 — 2026-08-19
 
 - `destructive-ops.md`: a package registry publish named as the irreversible operation for a library,

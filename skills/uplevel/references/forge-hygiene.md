@@ -150,6 +150,28 @@ propose the substitute that does work: a pre-push hook where there are no requir
 
 ---
 
+## 0b. Which of the sections below actually apply
+
+**The seed is universal; the weighting is not.** Establish the repository kind first
+(`mode-a-investigate.md`), then spend the audit where that kind can be hurt. Auditing a library's
+deploy gates finds nothing because there are none, and reports diligence rather than the release path
+that is actually exposed.
+
+| kind | spend the audit on | skip, and say you skipped it |
+|---|---|---|
+| **service** | §3 protection, §4 deploy gates and rollback, §5 deploy-time risk | — |
+| **library** | §2 supply chain **on the publish path**, §4 release gates only, provenance and version policy | §4's deploy half, §5 entirely |
+| **reference or teaching** | §1 triggers, §7 basics, whether the documented commands still run | §3–§5; there is nothing downstream to gate |
+| **tooling or config** | §2 in full — its output becomes other repositories' CI | §4–§5 unless it deploys itself |
+| **application others run** | §4 release gates, upgrade and migration safety | §5; you do not operate it |
+
+**Two checks that only exist for a published package**, and that the rest of this file does not cover:
+
+- **Provenance and attestation.** npm provenance, PyPI attestations, sigstore signing. Absent on most
+  packages; cheap to add; the only thing that ties a published artifact to the commit it came from.
+- **A version and deprecation policy.** What a breaking change requires, and how consumers you cannot
+  see are told. For a library this is the backwards-compatibility control, and there is no other.
+
 ## 1. What runs, and when — trigger correctness
 
 **`on:` is a YAML 1.1 boolean, and most parsers turn it into `True`.** A workflow's trigger key is

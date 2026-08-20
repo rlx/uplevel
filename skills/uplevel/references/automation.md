@@ -22,7 +22,14 @@ Moving a rule up a rung is a real improvement. Say so when you do it, and delete
 
 ## What to automate first
 
-Order by *damage prevented per hour of setup*. For a service with production issues, this is usually:
+Order by *damage prevented per hour of setup* — **and the order depends on the repository kind.** The
+list below is for a service with production issues. For a **library**, items 5 through 7 do not exist
+and the order starts differently: protect the publish job first (environment gate, manual trigger,
+OIDC rather than a long-lived token), then pin what runs on that path, then provenance, then the
+gate. For a **reference repository**, the highest-value automation is usually a check that the
+documented commands still run, and most of what follows does not apply.
+
+For a service with production issues, the usual order is:
 
 1. **Secret scanning** on every commit and in history. Cheap; the failure mode is unbounded.
 2. **A single command that runs the whole gate** (`make check` / `just check` / `npm run check`) — the
