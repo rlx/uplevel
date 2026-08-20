@@ -2,6 +2,12 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.59.0 — 2026-08-19
+
+- `mode-a-investigate.md`: hazard discovery no longer names four languages. An extension list returned
+  zero on a repository with thirty-two Elixir migrations, and destructive schema change is spelled in
+  each ORM's own vocabulary rather than in SQL.
+
 ## v0.58.0 — 2026-08-19
 
 - `automation.md`: four rules this project follows and the skill never taught — a committed hook is

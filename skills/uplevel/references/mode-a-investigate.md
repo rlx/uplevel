@@ -203,13 +203,25 @@ package manager installs a wrong tree instead of failing.
    `find -type d -name migrations` returns nothing in a tree whose directory is `migration`, and a
    bare `truncate` grep matches string helpers far more often than SQL.
    ```sh
-   find . -ipath '*migrat*' \( -name '*.sql' -o -name '*.go' -o -name '*.py' -o -name '*.rb' \) \
-     -not -path '*/node_modules/*' -not -path '*/vendor/*'
-   grep -rnE '\b(DROP TABLE|DROP COLUMN|TRUNCATE TABLE|DELETE FROM|ALTER TABLE)\b' \
-     --include='*.sql' --include='*.go' --include='*.py' .
+   # Let the tree name its own extensions; do not guess them.
+   find . -ipath '*migrat*' -type f -not -path '*/node_modules/*' -not -path '*/vendor/*' \
+     -not -path '*/.git/*' | sed 's|.*/||; s|.*\.||' | sort | uniq -c | sort -rn
+   # Then search those files in the vocabulary the project's ORM actually uses.
+   find . -ipath '*migrat*' -type f -not -path '*/node_modules/*' -not -path '*/vendor/*' \
+     -not -path '*/.git/*' -print0 | xargs -0 grep -lniE \
+     'drop[ _]table|drop[ _]column|drop constraint|truncate|delete from|remove\(|remove_column|RemoveField|DeleteModel|dropTable|dropColumn'
    ```
-   Word boundaries and an uppercase SQL context, scoped to datastore code — then read each hit before
-   it becomes a finding.
+
+   **Do not name the languages.** An extension list is the same mistake as a directory-name guess, one
+   step later: a `find` naming `.sql .go .py .rb` returns **zero** on a repository with thirty-two
+   Elixir migrations containing forty-eight `ALTER TABLE` and thirty `DROP CONSTRAINT` statements, and
+   zero destructive DDL reads as *no data hazard here* — a reassuring false clean on the hazard class
+   that matters most. Measured, on a real repository.
+
+   **And destructive schema change is not spelled in SQL.** Ecto writes `remove(`, Rails
+   `remove_column`, Django `RemoveField` and `DeleteModel`, Knex `dropColumn`. Searching for SQL
+   keywords finds the raw-SQL minority and misses the ORM majority. Read each hit before it becomes a
+   finding.
 6. **Audit what is already automated**, and what is defined but not enforced — a job that never blocks
    a merge, and one that is permanently red, are both worse than nothing.
    See `automation.md`.
