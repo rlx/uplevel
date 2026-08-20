@@ -2,6 +2,12 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.57.0 — 2026-08-19
+
+- `SKILL.md`, `discovery.md`: check the clone is not shallow before answering what has already gone
+  wrong. `--depth 1` makes every history question return zero, which reads exactly like a healthy
+  repository.
+
 ## v0.56.0 — 2026-08-19
 
 - `SKILL.md`: the three orienting questions are asked before the mode file is opened, not after. They

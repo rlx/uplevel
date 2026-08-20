@@ -12,7 +12,7 @@ description: >
   project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.56.0
+version: 0.57.0
 ---
 
 # uplevel
@@ -154,6 +154,8 @@ wrong.
    whether an absence is a finding at all.** Missing CI on a teaching repository whose tests need
    rented GPUs is a defensible trade-off; on a service with weekly incidents it is not.
 2. **What has already gone wrong here?** Reverts, hotfixes, an incident named in a commit message.
+   **Check the clone is not shallow first** — `git rev-list --count HEAD` returning 1 means every
+   answer here will be zero, and zero reads exactly like a healthy repository.
    Rules derived from what actually broke are the only ones certain to earn their place, and they are
    what makes a plan persuasive rather than generic.
 3. **Given those two, what would have to be true for this repository to be fine?** Name it in a
