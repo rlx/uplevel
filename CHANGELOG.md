@@ -2,6 +2,14 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.64.0 — 2026-08-20
+
+- `forge-hygiene.md`: a check that runs, reports green and validated nothing is a shape of its own,
+  and the one an audit is most likely to miss. Job-level `continue-on-error`, a matrix axis that
+  silently never varies, a failing threshold scoped to one trigger, and a scheduled job green because
+  its work was skipped — the GitHub half of the `allow_failure` grep.
+- `forge-hygiene.md`: the shape count matched the table.
+
 ## v0.63.0 — 2026-08-20
 
 - `selfcheck.sh`: the Mode A working set has a ceiling and fails when it is crossed. The entry cost
