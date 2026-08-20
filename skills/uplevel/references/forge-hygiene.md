@@ -218,8 +218,12 @@ ls .github/workflows/ >/dev/null 2>&1 || echo "no workflows directory — the fi
 ls .github/workflows/*.y*ml 2>/dev/null | wc -l   # FILES; `ls dir | wc -l` counts README and scripts/
 grep -lE '^[[:space:]]+pull_request:|^[[:space:]]*-[[:space:]]*pull_request$|^on:.*[[,][[:space:]]*pull_request[],]' .github/workflows/*.y*ml 2>/dev/null
 grep -lE '^[[:space:]]+pull_request_target:|^[[:space:]]*-[[:space:]]*pull_request_target$|^on:.*[[,][[:space:]]*pull_request_target[],]' .github/workflows/*.y*ml 2>/dev/null
-grep -lE '^[[:space:]]*permissions:' .github/workflows/*.y*ml 2>/dev/null | wc -l
+grep -lE '^permissions:' .github/workflows/*.y*ml 2>/dev/null | wc -l   # TOP-LEVEL only
 ```
+
+**Anchor `permissions:` to column zero.** Indented, it also matches every job-level block, and the
+question here is whether the *workflow* sets a restrictive default: one audited repository shows a
+`permissions:` line in all seventeen workflows and a top-level default in thirteen.
 
 **Run the first line first.** A repository with no `.github/workflows` is the case this whole section
 exists to find, and without the redirections every command below it fails with `No such file or
@@ -287,13 +291,18 @@ the inverse of the error this file spends most of its length preventing, and jus
   code; pin to a full commit SHA with the version in a trailing comment. This is the cheapest real
   security improvement most repos can make.
   ```sh
-  grep -rhoE 'uses:[[:space:]]*[^[:space:]@]+@[0-9a-fA-F]{40}' .github/workflows/ 2>/dev/null | wc -l
-  mut=$(grep -rhoE 'uses:[[:space:]]*[^[:space:]@#]+@[^[:space:]#]+' .github/workflows/ 2>/dev/null \
+  grep -hoE 'uses:[[:space:]]*[^[:space:]@]+@[0-9a-fA-F]{40}' .github/workflows/*.y*ml 2>/dev/null | wc -l
+  mut=$(grep -hoE 'uses:[[:space:]]*[^[:space:]@#]+@[^[:space:]#]+' .github/workflows/*.y*ml 2>/dev/null \
     | grep -vE '@[0-9a-fA-F]{40}' | grep -vE 'uses:[[:space:]]*\.')
   printf '%s\n' "$mut" | grep -cE  'uses:[[:space:]]*(actions|github)/'   # first-party
   printf '%s\n' "$mut" | grep -vcE 'uses:[[:space:]]*(actions|github)/'   # third-party — rank these
   printf '%s\n' "$mut" | grep -vE  'uses:[[:space:]]*(actions|github)/' | sort | uniq -c | sort -rn
   ```
+
+  **Match the workflow files, not the directory.** `grep -r` over `.github/workflows/` reads whatever
+  else lives there. One audited repository keeps markdown sources beside the YAML they compile to, and
+  two of them carry `uses:` references — inflating its pinned count by four. It is the same trap as
+  counting directory entries instead of files, one measurement further down.
 
   **Report the third-party number, not the total.** They differ by more than the rounding: on one
   audited repository the combined figure was 66 and the third-party figure 28, and it is the 28 that
@@ -323,6 +332,10 @@ the inverse of the error this file spends most of its length preventing, and jus
   `github/*`) from third-party, then order by the permissions of the job the action runs in. A raw
   count inverts the answer: ninety mutable refs that are all PR-comment bots holding
   `pull-requests: write` matter less than a handful on the release path holding registry credentials.
+- **Count `timeout-minutes` per job, not per file.** It is a job-level key, and a file count
+  misreports in both directions: one repository has it in 7 of 17 files but only 7 of 57 jobs, another
+  in 6 of 7 files but 14 of 15 jobs. The first looks half-covered and is not; the second looks patchy
+  and is nearly complete.
 - **No `permissions:` block.** The default `GITHUB_TOKEN` may carry write scope to the whole
   repository, handed to every action including third-party ones. Set `permissions: contents: read` at
   workflow level and widen per-job only where needed.
