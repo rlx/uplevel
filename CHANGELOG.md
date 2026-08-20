@@ -2,6 +2,15 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.63.0 — 2026-08-20
+
+- `selfcheck.sh`: the Mode A working set has a ceiling and fails when it is crossed. The entry cost
+  was bounded and the cost actually spent was not, and every addition lands in `references/`.
+- `selfcheck.sh`: `remedies.md` counts toward Mode A — every plan is routed through it, and leaving
+  it out understated the working set by its whole length. `long-runs.md` joins the two modes that
+  reach it.
+- `selfcheck.sh`: a reference in no mode-cost list now fails, so the next one cannot go unmeasured.
+
 ## v0.62.0 — 2026-08-20
 
 - `mode-a-investigate.md`: "teaching" is a weighting, never a reason to look less hard. No rollback is

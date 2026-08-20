@@ -132,12 +132,34 @@ checks:
     status: enforced
     by: skills/uplevel/selfcheck.sh; prints tokens per mode on every run
     note: >-
-      SKILL.md's 4k budget is the entry cost, not the cost. A full Mode A audit
+      SKILL.md's budget is the entry cost, not the cost. A full Mode A audit
       reads most of references/ before touching the user's repository, and
       nothing was measuring that - so the number people optimized was a seventh
       of what an audit actually spends. Records no figure here for the same
       reason the SKILL.md entry does not. The file list is guarded: a rename
       that leaves it dangling fails the gate. Verified red-then-green.
+
+  - id: mode-working-set-bounded
+    status: enforced
+    by: skills/uplevel/selfcheck.sh; fails when the Mode A working set exceeds its ceiling
+    note: >-
+      printing the figure made growth visible and did not make it cost anything,
+      and every addition lands in references/ where nothing had a ceiling. The
+      entry cost was bounded and the spent cost was not. Raising the number in
+      the change that needs the room is the sanctioned move; growing past it
+      silently is what this prevents. remedies.md was missing from the Mode A
+      list, which understated the working set by its whole length, and
+      long-runs.md was in no list at all. Verified red-then-green.
+
+  - id: every-reference-measured
+    status: enforced
+    by: skills/uplevel/selfcheck.sh; fails when a shipped reference is in no mode-cost list
+    note: >-
+      the ceiling only bounds what it counts. remedies.md sat in no list while
+      mode-a-investigate.md routed every plan through it, so the advertised Mode A
+      cost was short by that file's whole length and nothing said so. This makes
+      the next unlisted reference fail rather than quietly go unmeasured.
+      Verified red-then-green.
 
   - id: checklist-parses
     status: enforced

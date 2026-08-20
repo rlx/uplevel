@@ -57,15 +57,24 @@ mode_cost() {
     total=$((total + $(wc -w < "$f") * 4 / 3))
   done
   printf '  %-28s ≈ %6d tokens\n' "$label" "$total"
+  MODE_COST=$total
+  seen="$seen $*"
 }
+seen=""
 mode_cost "Mode A, full audit" SKILL.md references/mode-a-investigate.md references/discovery.md \
   references/forge-hygiene.md references/checklist.md references/example-output.md \
   references/destructive-ops.md references/production.md references/automation.md \
-  references/evidence.md
+  references/evidence.md references/remedies.md
+# The entry cost is bounded by BUDGET above; this is the one that is actually
+# spent, and it is the number that competes with the user's repository for
+# context. Raise it in the same change that needs the room, and say why.
+MODE_A_BUDGET=40000
+[ "$MODE_COST" -gt "$MODE_A_BUDGET" ] && note "Mode A working set is $MODE_COST tokens, over its $MODE_A_BUDGET ceiling — tighten a reference, or raise it deliberately"
+echo "  (Mode A ceiling $MODE_A_BUDGET; $((MODE_A_BUDGET - MODE_COST)) left)"
 mode_cost "Mode A + write the doc" SKILL.md references/mode-a-investigate.md references/discovery.md \
   references/forge-hygiene.md references/checklist.md references/example-output.md \
   references/destructive-ops.md references/production.md references/automation.md \
-  references/evidence.md references/claude-md-template.md
+  references/evidence.md references/remedies.md references/claude-md-template.md
 # The scoped Mode A entry points. Printed next to the full audit because the
 # table in mode-a-investigate.md claims a scope is about a third of it, and a
 # claim about cost should be the measurement rather than a number someone typed.
@@ -73,10 +82,17 @@ mode_cost "  scope: forge" SKILL.md references/mode-a-investigate.md references/
 mode_cost "  scope: gate" SKILL.md references/mode-a-investigate.md references/discovery.md \
   references/evidence.md
 mode_cost "  scope: hazards" SKILL.md references/mode-a-investigate.md \
-  references/destructive-ops.md references/production.md
+  references/destructive-ops.md references/production.md references/long-runs.md
 mode_cost "Mode B" SKILL.md references/automation.md
 mode_cost "Mode C, check-in" SKILL.md references/mode-c-enforce.md references/evidence.md \
-  references/commit-hygiene.md
+  references/commit-hygiene.md references/long-runs.md
+
+for f in references/*.md; do
+  case " $seen " in
+    *" $f "*) ;;
+    *) note "$f is in no mode-cost list, so its load cost is unmeasured" ;;
+  esac
+done
 
 echo "== shipped commands parse =="
 # bash -n catches shell syntax. It does NOT catch a bad regex -- which is how a
