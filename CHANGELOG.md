@@ -2,6 +2,14 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.65.0 — 2026-08-20
+
+- `forge-hygiene.md`: a tag can exist and still not identify what shipped — a version published with
+  no tag, two tags per release that diverged, tags the registry ignores as invalid semver, and a
+  floating major force-pushed before the release is known good.
+- `forge-hygiene.md`, `automation.md`: two shipped commands used an unquoted glob, which zsh reports
+  as an error when nothing matches — precisely the absent case both commands exist to measure.
+
 ## v0.64.0 — 2026-08-20
 
 - `forge-hygiene.md`: a check that runs, reports green and validated nothing is a shape of its own,
