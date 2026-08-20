@@ -131,7 +131,7 @@ protected branches and `CI_JOB_TOKEN` scope are invisible to a clone. Without AP
 
 **The most common real finding on a mature repo is a control that exists and does nothing.** It is not
 an absence — the settings page shows it, a reviewer would swear it is on — so an audit that only asks
-"is it there?" reports it as present. Ask separately whether it *bites*. Four shapes, all seen in the
+"is it there?" reports it as present. Ask separately whether it *bites*. Six shapes, all seen in the
 field:
 
 | shape | how to catch it |
@@ -141,6 +141,30 @@ field:
 | A check that is published but not required | cross-reference emitted job names against the required contexts |
 | A migration left half-done — the rule exists but the default branch is excluded, or the line is commented out pending a rollout | read `conditions.ref_name.include`/`exclude`, and grep config-as-code for commented-out rules |
 | A `SECURITY.md` naming a reporting channel that is switched off | ask the API whether the channel exists, below |
+| A check that runs, reports green, and validated nothing | the run conclusion cannot tell you; read the step conclusions and the inputs the job actually received |
+
+**The last shape is the one an audit is most likely to miss, because every signal it produces says
+pass.** A required check that never ran and a required check that ran vacuously are indistinguishable
+from the outside, and only the second leaves the badge green. Four mechanisms, each measured on a real
+repository:
+
+- **`continue-on-error: true` at *job* level.** The job reports, the run stays green, and the failure
+  is discarded. One audited repository carried it on its driver test job: **sixty of sixty runs
+  reported success and thirteen of them contained a failed matrix job** — a twenty-two percent masked
+  failure rate. Its *step* carried `continue-on-error: false`, which reads as rigor and changes
+  nothing, because the job had already thrown the result away. Check the job before trusting the step.
+- **A matrix axis that silently never varies.** One repository declared `go-versions:` while every step
+  read `${{ matrix.go-version }}`; the input resolved empty, the action fell back to the runner's
+  default, and **nine advertised versions were one version for three years and ten months**. Compare
+  the matrix key against every `matrix.*` reference — a typo here does not fail, it narrows.
+- **A failing threshold scoped to one trigger.** A vulnerability scanner set `exit-code: 1` only when
+  `github.event_name == 'schedule'`, so the nightly went red for four weeks while every release
+  published straight past the same findings.
+- **A scheduled job green because its real work was skipped.** A gating step decided there was nothing
+  to do, the build step reported `skipped`, and the run concluded `success` — for thirty-seven days.
+
+`grep -rn 'continue-on-error' .github/workflows/` is the GitHub half of the `allow_failure` grep above,
+and it is worth the same one minute.
 
 **The security policy is the one document whose accuracy is load-bearing for a stranger.** A
 `SECURITY.md` that says "use the Security tab and choose *Report a vulnerability*" is wrong if private
