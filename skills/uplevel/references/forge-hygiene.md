@@ -141,7 +141,19 @@ field:
 | A check that is published but not required | cross-reference emitted job names against the required contexts |
 | A migration left half-done — the rule exists but the default branch is excluded, or the line is commented out pending a rollout | read `conditions.ref_name.include`/`exclude`, and grep config-as-code for commented-out rules |
 | A `SECURITY.md` naming a reporting channel that is switched off | ask the API whether the channel exists, below |
+| `[skip ci]` in a commit subject, which skips the workflow entirely | grep the log for it, and check whether release commits carry it |
 | A check that runs, reports green, and validated nothing | the run conclusion cannot tell you; read the step conclusions and the inputs the job actually received |
+
+**`[skip ci]` deserves its own look on the release path.** It produces no check run at all, so the
+commit is not red — it is blank, and a required check that never reports is a different problem from
+one that fails. One audited repository carried it on forty-four commits including changes to the
+workflow files themselves; another puts it on the version-bump commit its release tool tags, so **the
+tagged commit — the one that becomes the published artifact — has no test run against it**, while the
+branch it came from is green.
+
+```sh
+git log --format='%h %s' -200 | grep -iE '\[(skip ci|ci skip)\]'
+```
 
 **The last shape is the one an audit is most likely to miss, because every signal it produces says
 pass.** A required check that never ran and a required check that ran vacuously are indistinguishable

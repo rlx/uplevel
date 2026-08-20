@@ -50,6 +50,20 @@ difference between an audit and a checklist read aloud.
   other people run and you cannot roll back. Weight it as *application others run*, whatever the
   distribution channel is.
 
+**Ask whether anyone is still there, before writing a plan addressed to them.** A repository can be
+dormant or archived while its artifact is still being installed daily, and then every maintainer-facing
+proposal in your plan is void. Check the last commit date, the last release, and whether the forge
+reports the repository archived — then check the registry's download figures, which is the half people
+skip. Seen five times across four rounds of auditing: an **archived** repository whose package was
+downloaded eighty-five thousand times in a week with fifty dependents, where no pull request can be
+opened and no workflow can ever be fixed; a container image still pulled while its lock file froze
+three years ago; a library five years unreleased still shipping a vulnerable dependency today.
+
+**When that is the answer, the report is addressed to consumers, not maintainers.** Say plainly that
+the project is not accepting changes, and make the plan a decision about depending on it — pin it,
+vendor it, fork it, or leave. A seven-item plan for a maintainer who is gone is a document nobody can
+act on, and writing one is how an audit reads as boilerplate.
+
 **When it is not obvious, ask.** One line, before you spend the context.
 
 ### Scope it first
