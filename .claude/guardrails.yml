@@ -28,9 +28,15 @@ checks:
     status: enforced
     by: selfcheck.sh; bash -n on fenced blocks, plus grep -E pattern validation
 
-  - id: skill-md-under-4k-tokens
+  - id: skill-md-within-budget
     status: enforced
-    by: selfcheck.sh
+    by: selfcheck.sh; 6000 tokens, printed with the headroom on every run
+    note: >-
+      raised from 4000 on 2026-08-19. The ceiling exists because this file loads
+      on every trigger for every user, so growth is a cost borne by someone else
+      and should be deliberate. It is not a quality cap: when something belongs
+      in the always-loaded file, it goes there and the number moves in the same
+      change.
 
   - id: relative-links-resolve
     status: enforced

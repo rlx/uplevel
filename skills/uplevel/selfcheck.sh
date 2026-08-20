@@ -35,8 +35,14 @@ echo "== load cost =="
 w=$(wc -w < SKILL.md); tok=$((w * 4 / 3))
 # Print the headroom, not just the number. The ceiling is a wall you hit without
 # warning; the remainder is what tells you a change is nearly the last one that fits.
-echo "  SKILL.md ≈ $tok tokens of 4000 ($((4000 - tok)) left; loaded whenever the skill triggers)"
-[ "$tok" -gt 4000 ] && note "SKILL.md is over the 4k budget — it loads on every trigger; move detail into references/"
+# The ceiling is a visibility mechanism, not a quality cap. It exists because
+# this file loads on every trigger, for every user, whether or not they use the
+# skill -- so growth is a cost borne by someone else and should be deliberate
+# rather than accidental. When quality needs the room, raise the number in the
+# same change and say why. Do not cut something worth saying to fit it.
+BUDGET=6000
+echo "  SKILL.md ≈ $tok tokens of $BUDGET ($((BUDGET - tok)) left; loaded whenever the skill triggers)"
+[ "$tok" -gt "$BUDGET" ] && note "SKILL.md is over its $BUDGET-token budget — raise it deliberately, or move detail into references/"
 
 # SKILL.md's budget is the entry cost, not the cost. A mode reads its own file
 # and everything that file names, and nothing was measuring that -- so the number
