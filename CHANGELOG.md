@@ -2,6 +2,15 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.67.0 — 2026-08-20
+
+- `forge-hygiene.md`: PowerShell fails open by default, so a publish script with no
+  `$ErrorActionPreference` and no `$LASTEXITCODE` test carries on past a failed build and ships the
+  previous binary. The POSIX idioms were named and this one was not.
+- `forge-hygiene.md`: nothing orders the deploy after the gate. Two workflows on one trigger are
+  concurrent, and the deploy is the shorter one — measured live before its own suite finished on two
+  repositories.
+
 ## v0.66.0 — 2026-08-20
 
 - `forge-hygiene.md`: a `branches:` filter that no longer names the branch that matters. One repository
