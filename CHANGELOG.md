@@ -2,6 +2,14 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.48.0 — 2026-08-19
+
+- `forge-hygiene.md`: the pinning census matches workflow files rather than recursing the directory,
+  which counted `uses:` references in markdown living beside the YAML.
+- `forge-hygiene.md`: `permissions:` anchored to the top level; indented it also matched every
+  job-level block.
+- `forge-hygiene.md`: count `timeout-minutes` per job, not per file.
+
 ## v0.47.0 — 2026-08-19
 
 - `commit-hygiene.md`: write a pull request body to a file. Passed as a shell argument, backticked
