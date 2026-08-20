@@ -427,6 +427,35 @@ items and
 nothing adjacent, land them one reviewable change at a time, and report back what passed, what did not,
 and what you did not touch. Scope creep here is the fastest way to make the next proposal unwelcome.
 
+**Find the repository's conventions before you write, not after the gate rejects you.** Up to here you
+have been reading; the moment you write, this repository's rules bind you the same as any contributor,
+and most of them are unwritten in the sense that matters — they are visible in the last ten commits and
+enforced by a script. An audit that lands a change violating three of them has demonstrated the exact
+carelessness it was hired to fix. Spend the two minutes:
+
+```sh
+git log -10 --format='%s'                      # subject mood, length, prefix, issue refs
+git log -50 --format='%(trailers:only)' | sort -u
+git log -10 --stat | grep -iE 'changelog|version|\.md'   # what a change here normally touches
+find . .github -maxdepth 1 \( -iname 'contributing.md' -o -iname 'changelog.md' \
+  -o -iname 'pull_request_template.md' \) 2>/dev/null
+```
+
+*Use `find -iname` rather than a shell glob: an unmatched glob is an error in zsh rather than an empty
+result, and on a case-insensitive filesystem `ls` will happily report both spellings of a file that
+exists once.*
+
+Then read the project's own gate script rather than guessing what it enforces. The recurring set, all
+of which have bounced a first attempt somewhere: **a version marker that must move with the change**, a
+**changelog entry written in the same commit** rather than at release, a **line-wrap width**, a
+**spelling variant**, a **trailer the project uses and no other**, and where new prose is allowed to
+live. `commit-hygiene.md` covers the message itself.
+
+**Match, do not improve.** If their subjects are lowercase and yours is capitalized, you are wrong and
+they are right — house style is not a defect, and a contribution that quietly restyles it will be read
+as not having looked. Where a convention genuinely conflicts with something you must do, that is the
+rules-conflict invariant in `SKILL.md`: say it and let the maintainer choose.
+
 ### Calibration
 
 Rules earn their place by having prevented a real incident, or by guarding something genuinely
