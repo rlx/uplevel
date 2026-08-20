@@ -2,6 +2,11 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.56.0 — 2026-08-19
+
+- `SKILL.md`: the three orienting questions are asked before the mode file is opened, not after. They
+  decide what the audit is for, and answering them late means aiming a report wrong.
+
 ## v0.55.0 — 2026-08-19
 
 - `selfcheck.sh`: the `SKILL.md` budget is 6000 rather than 4000, and is documented as a visibility
