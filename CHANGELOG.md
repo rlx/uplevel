@@ -2,6 +2,17 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.75.0 — 2026-08-21
+
+- `evidence.md`: a check that built a different configuration than the one that ships. Not the stale
+  artifact already listed — fresh, and the wrong thing. Three repositories in one round tested `Debug`
+  while packaging `Release`, including one whose shrinker config still named a package deleted long
+  ago, which is what proved the release build had not run.
+- `forge-hygiene.md`: a ruleset that requires review and requires no check. Carrying `pull_request`
+  without `required_status_checks` enforces a social control rather than a technical one — one
+  audited repository demanded two approvals with an empty bypass list while having no CI at all to
+  require. Ninth shape in the configured-versus-enforced table.
+
 ## v0.74.0 — 2026-08-21
 
 - `selfcheck.sh`: load cost is measured with a real tokenizer where `tiktoken` is importable, and the

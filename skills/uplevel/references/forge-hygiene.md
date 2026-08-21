@@ -49,6 +49,12 @@ answer. Then check two things beyond existence:
   a ruleset exists.
 - **`bypass_actors`** — a required check that an admin, app, or team can bypass is a different
   guarantee from one nobody can. An empty list is worth stating.
+- **Whether `rules[]` contains `required_status_checks` at all.** A ruleset carrying only
+  `pull_request`, `deletion` and `non_fast_forward` reads as protection and enforces a *social*
+  control, not a technical one: review is required, and nothing mechanical has to pass. Two audited
+  repositories had exactly this, one of them demanding two approvals with an empty bypass list while
+  the repository had no CI whatsoever to require. Read the rule types, not the ruleset's name or its
+  approval count.
 
 Cross-reference the required check *names* against the workflows you read. A ruleset requiring a check
 called `ci` proves nothing until you find the job that produces that exact name — and a required check
@@ -128,7 +134,7 @@ protected branches and `CI_JOB_TOKEN` scope are invisible to a clone. Without AP
 
 **The most common real finding on a mature repo is a control that exists and does nothing.** It is not
 an absence — the settings page shows it — so an audit that only asks "is it there?" reports it as
-present. Ask separately whether it *bites*. Eight shapes, all seen in the field:
+present. Ask separately whether it *bites*. Nine shapes, all seen in the field:
 
 | shape | how to catch it |
 |---|---|
@@ -139,6 +145,7 @@ present. Ask separately whether it *bites*. Eight shapes, all seen in the field:
 | A `SECURITY.md` naming a reporting channel that is switched off | ask the API whether the channel exists, below |
 | `[skip ci]` in a commit subject, which skips the workflow entirely | grep the log for it, and check whether release commits carry it |
 | A committed workflow the forge reports disabled | the file and the badge cannot tell you; ask `actions/workflows` for its `state`, below |
+| A ruleset that requires review and requires no check | read `rules[]` for `required_status_checks`, above; approvals gate people, not code |
 | A check that runs, reports green, and validated nothing | the run conclusion cannot tell you; read the step conclusions and the inputs the job actually received |
 
 **`[skip ci]` deserves its own look on the release path.** It produces no check run at all, so the

@@ -77,6 +77,15 @@ Look for these before quoting a pass:
 - **A stale artifact.** You tested a cached build, an old container, a previous binary. If a version
   marker or build tag exists, confirm it matches what you just built; if one does not exist, that
   absence is itself worth reporting.
+- **A different configuration than the one that ships.** Not stale — fresh, and the wrong thing. The
+  gate builds and tests `Debug` while the package, the image or the store upload is `Release`:
+  different optimizer, different `#if` branches, different minification, and on Android a whole
+  shrinker pass whose keep rules nobody exercises. Three repositories in one round — a .NET library
+  whose CI ran `-c Debug` while its nuspec packaged `bin\Release\`; a C++ service whose CI set
+  `CMAKE_BUILD_TYPE=Debug` while its Dockerfile set `Release`; an Android app whose CI ran only
+  `assembleVanillaDebug`, its shrinker config still keeping a package deleted long ago, which is what
+  proved the release build had not run in a long time. Compare the configuration the gate builds
+  against the one the release job packages, and say so when they differ.
 - **Would have passed anyway.** A regression test that never saw red proves the suite runs, not that
   the bug is caught. Revert the fix, watch it fail, restore it, watch it pass.
 - **Wrong environment.** Correct command, different target.
