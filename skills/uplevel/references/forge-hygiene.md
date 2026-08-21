@@ -534,6 +534,14 @@ are reverted. **A team that argues with a recommendation rarely argues with its 
   all. **`needs:` cannot fix this** when the gate is a separate workflow — query the commit's
   check-runs before publishing, or make the check required so the red commit never reaches the branch
   you release from.
+- **A publish step that tolerates a version already in the registry.** `--skip-duplicate`,
+  `skip-existing: true` and their equivalents turn "this version is already published" from an error
+  into a success, so a release where somebody forgot the version bump is a green run that shipped
+  nothing, and nobody finds out until a user asks why the fix is missing. Measured on two registries:
+  one repository sat six commits past its last tag with its version constant still naming that tag;
+  another takes the published version from a literal in the workflow, and a tag with **zero check
+  runs** had already diverged from it. The flag exists to make a re-run idempotent, which is worth
+  keeping — pair it with an assertion that the version being published is the one the tag names.
 - **No tag, release, or changelog**, so "what shipped" is reconstructed from memory during an incident.
 - **A tag that exists and does not identify what shipped.** Absence is the easy case; the tag that is
   present and wrong is the one an audit calls fine. Four ways it lies, each measured on a real
@@ -598,6 +606,13 @@ Cheap, and their absence is usually a symptom rather than the disease:
   version selection. Never impose it on a log that reads otherwise.
 - `CONTRIBUTING.md` (how to propose a change), `CODEOWNERS`, a PR template that asks for test evidence
   and a rollback note, `SECURITY.md` (where to report a vulnerability), `LICENSE`.
+- **A license that says different things in different places.** The one fact a consumer's legal review
+  turns on, and it is stated in up to four: `LICENSE`, the README or its badge, the package manifest,
+  and the packaging metadata a registry or formula publishes. Three measured: `LICENSE` AGPL-3.0
+  against a README badge, README body and `CONTRIBUTING.md` all saying GPL-3.0; `LICENSE.txt` GPL-3
+  against a README badge of BSD-3-Clause and a `setup.py` reading "All Rights Reserved"; and an
+  Apache-2.0 repository whose published Homebrew formula declares MIT. Check the **published** one
+  first — it is what scanners and package managers read, and it is the copy nobody remembers to edit.
 - `.gitignore` gaps — committed build output, `.env` files, credentials, large binaries in history.
 - Long-lived and abandoned branches; branch naming that makes ownership unclear.
 - **Can a newcomer get to a passing test run in one command?** Try it. If setup takes an afternoon of

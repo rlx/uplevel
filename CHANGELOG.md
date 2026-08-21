@@ -2,6 +2,17 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.77.0 — 2026-08-21
+
+- `forge-hygiene.md`: a publish step that tolerates a version already in the registry.
+  `--skip-duplicate` and `skip-existing: true` turn a forgotten version bump into a green run that
+  shipped nothing. Two registries measured, one of them with a tag carrying zero check runs that had
+  already diverged from the literal the workflow publishes.
+- `forge-hygiene.md`: a license that says different things in different places. Three repositories
+  stated it two, three and four ways across `LICENSE`, the README badge, the manifest and the
+  published packaging metadata — and the published copy, the one scanners read, is the one nobody
+  edits.
+
 ## v0.76.0 — 2026-08-21
 
 - `forge-hygiene.md`: the publish never asks whether the commit it is shipping is green. The existing
