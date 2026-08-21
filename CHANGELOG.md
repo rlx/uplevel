@@ -2,6 +2,14 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.78.0 — 2026-08-21
+
+- `forge-hygiene.md`: a support range that nothing tests. The manifest declares which runtimes and
+  peer versions a package supports; the matrix decides which were ever run. Two libraries promised
+  combinations their CI did not cover — one of them deleting the failing cell from the matrix six
+  days after shipping a security release from the commit it failed on, while the manifest kept the
+  promise.
+
 ## v0.77.0 — 2026-08-21
 
 - `forge-hygiene.md`: a publish step that tolerates a version already in the registry.
