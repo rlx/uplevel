@@ -27,6 +27,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: install tiktoken
+        # The load-cost ceilings are only asserted when a real tokenizer is
+        # present; a word count reads 3-9% low on this content. The commit hook
+        # degrades to the estimate, so this step is what keeps main guarded.
+        run: |
+          python3 -m pip install --quiet tiktoken \
+            || python3 -m pip install --quiet --break-system-packages tiktoken
       - name: scripts/check-repo.sh
         run: ./scripts/check-repo.sh
       - name: scripts/check-install.sh

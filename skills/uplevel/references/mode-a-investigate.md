@@ -77,8 +77,9 @@ Ask what they want to know, and read only what answers it. `selfcheck.sh` prints
 | **hazards** | before a migration or a deploy; "what here is irreversible?" | `destructive-ops.md`, `production.md` |
 | **full** | an audit, a bootstrap, "set up guardrails here" | everything below |
 
-A scope costs between a third and half of the full audit — `selfcheck.sh` prints the current figures,
-which is where that range comes from. Take one when the question is narrow, and **offer the rest**:
+A scope costs between two-fifths and just over half of the full audit — `selfcheck.sh` prints the
+figures, which is where that range comes from. Take one when the question is narrow, and **offer the
+rest**:
 "I looked at the forge; the gate and the hazards are unexamined, and either is another pass."
 
 **Say the scope in the report, in the first line.** This is the same rule as naming absences, pointed

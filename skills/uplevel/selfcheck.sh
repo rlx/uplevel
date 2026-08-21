@@ -32,7 +32,18 @@ grep -qE 'references/[a-z0-9-]+\.md' references/*.md \
   && note "a reference cites another with a references/ prefix; use the bare filename"
 
 echo "== load cost =="
-w=$(wc -w < SKILL.md); tok=$((w * 4 / 3))
+# Measure with a real tokenizer where one is available. `wc -w * 4/3` reads 3-9%
+# low on this content: backticks, em-dashes, table pipes and the indentation on
+# wrapped list lines all fragment into tokens a word count cannot see, so every
+# ceiling here was being compared against a figure that understated what a mode
+# actually spends -- Mode A measured 38862 by word count and 42141 by tokenizer,
+# already past a ceiling the script reported 1138 of headroom against. Where
+# tiktoken is absent the estimate is still printed and the ceilings are not
+# asserted: an unmeasured cost is unknown, not passing. CI installs it, so main
+# is always guarded, and the commit hook stays useful without it.
+EXACT=""
+python3 -c 'import tiktoken' >/dev/null 2>&1 && EXACT=1
+[ -n "$EXACT" ] || echo "  (no tiktoken here — figures are a word-count estimate that reads low; ceilings not asserted)"
 # Print the headroom, not just the number. The ceiling is a wall you hit without
 # warning; the remainder is what tells you a change is nearly the last one that fits.
 # The ceiling is a visibility mechanism, not a quality cap. It exists because
@@ -41,42 +52,36 @@ w=$(wc -w < SKILL.md); tok=$((w * 4 / 3))
 # rather than accidental. When quality needs the room, raise the number in the
 # same change and say why. Do not cut something worth saying to fit it.
 BUDGET=6000
-echo "  SKILL.md ≈ $tok tokens of $BUDGET ($((BUDGET - tok)) left; loaded whenever the skill triggers)"
-[ "$tok" -gt "$BUDGET" ] && note "SKILL.md is over its $BUDGET-token budget — raise it deliberately, or move detail into references/"
 
 # SKILL.md's budget is the entry cost, not the cost. A mode reads its own file
 # and everything that file names, and nothing was measuring that -- so the number
 # people optimized was a seventh of what a Mode A audit actually spends before it
 # has read a line of the user's repository. The failure is silent: the agent
 # reads less of the repo, not less of the skill.
+# Record the lists now; count them all in one pass below. A tokenizer import
+# per mode would put seconds into the commit hook, which is how a gate stops
+# being run.
+lists="$(mktemp)"; costs="$(mktemp)"
 mode_cost() {
   label="$1"; shift
-  total=0
   for f in "$@"; do
-    [ -f "$f" ] || { note "mode-cost list names a missing file: $f"; continue; }
-    total=$((total + $(wc -w < "$f") * 4 / 3))
+    [ -f "$f" ] || note "mode-cost list names a missing file: $f"
   done
-  printf '  %-28s ≈ %6d tokens\n' "$label" "$total"
-  MODE_COST=$total
+  printf '%s\t%s\n' "$label" "$*" >> "$lists"
   seen="$seen $*"
 }
 seen=""
+mode_cost "SKILL.md" SKILL.md
 mode_cost "Mode A, full audit" SKILL.md references/mode-a-investigate.md references/discovery.md \
   references/forge-hygiene.md references/checklist.md references/example-output.md \
   references/destructive-ops.md references/production.md references/automation.md \
   references/evidence.md references/remedies.md
-# The entry cost is bounded by BUDGET above; this is the one that is actually
-# spent, and it is the number that competes with the user's repository for
-# context. Raise it in the same change that needs the room, and say why.
-MODE_A_BUDGET=40000
-[ "$MODE_COST" -gt "$MODE_A_BUDGET" ] && note "Mode A working set is $MODE_COST tokens, over its $MODE_A_BUDGET ceiling — tighten a reference, or raise it deliberately"
-echo "  (Mode A ceiling $MODE_A_BUDGET; $((MODE_A_BUDGET - MODE_COST)) left)"
 mode_cost "Mode A + write the doc" SKILL.md references/mode-a-investigate.md references/discovery.md \
   references/forge-hygiene.md references/checklist.md references/example-output.md \
   references/destructive-ops.md references/production.md references/automation.md \
   references/evidence.md references/remedies.md references/claude-md-template.md
 # The scoped Mode A entry points. Printed next to the full audit because the
-# table in mode-a-investigate.md claims a scope is about a third of it, and a
+# table in mode-a-investigate.md makes a claim about what a scope costs, and a
 # claim about cost should be the measurement rather than a number someone typed.
 mode_cost "  scope: forge" SKILL.md references/mode-a-investigate.md references/forge-hygiene.md
 mode_cost "  scope: gate" SKILL.md references/mode-a-investigate.md references/discovery.md \
@@ -86,6 +91,45 @@ mode_cost "  scope: hazards" SKILL.md references/mode-a-investigate.md \
 mode_cost "Mode B" SKILL.md references/automation.md
 mode_cost "Mode C, check-in" SKILL.md references/mode-c-enforce.md references/evidence.md \
   references/commit-hygiene.md references/long-runs.md
+
+# The entry cost is bounded by BUDGET above; the Mode A figure is the one that is
+# actually spent, and the number that competes with the user's repository for
+# context. Raise it in the same change that needs the room, and say why. It is a
+# visibility mechanism, not a quality cap: hitting it is a prompt to look at what
+# grew, never a reason to cut something worth saying.
+MODE_A_BUDGET=44000
+if [ -n "$EXACT" ]; then
+  python3 - "$lists" <<'PY' > "$costs"
+import sys, tiktoken
+enc = tiktoken.get_encoding("o200k_base")
+for line in open(sys.argv[1], encoding="utf-8"):
+    label, files = line.rstrip("\n").split("\t")
+    text = "".join(open(f, encoding="utf-8").read() for f in files.split())
+    print("%s\t%d" % (label, len(enc.encode(text))))
+PY
+else
+  while IFS="$(printf '\t')" read -r label files; do
+    printf '%s\t%s\n' "$label" "$(cat $files | wc -w | awk '{print int($1 * 4 / 3)}')"
+  done < "$lists" > "$costs"
+fi
+
+while IFS="$(printf '\t')" read -r label total; do
+  case "$label" in
+    "SKILL.md")
+      echo "  SKILL.md ≈ $total tokens of $BUDGET ($((BUDGET - total)) left; loaded whenever the skill triggers)"
+      [ -n "$EXACT" ] && [ "$total" -gt "$BUDGET" ] \
+        && note "SKILL.md is over its $BUDGET-token budget — raise it deliberately, or move detail into references/"
+      ;;
+    "Mode A, full audit")
+      printf '  %-28s ≈ %6d tokens\n' "$label" "$total"
+      [ -n "$EXACT" ] && [ "$total" -gt "$MODE_A_BUDGET" ] \
+        && note "Mode A working set is $total tokens, over its $MODE_A_BUDGET ceiling — tighten a reference, or raise it deliberately"
+      echo "  (Mode A ceiling $MODE_A_BUDGET; $((MODE_A_BUDGET - total)) left)"
+      ;;
+    *) printf '  %-28s ≈ %6d tokens\n' "$label" "$total" ;;
+  esac
+done < "$costs"
+rm -f "$lists" "$costs"
 
 for f in references/*.md; do
   case " $seen " in

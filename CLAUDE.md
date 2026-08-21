@@ -17,6 +17,10 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
 
 - `skills/uplevel/` is symlinked into `~/.claude/skills/`. The working tree is the installed skill;
   an edit takes effect in the next session.
+- Load cost is measured with a real tokenizer when `tiktoken` is importable, and falls back to a word
+  count that reads 3-9% low, in which case the gate prints the figures and asserts no ceiling. CI
+  installs it, so `main` is always measured exactly. The Mode A working set has a ceiling, currently
+  44000; raise it in the change that needs the room and say why.
 - `SKILL.md` has a token budget, currently 6000, enforced by the gate. It loads on every trigger;
   `references/` load only when read. New detail goes in a reference by default. The budget makes
   growth deliberate rather than capping quality — raise it in the same change when something belongs
