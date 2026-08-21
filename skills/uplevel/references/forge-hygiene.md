@@ -522,6 +522,18 @@ are reverted. **A team that argues with a recommendation rarely argues with its 
   race that *sometimes* loses; the ordering is structural. `needs:` in one workflow, or a deploy that
   is a job rather than a second trigger, is the fix — and *"CI runs on every push"* is not the answer
   to *"what runs before users see it?"*
+- **The publish never asks whether the commit it is shipping is green.** Distinct from the bullet
+  above: there the deploy races the gate, here the gate has already finished and *failed*, and
+  nothing reads the result. It appears wherever the tests live in a different workflow from the
+  release, because then the release job's `needs:` covers only its own build steps and a red commit
+  publishes normally. Four measured in one round: a WebSocket service whose production build fires on
+  `push: main` with no reference to its test workflow, whose own `Tests` on `main` ran 14 failure to
+  9 success while 12 of 30 merged pull requests carried a failing check; a library shipping wheels to
+  a registry on every tag while its default branch had been red for weeks; an image published from a
+  failed-CI commit six times in sixty pushes; and a plugin whose release workflow reads no status at
+  all. **`needs:` cannot fix this** when the gate is a separate workflow — query the commit's
+  check-runs before publishing, or make the check required so the red commit never reaches the branch
+  you release from.
 - **No tag, release, or changelog**, so "what shipped" is reconstructed from memory during an incident.
 - **A tag that exists and does not identify what shipped.** Absence is the easy case; the tag that is
   present and wrong is the one an audit calls fine. Four ways it lies, each measured on a real
