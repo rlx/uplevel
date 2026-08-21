@@ -11,9 +11,8 @@ project the skill is used on.
 
 **Absence is a finding.** Most of this file lists things that should exist, and in a repo with
 recurring production issues the highest-value findings are usually the missing ones — no CI on pull
-requests, no required checks, no rollback, no dependency updates. Say so by name. "There is no workflow
-that runs on `pull_request`, so nothing validates a change before it reaches `main`" is a finding.
-Silence about it reads as approval.
+requests, no required checks, no rollback, no dependency updates. Name them; `mode-a-investigate.md`
+step 7 has the wording, and silence about them reads as approval.
 
 ---
 
@@ -195,21 +194,15 @@ maintainers already reasoned about it — a staged rollout, a bootstrapping orde
 for them, not an accusation**: the loop was left open, which is different from nobody having thought
 about it.
 
-**Then classify every absence in this file into one of four buckets, and use the words:**
+**Then classify every absence in this file, and use the words** — `mode-a-investigate.md` step 7
+carries the rule, including that *unknown* is never rounded down to *absent*, and that only what needs
+attention gets a table row. Two of the four are worth spelling out against a list this long:
 
 - **absent** — the forge supports it, the account can use it, nobody set it up. *A gap the team owns.*
 - **unsupported here** — the platform, plan, or org policy does not offer it. **Still say it.** Name it
   as *best practice with no support in this environment*, say what protection is therefore missing, and
   point at the nearest thing that is available. It is not the team's failing, and it is not the team's
   fix either — but a reader deciding whether this repo is safe needs to know the control does not exist.
-- **unknown** — you lacked the permission or the tool to check. Never round this to *absent*; inferring
-  a missing control from a 403 is how a report acquires a false accusation.
-- **present** — verified, with what you ran to verify it.
-
-**Classify all of them; give a table row only to what needs attention.** This list is long, and a
-row per item buries the few that matter. Tabulate *absent*, *unsupported here* and *unknown*;
-report *present* as a count plus a one-line list. `mode-a-investigate.md` states the same rule for
-the report, and the two must not drift.
 
 A plan item aimed at an *unsupported* control is not actionable and should not be numbered. Put it in
 the report as a stated limitation of the environment, and — where one exists —

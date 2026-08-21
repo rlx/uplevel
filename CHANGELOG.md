@@ -2,6 +2,15 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.73.0 — 2026-08-21
+
+- `forge-hygiene.md`, `discovery.md`, `destructive-ops.md`: three rules that were stated in full in
+  two files at once now have one home and a pointer from the other. The four classification words and
+  the tabulate-only-what-matters rule belong to `mode-a-investigate.md` step 7; read-before-you-run
+  belongs to `SKILL.md`; why a wrong-environment command never looks like an error belongs to
+  `production.md` §1. In each case both files are loaded together wherever either is, so nothing moved
+  out of reach. Mode A 39027 → 38862 tokens, and no mode or scope grew.
+
 ## v0.72.0 — 2026-08-21
 
 - `evidence.md`: the runner's target list is not the set of tests. A test source the build system has
