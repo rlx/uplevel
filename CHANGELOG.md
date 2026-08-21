@@ -2,6 +2,15 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.76.0 — 2026-08-21
+
+- `forge-hygiene.md`: the publish never asks whether the commit it is shipping is green. The existing
+  bullet covers a deploy that *races* its gate; this is the case where the gate finished, failed, and
+  nothing read the result — which is what happens whenever the tests live in a different workflow
+  from the release, since the release job's `needs:` then covers only its own build steps. Four
+  repositories in one round, one of them merging 12 of 30 pull requests with a failing check while
+  its production build fired on every push to the default branch.
+
 ## v0.75.0 — 2026-08-21
 
 - `evidence.md`: a check that built a different configuration than the one that ships. Not the stale
