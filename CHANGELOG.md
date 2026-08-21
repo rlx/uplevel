@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.71.0 — 2026-08-21
+
+- `forge-hygiene.md`: a committed workflow the forge reports disabled. The file declares its triggers
+  and the last badge is green, but the forge has switched the whole workflow off — every trigger, not
+  just the `schedule:` — and nothing in the tree records it. Replaces the narrower note that only
+  scheduled workflows stop, and names the second cause, a maintainer disabling it by hand.
+
 ## v0.70.0 — 2026-08-20
 
 - `forge-hygiene.md`: a version marker in the tree that disagrees with what shipped. A tag
