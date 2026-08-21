@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.70.0 — 2026-08-20
+
+- `forge-hygiene.md`: a version marker in the tree that disagrees with what shipped. A tag
+  misidentifies a release from outside; a marker is read by the software itself, so being wrong
+  changes what users get — one installer served the untagged default branch for twenty-seven months
+  because its `VERSION` file said `dev`.
+
 ## v0.69.0 — 2026-08-20
 
 - `forge-hygiene.md`: the shape count matched the table again, and two adjacent bullets stopped
