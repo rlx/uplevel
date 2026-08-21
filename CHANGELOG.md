@@ -2,6 +2,21 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.74.0 — 2026-08-21
+
+- `selfcheck.sh`: load cost is measured with a real tokenizer where `tiktoken` is importable, and the
+  ceilings are asserted only then. A word count reads 3-9% low on this content — backticks,
+  em-dashes, table pipes and the indentation on wrapped list lines all fragment into tokens it cannot
+  see — so Mode A measured 38862 by word count against 42141 by tokenizer, and every ceiling here was
+  being compared against a figure that understated what a mode spends. Where the tokenizer is absent
+  the estimate is still printed and no ceiling is asserted, because an unmeasured cost is unknown
+  rather than passing; CI installs it, so `main` is always measured exactly. All modes are counted in
+  one pass, which keeps the commit hook under a second.
+- The Mode A ceiling is 44000, raised from 40000, which the measured cost had already passed. It
+  guards against growth nobody decided on; it is not a reason to cut something worth saying.
+- `mode-a-investigate.md`: a scope costs between two-fifths and just over half of the full audit,
+  measured. It claimed a third to a half.
+
 ## v0.73.0 — 2026-08-21
 
 - `forge-hygiene.md`, `discovery.md`, `destructive-ops.md`: three rules that were stated in full in

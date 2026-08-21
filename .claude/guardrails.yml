@@ -139,9 +139,28 @@ checks:
       reason the SKILL.md entry does not. The file list is guarded: a rename
       that leaves it dangling fails the gate. Verified red-then-green.
 
+  - id: load-cost-measured-not-estimated
+    status: enforced
+    by: >-
+      skills/uplevel/selfcheck.sh; counts with tiktoken where it is importable, and asserts the
+      ceilings only then. CI installs it
+    note: >-
+      a word count reads 3-9 percent low on this content - backticks, em-dashes,
+      table pipes and the indentation on wrapped list lines all fragment into
+      tokens it cannot see. Mode A measured 38862 by word count against 42141 by
+      tokenizer, so the ceilings were compared against a figure that understated
+      what a mode spends and the gate reported headroom against a limit already
+      passed. Where the tokenizer is absent the estimate is still printed and
+      nothing is asserted, because an unmeasured cost is unknown rather than
+      passing; the commit hook degrades to that and CI is what keeps main
+      guarded. All modes are counted in one pass, so the hook stays under a
+      second.
+
   - id: mode-working-set-bounded
     status: enforced
-    by: skills/uplevel/selfcheck.sh; fails when the Mode A working set exceeds its ceiling
+    by: >-
+      skills/uplevel/selfcheck.sh; fails when the Mode A working set exceeds its ceiling, currently
+      44000
     note: >-
       printing the figure made growth visible and did not make it cost anything,
       and every addition lands in references/ where nothing had a ceiling. The
@@ -149,7 +168,9 @@ checks:
       the change that needs the room is the sanctioned move; growing past it
       silently is what this prevents. remedies.md was missing from the Mode A
       list, which understated the working set by its whole length, and
-      long-runs.md was in no list at all. Verified red-then-green.
+      long-runs.md was in no list at all. Verified red-then-green. Raised from
+      40000 on 2026-08-21, when measuring it properly showed the real cost had
+      already passed it.
 
   - id: every-reference-measured
     status: enforced
