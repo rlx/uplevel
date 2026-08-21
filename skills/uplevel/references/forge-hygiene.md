@@ -239,6 +239,15 @@ that is actually exposed.
   packages; cheap to add; the only thing that ties a published artifact to the commit it came from.
 - **A version and deprecation policy.** What a breaking change requires, and how consumers you cannot
   see are told. For a library this is the backwards-compatibility control, and there is no other.
+- **A support range that nothing tests.** The manifest declares which runtimes and peer versions the
+  package works with; the CI matrix decides which ones anyone has ever run. Where those two sets
+  differ, the manifest is a promise no machine checks. Two measured: a plugin whose manifest said
+  `>= 20 < 23` while its README advertised 20 to 23 and its matrix tested 20 and 23 — the one major
+  the manifest excludes, and neither of the two it supports; and a library whose PHP 8.1 × Laravel 10
+  cell failed on the very commit a security release was tagged from, and was then deleted from the
+  matrix six days later by a commit whose body reads *"remove PHP 8.1 from Laravel 10.\*"*, while the
+  manifest still declares both. Diff the declared set against the tested set, and treat narrowing the
+  matrix to clear a red cell as a breaking change unless the manifest narrows with it.
 
 ## 1. What runs, and when — trigger correctness
 
