@@ -129,7 +129,7 @@ protected branches and `CI_JOB_TOKEN` scope are invisible to a clone. Without AP
 
 **The most common real finding on a mature repo is a control that exists and does nothing.** It is not
 an absence — the settings page shows it — so an audit that only asks "is it there?" reports it as
-present. Ask separately whether it *bites*. Seven shapes, all seen in the field:
+present. Ask separately whether it *bites*. Eight shapes, all seen in the field:
 
 | shape | how to catch it |
 |---|---|
@@ -139,6 +139,7 @@ present. Ask separately whether it *bites*. Seven shapes, all seen in the field:
 | A migration left half-done — the rule exists but the default branch is excluded, or the line is commented out pending a rollout | read `conditions.ref_name.include`/`exclude`, and grep config-as-code for commented-out rules |
 | A `SECURITY.md` naming a reporting channel that is switched off | ask the API whether the channel exists, below |
 | `[skip ci]` in a commit subject, which skips the workflow entirely | grep the log for it, and check whether release commits carry it |
+| A committed workflow the forge reports disabled | the file and the badge cannot tell you; ask `actions/workflows` for its `state`, below |
 | A check that runs, reports green, and validated nothing | the run conclusion cannot tell you; read the step conclusions and the inputs the job actually received |
 
 **`[skip ci]` deserves its own look on the release path.** It produces no check run at all, so the
@@ -294,8 +295,18 @@ Failure modes to check for by name, each of which produces a green repo that val
 - **No `workflow_dispatch`.** Nothing can be re-run without pushing an empty commit.
 - **Fork pull requests get no secrets**, so integration tests silently skip and report success. Decide
   deliberately what runs for forks.
-- **Scheduled workflows are disabled after ~60 days of repository inactivity** on GitHub. A nightly
-  security scan that quietly stopped months ago is worse than none, because everyone believes it runs.
+- **A committed workflow the forge reports disabled.** GitHub disables the *whole* workflow — every
+  trigger it declares, not just its `schedule:` — either as `disabled_inactivity` after ~60 days
+  without repository activity, or as `disabled_manually` when somebody switched it off in the Actions
+  tab. Neither leaves a mark in the tree, so the committed file and the last green badge both still
+  say the gate runs. Ask the forge:
+
+  ```sh
+  gh api repos/{owner}/{repo}/actions/workflows --jq '.workflows[]|"\(.state)\t\(.path)"'
+  ```
+
+  Anything but `active` means the file describes a gate that is not running. A nightly security scan
+  that quietly stopped is worse than none, because everyone believes it runs.
 - **Matrix covers one runtime version while production runs another.**
 - **Caches that never invalidate**, so CI passes against dependencies nobody has locally.
 
