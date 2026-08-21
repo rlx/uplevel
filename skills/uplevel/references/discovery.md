@@ -230,10 +230,7 @@ does not distinguish them is neither.
 
 ## Verifying — safely
 
-**Read every command before you run it.** Names lie: a target called `test` or `check` can seed a
-database, hit staging, deploy, or call a paid API. Open the script or task definition first and look
-for network calls, credential reads, datastore writes, container orchestration, and environment names.
-
+`SKILL.md` carries the rule — read every command before you run it, whatever its name promises.
 **The sharpest case is a name promising a read while the body writes.** These are common enough to
 look for by default, and they are dangerous precisely because you reach for them to be careful:
 

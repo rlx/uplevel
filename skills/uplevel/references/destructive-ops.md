@@ -44,9 +44,8 @@ draining a node, purging a cache or CDN, replaying or purging a queue. These are
 principle and disruptive in practice, and several of them look like reads until they are not.
 
 **Wrong-environment execution.** Not a category of command but a category of mistake, and the most
-expensive one: a correct command against the wrong target. It never looks like an error — valid
-command, normal output, damage found later by someone else. Print the resolved environment before any
-command that reads credentials or mutates state. See `production.md` §1.
+expensive one: a correct command against the wrong target, which never looks like an error. Print the
+resolved environment before any command that reads credentials or mutates state — `production.md` §1.
 
 **Infrastructure state.** `terraform apply`/`destroy`, Helm uninstalls, deleting a bucket, volume, or
 managed instance. Read the plan; a plan showing a replace where you expected an update is the warning.
