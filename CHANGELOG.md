@@ -2,6 +2,13 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.72.0 — 2026-08-21
+
+- `evidence.md`: the runner's target list is not the set of tests. A test source the build system has
+  no target for never runs and never shows in the count; an in-source harness runs on every binary
+  start and is never a target at all. Calling a file untested because `ninja test` does not name it
+  is how an audit reports a coverage gap that is not there.
+
 ## v0.71.0 — 2026-08-21
 
 - `forge-hygiene.md`: a committed workflow the forge reports disabled. The file declares its triggers

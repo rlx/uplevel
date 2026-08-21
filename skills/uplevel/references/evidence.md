@@ -64,6 +64,15 @@ Look for these before quoting a pass:
 
 - **Silently skipped.** The suite needed a database, a key, or a container, did not have it, and
   reported success on what remained. Check the *count*, not the exit code — and compare it to last time.
+- **The runner's target list is not the set of tests.** `ninja test`, `bazel test`, `go test ./...`
+  report on what the build system was *told about*, and tests sit on both sides of that line. A test
+  source with no target never runs and never appears in the count. An in-source harness — a
+  constructor function, an `#ifdef TEST` block, a doctest — runs on every binary start and is never a
+  target at all. Before writing that a file is untested, diff the test sources on disk against the
+  registered targets, and grep the source for the project's own test macro. Both directions have been
+  observed: two test files with no build entry, so the backend they covered had never run; and 42 unit
+  tests firing from a constructor macro that `ninja test` never mentions, which an audit reading only
+  the target list called untested code.
 - **Not covering the change.** Passing tests that never execute the modified lines.
 - **A stale artifact.** You tested a cached build, an old container, a previous binary. If a version
   marker or build tag exists, confirm it matches what you just built; if one does not exist, that
