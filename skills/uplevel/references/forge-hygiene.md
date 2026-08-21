@@ -521,6 +521,15 @@ are reverted. **A team that argues with a recommendation rarely argues with its 
   and a **floating major tag force-pushed before the release is known good**, handing consumers new
   code against an old artifact. Compare the registry's version list against `git tag`, in both
   directions — neither is authoritative alone.
+- **A version marker in the tree that disagrees with what shipped.** A tag misidentifies a release
+  from outside; this one is read by the software itself, so being wrong changes what users get. Check
+  the `VERSION` file, the version constant and the manifest field against the newest tag *and* the
+  registry — all three, because the build often takes its version from a fourth place. Measured: a
+  constant three releases stale, because the packaging step derived the version from `git describe`
+  and ignored the constant it required; and a `VERSION` file containing the literal string `dev`,
+  which the project's own installer reads — so every user of the documented one-command install got
+  the untagged tip of the default branch, and the upgrade check, guarded by `if VERSION != "dev"`,
+  never fired for anyone for twenty-seven months.
 - **Release built from a dirty or unpinned toolchain**, so the artifact cannot be reproduced.
 - **No freeze or ownership convention** for risky periods, if the team wants one.
 
