@@ -50,3 +50,10 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
 - `.claude/guardrails.yml` is the per-repo checklist and must parse as YAML — enforced where
   `python3` and `pyyaml` are available, skipped where they are not. Quote or use a block scalar for
   any value containing `#` or `: `.
+- The defects this skill ships come from a blind validation program kept outside this repository:
+  rounds of ten previously-unseen repositories, audited against the current version, every finding
+  reproduced against the repository before it ships. That tree is deliberately unpublished — it
+  names third-party projects and their unfixed findings — and deliberately not a git repository,
+  which also leaves it **unbacked, local to one machine, and the only record of which repositories
+  have already been used**. Losing it costs the program, not the skill: nothing here builds,
+  tests, or gates against it.
