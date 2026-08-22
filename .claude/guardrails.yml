@@ -6,14 +6,16 @@
 # a project's own gaps is a roadmap for whoever wants to use them.
 #
 # status: present | enforced
-audited: 2026-08-19
+audited: 2026-08-21
 visibility: public
 last_audit_scope: >
-  Re-audit as a diff. Verified this pass: gate and its runtime, workflow
-  triggers and permissions, action pinning, ruleset rules and bypass actors,
-  repository security settings, code scanning, toolchain portability, release
-  tagging, merged-branch deletion, and the repository's own review and CI
-  history. Nothing regressed; four controls were in place and unrecorded.
+  Re-audit as a diff. Verified this pass: ruleset rules, bypass actors, strict
+  policy and required contexts; SECURITY.md against the private reporting
+  setting the forge actually reports; action pinning, workflow-level
+  permissions, timeouts and concurrency; dependency automation; the split
+  between this file and the untracked plan; and the commit history for reverts
+  and hotfixes. Nothing regressed. The load-cost check added on 2026-08-21
+  postdates the previous pass and is recorded below.
 
 checks:
   - id: gate-runs-on-commit
