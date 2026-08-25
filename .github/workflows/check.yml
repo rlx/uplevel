@@ -23,6 +23,7 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: read
+      security-events: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -45,8 +46,9 @@ jobs:
       - name: scripts/check-forge.sh
         # Same reasoning, different cost: this one needs the network and an
         # authenticated gh, which a commit hook should not. The token reads the
-        # rules protecting main and the release list; contents: read covers
-        # both, and the job holds nothing else.
+        # rules protecting main, the release list, the repository settings and
+        # the code scanning setup; contents: read covers the first three and
+        # security-events: read the last, and the job holds nothing else.
         env:
           GH_TOKEN: ${{ github.token }}
         run: ./scripts/check-forge.sh
