@@ -31,6 +31,8 @@ The gate runs in about a second. If it fails it names what to fix. Bypass it wit
   there and raise the number in the same change, saying why. Never cut something worth saying to fit
   a figure.
 - **Bump `version:` in `SKILL.md`** in the same commit as any change to `SKILL.md` or `references/`.
+  **And `version` in `.claude-plugin/plugin.json` with it** — that is the number a plugin install
+  reports, and the gate fails while the two disagree.
 - **Write the `CHANGELOG.md` entry in the same change**, not in a follow-up. A release was published
   once from a commit that documented every version except the one it released.
 - **Every reference must be linked from `SKILL.md`, and every link must resolve.** Both directions.

@@ -172,6 +172,48 @@ else
   echo "  $tagn $tw checked; SKILL.md declares $cur, not yet tagged - tag it when it reaches main"
 fi
 
+echo "== the plugin manifests agree with the skill =="
+# The repository is its own marketplace, so .claude-plugin/plugin.json carries a
+# version a consumer installs by. That is a second version marker in the tree,
+# and a version marker that disagrees with what shipped is a defect this skill
+# ships a warning about -- so it is checked rather than trusted. The manifests
+# are also what the plugin tooling parses; a JSON error there is invisible until
+# someone tries to install.
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "  no python3, skipping"
+elif [ ! -f .claude-plugin/plugin.json ]; then
+  echo "  no plugin manifest, skipping"
+else
+  msg=$(python3 - "$cur" <<'MANIFESTS'
+import json, sys
+declared = sys.argv[1]
+try:
+    plugin = json.load(open(".claude-plugin/plugin.json"))
+except Exception as exc:
+    print(".claude-plugin/plugin.json does not parse: %s" % exc); sys.exit(1)
+try:
+    market = json.load(open(".claude-plugin/marketplace.json"))
+except FileNotFoundError:
+    market = None
+except Exception as exc:
+    print(".claude-plugin/marketplace.json does not parse: %s" % exc); sys.exit(1)
+if plugin.get("version") != declared:
+    print("plugin.json declares version %r, SKILL.md declares %r - bump both in the same change"
+          % (plugin.get("version"), declared)); sys.exit(1)
+if market is not None:
+    entries = [p for p in market.get("plugins", []) if p.get("name") == plugin.get("name")]
+    if not entries:
+        print("marketplace.json lists no plugin named %r" % plugin.get("name")); sys.exit(1)
+    for e in entries:
+        if "version" in e and e["version"] != declared:
+            print("the marketplace entry declares version %r, SKILL.md declares %r"
+                  % (e["version"], declared)); sys.exit(1)
+print("plugin.json and marketplace.json agree, both at %s" % declared)
+MANIFESTS
+  )
+  if [ $? -eq 0 ]; then echo "  $msg"; else note "$msg"; fi
+fi
+
 echo "== gate scripts stay portable =="
 # CI runs ubuntu-latest (bash 5, GNU coreutils). A maintainer's macOS runs bash 3.2
 # with BSD or ugrep tools, and the commit hook gates on that one. A GNU-only flag

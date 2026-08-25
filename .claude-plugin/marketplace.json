@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "uplevel",
+  "description": "The uplevel skill, installable as a plugin.",
+  "owner": {
+    "name": "Lior Rudnik and Tracey Mercer"
+  },
+  "plugins": [
+    {
+      "name": "uplevel",
+      "description": "Establish, automate, and enforce a project's engineering process. Advisory by default — it reports what it found and proposes a numbered plan, and changes nothing until you pick.",
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/rlx/uplevel"
+    }
+  ]
+}
