@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "uplevel",
-      "description": "Establish, automate, and enforce a project's engineering process. Advisory by default — it reports what it found and proposes a numbered plan, and changes nothing until you pick.",
+      "description": "Finds the engineering controls your repository does not have — CI that never runs on pull requests, a check target that quietly rewrites files, a migration with nothing in front of it — and hands back a numbered plan. Advisory: it changes nothing until you pick.",
       "source": "./",
       "category": "development",
       "homepage": "https://github.com/rlx/uplevel"

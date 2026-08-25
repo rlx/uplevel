@@ -1,0 +1,32 @@
+name: Bug
+description: A command, script, or install path that does not work as documented
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The command you ran and the output it printed.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The `version:` in SKILL.md, or the release you installed.
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Platform and shell
+      description: For example, macOS with bash 3.2, or Ubuntu with bash 5.
+    validations:
+      required: false

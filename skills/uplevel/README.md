@@ -28,9 +28,21 @@ keep backfills resumable, and report results honestly.
 - **Discovers, never guesses.** Every command it reports is one it ran and watched pass, or is
   marked unverified.
 
+## Install as a plugin
+
+```sh
+claude plugin marketplace add rlx/uplevel
+claude plugin install uplevel@uplevel
+```
+
+Both names are `uplevel` because the repository is its own marketplace, and `install` wants the
+`plugin@marketplace` form. Restart Claude Code; the skill is then available as `/uplevel`, and
+`claude plugin update uplevel@uplevel` moves it to the next release.
+
 ## Install
 
-**These commands run from a clone of the repository**, not from an installed copy of the skill:
+To install the skill on its own instead, with no plugin machinery. **These commands run from a clone
+of the repository**, not from an installed copy of the skill:
 
 ```sh
 git clone https://github.com/rlx/uplevel.git

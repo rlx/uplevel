@@ -322,8 +322,12 @@ checks:
       selfcheck run against the installed copy. That pass is also what caught
       the update command README.md printed, which named the plugin bare and
       failed - "update" wants the marketplace-qualified form that "install"
-      takes, while "uninstall" accepts the bare name. The gate cannot see this
-      section, so every command in it is verified by hand or not at all.
+      takes, while "uninstall" accepts the bare name. The gate cannot see these
+      commands - they sit outside the "## Install" heading check-install.sh
+      extracts from - so every one of them is verified by hand or not at all.
+      "claude plugin validate --strict" passes on this tree, which is the check
+      the community-marketplace submission pipeline runs; it reads the manifests
+      and does not exercise an install.
 
   - id: plugin-manifests-agree-with-the-skill
     status: enforced
