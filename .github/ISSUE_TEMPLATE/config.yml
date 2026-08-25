@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/rlx/uplevel/security/policy
+    about: Report privately through the Security tab. Please do not open a public issue.
+  - name: Contributing
+    url: https://github.com/rlx/uplevel/blob/main/CONTRIBUTING.md
+    about: What a change to the skill's text has to carry before it ships.

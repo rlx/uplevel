@@ -1,0 +1,38 @@
+name: A finding was wrong
+description: uplevel reported something that is not true of your repository, or missed something that is
+labels: ["wrong-finding"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the most useful report this project can receive. A finding that is wrong, or an
+        absence that was not named, is a defect in the skill's text rather than in your repository.
+  - type: textarea
+    id: finding
+    attributes:
+      label: What it reported
+      description: Paste the finding or plan item, as printed.
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: truth
+    attributes:
+      label: What is actually true
+      description: The file, line, or setting that contradicts it.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The `version:` in SKILL.md, or the release you installed.
+    validations:
+      required: true
+  - type: input
+    id: forge
+    attributes:
+      label: Forge
+      description: GitHub, GitLab, Bitbucket, Forgejo, Gitea, or none.
+    validations:
+      required: false

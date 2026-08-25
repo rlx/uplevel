@@ -2,6 +2,19 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.80.0 — 2026-08-25
+
+- README.md leads with what the skill finds rather than with how to install it. The plugin install,
+  three badges and a sample finding are above the fold; the manual install, unchanged, moved below
+  the pitch. New sections cover what a run costs, what it will not do, and the checks this repository
+  holds itself to.
+- The shipped README documents the plugin install. It previously sent a reader who had arrived
+  through `claude plugin install` off to clone the repository.
+- Issue templates: a bug form, a form for a finding that was wrong, and contact links for the
+  security policy and the contributing guide.
+- The plugin manifests carry the same description the README leads with.
+- The skill's own text is unchanged from v0.79.0.
+
 ## v0.79.0 — 2026-08-24
 
 - The skill's own text is unchanged from v0.78.0. What this releases is the repository around it,
