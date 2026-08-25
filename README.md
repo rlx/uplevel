@@ -68,9 +68,9 @@ Full worked example: [`references/example-output.md`](skills/uplevel/references/
 - **It branches before its first write**, so anything it does build is one `git switch -` from undone.
 - **It runs commands it has read and judged safe** — the candidate gate commands — and reports the
   literal output. Anything it did not run is marked unverified rather than assumed.
-- **About 40,000 tokens of skill text** load for a full audit, under a 44,000 ceiling this repository
-  enforces on itself. That is context competing with your repository, so it is measured on every
-  commit rather than estimated.
+- **About 43,000 tokens of skill text** load for a full audit, under a 44,000 ceiling this repository
+  enforces on itself. That is context competing with your repository, so it is measured with a real
+  tokenizer on every change rather than estimated.
 
 ## What it covers
 
