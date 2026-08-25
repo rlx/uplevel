@@ -141,8 +141,24 @@ checks:
   - id: code-scanning
     status: enforced
     by: CodeQL default setup, query suite "default", weekly
+
+  - id: code-scanning-languages-recorded
+    status: present
+    by: scripts/check-forge.sh, on a maintainer's machine; CI may not read this
+    languages: ["actions", "python"]
+    query_suite: default
     note: >-
-      languages ["actions"] - the workflow is the analyzable surface here.
+      the workflow was the only analyzable surface until assets/social-preview.py
+      was tracked, and default setup enabled python by itself within minutes,
+      while this file still said ["actions"]. The set is GitHub's to change
+      rather than this repository's - a file in a new language moves it with no
+      commit that mentions it - so it is data, and check-forge.sh diffs it.
+      Present rather than enforced because the endpoint wants admin-level
+      access: the gate job holds contents: read, and the call was watched fail
+      with security-events: read added as well. Widening a required job's token
+      to read one config is the worse trade, so CI prints that the claim is
+      unchecked there and a maintainer's run is what gates it. A forbidden
+      response skips; any other failure still fails.
 
   - id: branch-deleted-on-merge
     status: enforced

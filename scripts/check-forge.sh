@@ -129,6 +129,62 @@ ACTUAL
 fi
 rm -f "$want" "$got" "$live"
 
+echo "== code scanning analyzes the languages the checklist records =="
+# Default setup picks its own languages from what is in the tree, and moves them
+# without a commit that says so: tracking one .py file added "python" here within
+# minutes, while this file still recorded ["actions"]. The set is GitHub's to
+# change, which is what makes it worth diffing rather than trusting.
+#
+# This is the one claim CI cannot answer. The endpoint wants admin-level access;
+# the gate job holds contents: read, and was observed to fail on this call with
+# security-events: read added too. Widening a required job's token to read one
+# config is the worse trade, so a forbidden response is a skip that says so on
+# every run, and a maintainer's gh gates it. Any OTHER failure is still a
+# failure -- "cannot see it" and "it broke" must not print the same line.
+want="$(mktemp)"; got="$(mktemp)"; live="$(mktemp)"; err="$(mktemp)"
+python3 - > "$want" <<'WANTED'
+import sys, yaml
+doc = yaml.safe_load(open(".claude/guardrails.yml"))
+entry = None
+for c in doc.get("checks", []):
+    if c.get("id") == "code-scanning-languages-recorded":
+        entry = c
+if entry is None or not entry.get("languages") or not entry.get("query_suite"):
+    sys.exit("the checklist records no languages or query suite")
+lines = ["language: %s" % l for l in entry["languages"]]
+lines += ["query suite: %s" % entry["query_suite"]]
+print("\n".join(sorted(lines)))
+WANTED
+if [ $? -ne 0 ]; then
+  note "could not read the recorded code scanning setup out of .claude/guardrails.yml"
+elif ! gh api "repos/{owner}/{repo}/code-scanning/default-setup" > "$live" 2>"$err"; then
+  if grep -qE 'HTTP 40[34]' "$err"; then
+    echo "  this token may not read the code scanning setup — unchecked here; a maintainer's gh gates it"
+  else
+    note "could not read the code scanning setup — gh is authenticated, so this is a real failure, not an absent control"
+  fi
+else
+  python3 - "$live" > "$got" <<'ACTUAL'
+import json, sys
+setup = json.load(open(sys.argv[1]))
+lines = ["language: %s" % l for l in setup.get("languages", [])]
+lines += ["query suite: %s" % (setup.get("query_suite") or "")]
+print("\n".join(sorted(lines)))
+ACTUAL
+  if diff -u "$want" "$got" > /dev/null 2>&1; then
+    echo "  $(grep -c 'language: ' "$want") languages on the $(awk -F': ' '/query suite/ { print $2 }' "$want") suite, as recorded"
+  else
+    note "the checklist and code scanning disagree:"
+    diff -u "$want" "$got" | grep -E '^[-+][^-+]' | while IFS= read -r d; do
+      case "$d" in
+        -*) echo "     recorded, not analyzed: ${d#-}";;
+        +*) echo "     analyzed, not recorded: ${d#+}";;
+      esac
+    done
+  fi
+fi
+rm -f "$want" "$got" "$live" "$err"
+
 echo "== the version main declares has been released =="
 # The checklist recorded "git tag + GitHub release" while nine consecutive tags
 # had no release and the Releases page named a version nine behind. Checked

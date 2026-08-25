@@ -45,8 +45,10 @@ jobs:
       - name: scripts/check-forge.sh
         # Same reasoning, different cost: this one needs the network and an
         # authenticated gh, which a commit hook should not. The token reads the
-        # rules protecting main and the release list; contents: read covers
-        # both, and the job holds nothing else.
+        # rules protecting main, the release list and the repository settings;
+        # contents: read covers those, and the job holds nothing else. The code
+        # scanning setup needs admin-level access this token is not given, so
+        # that one claim reports itself unchecked here rather than passing.
         env:
           GH_TOKEN: ${{ github.token }}
         run: ./scripts/check-forge.sh
