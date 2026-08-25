@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Checks .claude/guardrails.yml against the forge it describes: the rules that
-# actually protect main, and whether the version main declares was released.
+# actually protect main, whether the version main declares was released, and the
+# description and topics a stranger finds the repository by.
 #   ./scripts/check-forge.sh
 #
 # Everything in check-repo.sh reads the tree, so the commit hook can run it
-# offline in about a second. These two claims are about GitHub, and both drifted
+# offline in about a second. These claims are about GitHub, and two of them drifted
 # within four days of being written down while every tree-side claim stayed
 # true. Network and an authenticated gh make this a CI step instead, on the same
 # reasoning as check-install.sh: the required job carries it, the hook does not.
@@ -76,6 +77,52 @@ ACTUAL
       case "$d" in
         -*) echo "     recorded, not in force: ${d#-}";;
         +*) echo "     in force, not recorded: ${d#+}";;
+      esac
+    done
+  fi
+fi
+rm -f "$want" "$got" "$live"
+
+echo "== the description and topics the checklist records are the ones set =="
+# The two sentences a stranger reads before the README: the description GitHub
+# search returns, and the topics the plugin directories index by. Both are
+# settings rather than files, which is the shape that drifted twice here before
+# it was written down as data -- nothing in the tree could contradict them, so
+# nothing did.
+want="$(mktemp)"; got="$(mktemp)"; live="$(mktemp)"
+python3 - > "$want" <<'WANTED'
+import sys, yaml
+doc = yaml.safe_load(open(".claude/guardrails.yml"))
+entry = None
+for c in doc.get("checks", []):
+    if c.get("id") == "repository-description-and-topics":
+        entry = c
+if entry is None or not entry.get("description") or not entry.get("topics"):
+    sys.exit("the checklist records no description or topics")
+lines = ["description: %s" % " ".join(entry["description"].split())]
+lines += ["topic: %s" % t for t in entry["topics"]]
+print("\n".join(sorted(lines)))
+WANTED
+if [ $? -ne 0 ]; then
+  note "could not read the recorded description and topics out of .claude/guardrails.yml"
+elif ! gh api "repos/{owner}/{repo}" > "$live" 2>/dev/null; then
+  note "could not read the repository settings — gh is authenticated, so this is a real failure, not an absent control"
+else
+  python3 - "$live" > "$got" <<'ACTUAL'
+import json, sys
+repo = json.load(open(sys.argv[1]))
+lines = ["description: %s" % " ".join((repo.get("description") or "").split())]
+lines += ["topic: %s" % t for t in repo.get("topics", [])]
+print("\n".join(sorted(lines)))
+ACTUAL
+  if diff -u "$want" "$got" > /dev/null 2>&1; then
+    echo "  the description and $(grep -c 'topic: ' "$want") topics, as recorded"
+  else
+    note "the checklist and the repository settings disagree:"
+    diff -u "$want" "$got" | grep -E '^[-+][^-+]' | while IFS= read -r d; do
+      case "$d" in
+        -*) echo "     recorded, not set: ${d#-}";;
+        +*) echo "     set, not recorded: ${d#+}";;
       esac
     done
   fi
