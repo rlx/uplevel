@@ -307,6 +307,30 @@ checks:
       than the green conclusion, on its first CI run. Verified red-then-green
       through the API path, against a tag that really has no release.
 
+  - id: installable-as-a-plugin
+    status: present
+    by: .claude-plugin/plugin.json and .claude-plugin/marketplace.json; the repository is its own marketplace
+    note: >-
+      the plugin root is the repository root, so skills/uplevel is already where
+      a plugin's skills belong and nothing moved. Verified by hand against a
+      throwaway HOME: adding this tree as a marketplace, installing the plugin
+      from it, and reading back "Skills (1) uplevel" at version 0.78.0. Not in
+      the gate - check-install.sh runs the documented shell install against a
+      clean HOME, and this path needs the claude CLI, which CI does not have.
+      The GitHub shorthand in README.md resolves the default branch, so it is
+      verified only once the manifests are on main.
+
+  - id: plugin-manifests-agree-with-the-skill
+    status: enforced
+    by: scripts/check-repo.sh; plugin.json's version against SKILL.md's, and the marketplace entry against both
+    note: >-
+      a second version marker in the tree, and the one a consumer installs by.
+      A version marker that disagrees with what shipped is a defect this skill
+      ships a warning about, so it is checked rather than trusted. Also parses
+      both manifests: a JSON error there is invisible until someone tries to
+      install. Skips where python3 or the manifest is absent. Verified
+      red-then-green on a version disagreement and on malformed JSON.
+
   - id: tag-matches-declared-version
     status: enforced
     by: scripts/check-repo.sh; every v* tag's commit must declare that version

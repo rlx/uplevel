@@ -13,6 +13,24 @@ marks what it could not.
 It hands back a numbered plan and changes nothing until you reply with the numbers you want.
 Anything that could fail a colleague's merge is proposed, never applied.
 
+## Install as a plugin
+
+```sh
+claude plugin marketplace add rlx/uplevel
+claude plugin install uplevel@uplevel
+```
+
+Or from inside a session: `/plugin marketplace add rlx/uplevel`, then `/plugin install
+uplevel@uplevel`.
+
+Restart Claude Code. The skill is then available as `/uplevel`, and `claude plugin update uplevel`
+moves it to the next release. This repository is its own marketplace — the manifests are in
+`.claude-plugin/`, and the plugin they serve is this tree, so the version you install is the one
+`SKILL.md` declares.
+
+To install the skill on its own instead, with no plugin machinery and the working tree *as* the
+install, use the section below.
+
 ## Install
 
 ```sh
