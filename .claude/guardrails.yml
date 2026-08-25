@@ -80,6 +80,14 @@ checks:
       to the required set only once it had been observed running on a pull
       request head; an advisory check is ignored within a week.
 
+      "Analyze (python)" is deliberately not in the set. Tracking one .py file
+      made CodeQL default setup add the language, so the job runs on every pull
+      request and has passed on every one - but the only Python here draws a
+      PNG, and a required check that can block a merge should guard a surface
+      worth blocking a merge over. The workflow it comes from has never failed;
+      the argument is about blast radius, not reliability. Revisit if Python
+      ever runs as part of the gate or the skill.
+
   - id: recorded-protection-matches-the-ruleset
     status: enforced
     by: scripts/check-forge.sh, a step in the required "Repo gate" job
