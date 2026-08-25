@@ -17,8 +17,8 @@ in the same way a wrong line of code is. Most of what follows exists to keep tha
 change and the commit hook does not.
 
 `check-forge.sh` diffs what the checklist records about GitHub — the rules protecting `main`, whether
-the declared version was released, and the repository's description and topics — against GitHub
-itself. It needs the network and an
+the declared version was released, the repository's description and topics, and the languages code
+scanning analyzes — against GitHub itself. It needs the network and an
 authenticated `gh`, so it skips on a machine without them and CI is what gates it.
 
 The gate runs in about a second. If it fails it names what to fix. Bypass it with

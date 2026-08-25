@@ -141,8 +141,15 @@ checks:
   - id: code-scanning
     status: enforced
     by: CodeQL default setup, query suite "default", weekly
+    languages: ["actions", "python"]
+    query_suite: default
     note: >-
-      languages ["actions"] - the workflow is the analyzable surface here.
+      the workflow was the only analyzable surface until assets/social-preview.py
+      was tracked, and default setup enabled python by itself within minutes.
+      This entry said ["actions"] until the next run of the gate. The languages
+      are data now, and scripts/check-forge.sh diffs them, because the set is
+      GitHub's to change rather than this repository's - adding a file in a new
+      language moves it with no commit that mentions it.
 
   - id: branch-deleted-on-merge
     status: enforced
