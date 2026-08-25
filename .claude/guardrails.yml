@@ -299,7 +299,13 @@ checks:
       the release when the tag is cut, and the next run confirms it. Checked
       forward, like the changelog rule, so it gates the next tag rather than
       relitigating published ones - the tags before v0.78.0 stay release-less,
-      which is history rather than a claim. Verified red-then-green.
+      which is history rather than a claim. Both questions go to the forge
+      rather than to the local clone: asking git whether the tag exists passed
+      on a maintainer's machine and was vacuous in CI, where actions/checkout
+      fetches no tags, so every version read as "not tagged yet" and the check
+      reported OK having compared nothing. Caught by reading the step log rather
+      than the green conclusion, on its first CI run. Verified red-then-green
+      through the API path, against a tag that really has no release.
 
   - id: tag-matches-declared-version
     status: enforced

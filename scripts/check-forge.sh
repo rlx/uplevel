@@ -87,9 +87,15 @@ echo "== the version main declares has been released =="
 # had no release and the Releases page named a version nine behind. Checked
 # forward, like the changelog rule: it asks about the version in the tree, so a
 # tag that shipped without its release fails the next run rather than never.
+#
+# Both questions go to the forge, not to the local clone. Asking git whether the
+# tag exists passed here and was vacuous in CI: actions/checkout fetches no tags,
+# so rev-parse failed on the runner, every version read as "not tagged yet", and
+# the check reported OK having compared nothing. It was green on the first run
+# after being written, on the one repository whose release it was watching.
 cur="$(awk -F'[ \t]*:[ \t]*' '/^version:/ { print $2; exit }' skills/uplevel/SKILL.md)"
-if ! git rev-parse -q --verify "refs/tags/v$cur" >/dev/null 2>&1; then
-  echo "  $cur is not tagged yet; the release is due when the tag is"
+if ! gh api "repos/{owner}/{repo}/git/ref/tags/v$cur" >/dev/null 2>&1; then
+  echo "  $cur is not tagged on the forge yet; the release is due when the tag is"
 elif gh release view "v$cur" >/dev/null 2>&1; then
   echo "  v$cur is tagged and released"
 else
