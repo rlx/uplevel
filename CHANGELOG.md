@@ -2,6 +2,18 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.79.0 — 2026-08-24
+
+- The skill's own text is unchanged from v0.78.0. What this releases is the repository around it,
+  which a plugin install now ships in full.
+- uplevel is installable as a plugin: `claude plugin marketplace add rlx/uplevel`, then
+  `claude plugin install uplevel@uplevel`. The repository is its own marketplace, and the manifests
+  are in `.claude-plugin/`.
+- The update command README.md printed named the plugin bare, and that form fails — `update` wants
+  the marketplace-qualified name that `install` takes.
+- `scripts/check-forge.sh`: what `.claude/guardrails.yml` records about GitHub — the rules protecting
+  `main`, and whether the declared version was released — is diffed against GitHub on every run.
+
 ## v0.78.0 — 2026-08-21
 
 - `forge-hygiene.md`: a support range that nothing tests. The manifest declares which runtimes and
