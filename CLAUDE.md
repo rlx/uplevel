@@ -50,6 +50,11 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
   `skills/uplevel/references/commit-hygiene.md`.
 - Prose is **en-US** throughout — behavior, license, judgment, labeled. The repository is public and
   the skill ships as text; mixed spelling reads as two authors who never compared notes.
+- Plan files live in `.claude/plans/`, untracked. Plan mode writes to `~/.claude/plans/`, a flat
+  directory every project on this machine shares, under a random slug that does not name the repo it
+  belongs to — so a plan left there is both invisible to this project and in reach of another one's
+  agent. Move it in, and name it for what it is. Its contents are the same class as the improvement
+  plan: traffic figures, unfixed weaknesses, draft copy.
 - `.claude/guardrails.yml` is public, so it records only what is **in place**. Absent, unverified, and
   undecided items go in the untracked `.claude/improvement-plan.md` — a public list of a project's own
   gaps is a roadmap for whoever wants to use them.
