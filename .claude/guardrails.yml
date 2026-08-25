@@ -6,16 +6,17 @@
 # a project's own gaps is a roadmap for whoever wants to use them.
 #
 # status: present | enforced
-audited: 2026-08-21
+audited: 2026-08-24
 visibility: public
 last_audit_scope: >
-  Re-audit as a diff. Verified this pass: ruleset rules, bypass actors, strict
-  policy and required contexts; SECURITY.md against the private reporting
-  setting the forge actually reports; action pinning, workflow-level
-  permissions, timeouts and concurrency; dependency automation; the split
-  between this file and the untracked plan; and the commit history for reverts
-  and hotfixes. Nothing regressed. The load-cost check added on 2026-08-21
-  postdates the previous pass and is recorded below.
+  Re-audit as a diff. Verified this pass: the rules protecting main, against
+  what this file records; every tag against its release; action pinning and the
+  repository Actions settings; the checklist entries against the scripts that
+  enforce them; and the commit history since the previous pass. One regression,
+  found and closed: nine consecutive tags had shipped with no GitHub release
+  while this file recorded releases as enforced. Both claims that had drifted
+  were about GitHub rather than about the tree, where every claim was already
+  checked by a script, and scripts/check-forge.sh now diffs them too.
 
 checks:
   - id: gate-runs-on-commit
@@ -66,13 +67,32 @@ checks:
   - id: branch-protection-required-checks
     status: enforced
     by: ruleset "Protect main", active, no bypass actors
+    required_contexts: ["Repo gate", "Analyze (actions)", "CodeQL"]
+    required_rules: ["deletion", "non_fast_forward", "pull_request", "required_status_checks"]
+    strict_up_to_date: true
     note: >-
-      requires a pull request, branches up to date, and two checks - "Repo gate"
-      and "Analyze (actions)" from CodeQL. Blocks force-push and deletion.
-      Verified behaviorally: a direct push to main was rejected with both the
-      pull-request and required-status-check rules cited. CodeQL was added to
-      the required set only once it had been observed running on a pull request
-      head; an advisory check is ignored within a week.
+      the three fields above are data rather than prose because prose drifts:
+      this entry said "two checks" while three were required, from the hour
+      "CodeQL" joined the required set until the next audit found it by hand.
+      scripts/check-forge.sh diffs them against the rules actually protecting
+      main. Verified behaviorally: a direct push to main was rejected with both
+      the pull-request and required-status-check rules cited. CodeQL was added
+      to the required set only once it had been observed running on a pull
+      request head; an advisory check is ignored within a week.
+
+  - id: recorded-protection-matches-the-ruleset
+    status: enforced
+    by: scripts/check-forge.sh, a step in the required "Repo gate" job
+    note: >-
+      every claim in this file about the tree is checked by a script; every
+      claim about GitHub was hand-written, and two of them drifted within four
+      days of an audit while the tree-side claims held. This diffs the recorded
+      contexts, rule types and up-to-date policy against
+      repos/{owner}/{repo}/rules/branches/main. gh missing or unauthenticated
+      skips, because that is a contributor's laptop; an API error once
+      authenticated fails, because a check that cannot see what it audits and
+      reports nothing is the shape this repository ships warnings about.
+      Verified red-then-green, and the skip path was exercised.
 
   - id: secret-scanning
     status: enforced
@@ -94,6 +114,21 @@ checks:
   - id: action-update-automation
     status: enforced
     by: .github/dependabot.yml; github-actions ecosystem, monthly
+
+  - id: actions-pinned-to-sha
+    status: present
+    by: .github/workflows/check.yml; actions/checkout at a full commit SHA, version in a trailing comment
+    note: >-
+      one workflow, one third-party action, pinned. Recorded because it was in
+      place and unrecorded, so a re-audit re-derived it by hand and nothing
+      would have noticed it regressing. The repository-level
+      sha_pinning_required setting is off, and is a maintainer's toggle rather
+      than an audit's: CodeQL default setup runs as a dynamic workflow this
+      repository does not author, the required "Analyze (actions)" check depends
+      on it, and whether enforcement reaches that workflow is untested here. One
+      pinned reference in one workflow is not worth finding out on the required
+      check. Revisit when a second workflow exists, and watch "Analyze
+      (actions)" on the pull request that turns it on.
 
   - id: security-policy
     status: present
@@ -172,7 +207,10 @@ checks:
       list, which understated the working set by its whole length, and
       long-runs.md was in no list at all. Verified red-then-green. Raised from
       40000 on 2026-08-21, when measuring it properly showed the real cost had
-      already passed it.
+      already passed it. Not to be raised again: the validation program that
+      grew this number a round at a time is closed, so the working set is final
+      at what it now measures and the headroom that remains is for accidents
+      rather than for additions.
 
   - id: every-reference-measured
     status: enforced
@@ -241,12 +279,33 @@ checks:
 
   - id: versioned-releases
     status: enforced
-    by: git tag + GitHub release; version bump already gated at commit time
+    by: git tag; version bump already gated at commit time
     note: >-
       the version in SKILL.md frontmatter and the tag carry the same number, so
       an installed copy can be identified. Verified by cloning the public
       repository at a tag into a clean HOME, installing twice, and running the
-      shipped selfcheck.
+      shipped selfcheck. The tag is the artifact - the documented install is a
+      clone, not a download - and the GitHub release is a separate claim,
+      recorded below.
+
+  - id: release-follows-the-tag
+    status: enforced
+    by: scripts/check-forge.sh, a step in the required "Repo gate" job
+    note: >-
+      this entry once read "git tag + GitHub release" while nine consecutive
+      tags, v0.70.0 through v0.78.0, had no release and the Releases page named
+      v0.69.0 as latest. Nothing looked: the gate checks that a declared version
+      is tagged and prints when it is not, and never asked about releases. Cut
+      the release when the tag is cut, and the next run confirms it. Checked
+      forward, like the changelog rule, so it gates the next tag rather than
+      relitigating published ones - the tags before v0.78.0 stay release-less,
+      which is history rather than a claim. Both questions go to the forge
+      rather than to the local clone: asking git whether the tag exists passed
+      on a maintainer's machine and was vacuous in CI, where actions/checkout
+      fetches no tags, so every version read as "not tagged yet" and the check
+      reported OK having compared nothing. Caught by reading the step log rather
+      than the green conclusion, on its first CI run. Verified red-then-green
+      through the API path, against a tag that really has no release.
 
   - id: tag-matches-declared-version
     status: enforced

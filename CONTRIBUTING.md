@@ -9,11 +9,16 @@ in the same way a wrong line of code is. Most of what follows exists to keep tha
 ./scripts/install-hooks.sh   # once, after cloning
 ./scripts/check-repo.sh      # the gate; runs on every commit and in CI
 ./scripts/check-install.sh   # only if you touched README.md's install section
+./scripts/check-forge.sh     # only if you touched what .claude/guardrails.yml says about GitHub
 ```
 
 `check-install.sh` extracts the install commands from `README.md` and runs them against a clean
 `HOME`. It clones this repository four times, so it runs about five seconds — CI runs it on every
 change and the commit hook does not.
+
+`check-forge.sh` diffs what the checklist records about GitHub — the rules protecting `main`, and
+whether the declared version was released — against GitHub itself. It needs the network and an
+authenticated `gh`, so it skips on a machine without them and CI is what gates it.
 
 The gate runs in about a second. If it fails it names what to fix. Bypass it with
 `git commit --no-verify` only when you know why, and say so in the pull request.
