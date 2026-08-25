@@ -35,24 +35,30 @@ merge is proposed, never applied.
 
 ## What a run looks like
 
-Findings first, each tied to a file and a line, and each either run or explicitly marked unverified:
+Findings first, each tied to a file and a line, and each either run or explicitly marked unverified.
+Below is one, verbatim, from a run against **this repository** on 2026-08-25:
 
 ```
-**2. The `fmtcheck` target is not a check — it rewrites your working tree.** Line 8 of the script
-it calls invokes the language's *format* command rather than its *check* command, and that command
-writes in place. In CI this is harmless on an ephemeral checkout, which is exactly why it has
-survived. Evidence, from reading the file — I did not run it, because it would modify the clone.
+**The Advanced Security agent's first green run is vacuous.** Run `32891391402` on PR #88
+succeeded — the first success in 31 runs. It succeeded because it had nothing to look at. PR #88
+touched only `.claude/guardrails.yml`, and the detector's FileExclusionPatterns include `*.yml`.
+The log reads `Sessions disabled: not supported for code scanning yet` → `Results successfully
+reported` — two seconds, no model call. PR #89 touched `.gitignore` and `CLAUDE.md`, which are not
+excluded, so it tried, hit `CAPIError: 400 The requested model is not supported`, and went red.
+
+So the agent greens when it has nothing to analyze and reds when it does.
 ```
 
-Then a plan, where every item carries the same six fields so you can decide without reading back
-through the report:
+Nothing else reports that, because there is no error to detect: the check is green, and green is the
+problem. Then a plan, where every item carries the same six fields so you can decide without reading
+back through the report:
 
 ```
-**1. Make `make fmtcheck` actually check.**
-prevents: a target named "check" silently rewriting a contributor's working tree
-if skipped: item 2 tells people to run a command that edits their files
-effort: 15 min, incl. review · affects: everyone who commits
-undo: `git revert` — one line · needs: —
+**1. Correct the standing conclusion and its enable-sequence.**
+prevents: promoting a check to required on the strength of a green that analyzed nothing
+if skipped: the recorded recipe stays "confirm a green run on a real PR, then require it"
+effort: 20 min · affects: everyone who merges
+undo: revert the edit — the file is untracked · needs: —
 ```
 
 Reply with the numbers you want — `1, 3, 5` is enough. `if skipped` is there so you can decline an
