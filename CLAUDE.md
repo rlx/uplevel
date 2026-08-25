@@ -31,7 +31,13 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
 - Bumping `version:` in `SKILL.md` alongside any change under `skills/uplevel/` is enforced at commit
   time. Tagging is not: the gate prints when the declared version has no tag, and does not fail.
   Failing at commit time would fail the commit that does the bump, and failing in CI would leave
-  `main` red between merge and tag. Tag after merge.
+  `main` red between merge and tag. Tag after merge — and cut the GitHub release in the same sitting.
+  `scripts/check-forge.sh` fails once a declared version is tagged with no release, which is how nine
+  consecutive tags stopped being possible; before it existed, nothing looked.
+- What `.claude/guardrails.yml` says about GitHub — the required checks, the rules protecting `main`,
+  the release — is data, not prose, and `scripts/check-forge.sh` diffs it against GitHub. Every claim
+  in that file about the tree was already checked by a script; the claims about the forge were the
+  ones that drifted. Update the fields, not only the note.
 - Every reference file must be linked from `SKILL.md`, and every link must resolve. Both directions
   are enforced.
 - CI is `ubuntu-latest` (bash 5, GNU coreutils); a maintainer may be on bash 3.2 with BSD or ugrep

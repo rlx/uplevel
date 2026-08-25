@@ -59,10 +59,10 @@ echo "== a new check is recorded in the checklist =="
 # entry. Commit time only, for the same reason the version rule is: "in the same
 # commit" is a question only answerable here.
 staged=$(git diff --cached --name-only 2>/dev/null)
-gates="scripts/check-repo.sh scripts/check-install.sh skills/uplevel/selfcheck.sh"
+gates="scripts/check-repo.sh scripts/check-install.sh scripts/check-forge.sh skills/uplevel/selfcheck.sh"
 if [ -z "$staged" ]; then
   echo "  nothing staged, skipping"
-elif ! printf '%s\n' "$staged" | grep -qE '^(scripts/check-(repo|install)\.sh|skills/uplevel/selfcheck\.sh)$'; then
+elif ! printf '%s\n' "$staged" | grep -qE '^(scripts/check-(repo|install|forge)\.sh|skills/uplevel/selfcheck\.sh)$'; then
   echo "  no gate script staged"
 else
   # Count assertions, not just section headings: a check added inside an existing
