@@ -317,8 +317,13 @@ checks:
       from it, and reading back "Skills (1) uplevel" at version 0.78.0. Not in
       the gate - check-install.sh runs the documented shell install against a
       clean HOME, and this path needs the claude CLI, which CI does not have.
-      The GitHub shorthand in README.md resolves the default branch, so it is
-      verified only once the manifests are on main.
+      Re-verified from the GitHub shorthand once the manifests reached main:
+      marketplace added, plugin installed, "Version: 0.78.0", and the shipped
+      selfcheck run against the installed copy. That pass is also what caught
+      the update command README.md printed, which named the plugin bare and
+      failed - "update" wants the marketplace-qualified form that "install"
+      takes, while "uninstall" accepts the bare name. The gate cannot see this
+      section, so every command in it is verified by hand or not at all.
 
   - id: plugin-manifests-agree-with-the-skill
     status: enforced

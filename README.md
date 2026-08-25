@@ -23,8 +23,9 @@ claude plugin install uplevel@uplevel
 Or from inside a session: `/plugin marketplace add rlx/uplevel`, then `/plugin install
 uplevel@uplevel`.
 
-Restart Claude Code. The skill is then available as `/uplevel`, and `claude plugin update uplevel`
-moves it to the next release. This repository is its own marketplace — the manifests are in
+Restart Claude Code. The skill is then available as `/uplevel`, and `claude plugin update
+uplevel@uplevel` moves it to the next release — qualified with the marketplace, which is the form
+that command takes. This repository is its own marketplace — the manifests are in
 `.claude-plugin/`, and the plugin they serve is this tree, so the version you install is the one
 `SKILL.md` declares.
 
