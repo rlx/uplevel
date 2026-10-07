@@ -1,0 +1,3 @@
+# What CI installs to measure load cost. Pinned so the figure the ceilings are
+# compared against moves only with a commit; Dependabot proposes the bumps.
+tiktoken==0.14.0

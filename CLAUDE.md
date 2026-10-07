@@ -20,7 +20,7 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
 - Load cost is measured with a real tokenizer when `tiktoken` is importable, and falls back to a word
   count that reads 3-9% low, in which case the gate prints the figures and asserts no ceiling. CI
   installs it, so `main` is always measured exactly. The Mode A working set has a ceiling, currently
-  44000; raise it in the change that needs the room and say why.
+  46000; raise it in the change that needs the room and say why.
 - `SKILL.md` has a token budget, currently 6000, enforced by the gate. It loads on every trigger;
   `references/` load only when read. New detail goes in a reference by default. The budget makes
   growth deliberate rather than capping quality — raise it in the same change when something belongs
@@ -29,7 +29,8 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
   This is a discipline, not an enforced rule: the gate parses fenced blocks and validates `grep -E`
   patterns, which proves they are well-formed, not that they do what the text claims.
 - Bumping `version:` in `SKILL.md` alongside any change under `skills/uplevel/` is enforced at commit
-  time. Tagging is not: the gate prints when the declared version has no tag, and does not fail.
+  time, and again in CI against the pull request's base. Tagging is not: the gate prints when the
+  declared version has no tag, and does not fail.
   Failing at commit time would fail the commit that does the bump, and failing in CI would leave
   `main` red between merge and tag. Tag after merge — and cut the GitHub release in the same sitting.
   `scripts/check-forge.sh` fails once a declared version is tagged with no release, which is how nine

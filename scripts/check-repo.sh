@@ -33,6 +33,26 @@ else
   echo "  not a git checkout, skipping"
 fi
 
+# The three rules below ask what a change contains. At commit time that is the
+# index. In CI nothing is staged, so they skipped there and bound only whoever
+# had installed the hook -- a web edit, a bot or a --no-verify commit reached
+# main unasked. On a pull request the same question is asked of the diff against
+# the base branch, which needs the checkout to have fetched it.
+RANGE=""; what="staged"
+if [ -n "$(git diff --cached --name-only 2>/dev/null)" ]; then
+  RANGE="--cached"
+elif [ -n "${GITHUB_BASE_REF:-}" ]; then
+  if git rev-parse -q --verify "origin/$GITHUB_BASE_REF" >/dev/null 2>&1; then
+    RANGE="origin/$GITHUB_BASE_REF...HEAD"; what="in this pull request"
+  else
+    note "origin/$GITHUB_BASE_REF is not in this checkout, so the pull request cannot be diffed — fetch full history"
+  fi
+fi
+# shellcheck disable=SC2086
+changed=$( [ -n "$RANGE" ] && git diff $RANGE --name-only 2>/dev/null )
+# shellcheck disable=SC2086
+gdiff() { git diff $RANGE "$@"; }
+
 echo "== skill version bumped with skill changes =="
 # The rule lives in references/mode-c-enforce.md: bump the version marker in the
 # same commit as the change it invalidates. Enforced at commit time, which is the
@@ -40,15 +60,14 @@ echo "== skill version bumped with skill changes =="
 # Everything under skills/uplevel/ ships, not only SKILL.md and references/ --
 # the shipped README, the selfcheck and its data files reach an installed copy
 # too, and a version that does not move cannot identify what someone installed.
-staged=$(git diff --cached --name-only 2>/dev/null)
-if [ -z "$staged" ]; then
-  echo "  nothing staged, skipping"
-elif ! printf '%s\n' "$staged" | grep -qE '^skills/uplevel/'; then
-  echo "  no skill content staged"
-elif git diff --cached -U0 -- skills/uplevel/SKILL.md | grep -q '^+version:'; then
+if [ -z "$changed" ]; then
+  echo "  nothing staged and not a pull request, skipping"
+elif ! printf '%s\n' "$changed" | grep -qE '^skills/uplevel/'; then
+  echo "  no skill content $what"
+elif gdiff -U0 -- skills/uplevel/SKILL.md | grep -q '^+version:'; then
   echo "  skill content changed, version bumped"
 else
-  note "skill content is staged without a version: bump in SKILL.md"
+  note "skill content is $what without a version: bump in SKILL.md"
 fi
 
 echo "== a new check is recorded in the checklist =="
@@ -58,12 +77,11 @@ echo "== a new check is recorded in the checklist =="
 # this fires. Renames net to zero, so only genuinely new headings ask for an
 # entry. Commit time only, for the same reason the version rule is: "in the same
 # commit" is a question only answerable here.
-staged=$(git diff --cached --name-only 2>/dev/null)
 gates="scripts/check-repo.sh scripts/check-install.sh scripts/check-forge.sh skills/uplevel/selfcheck.sh"
-if [ -z "$staged" ]; then
-  echo "  nothing staged, skipping"
-elif ! printf '%s\n' "$staged" | grep -qE '^(scripts/check-(repo|install|forge)\.sh|skills/uplevel/selfcheck\.sh)$'; then
-  echo "  no gate script staged"
+if [ -z "$changed" ]; then
+  echo "  nothing staged and not a pull request, skipping"
+elif ! printf '%s\n' "$changed" | grep -qE '^(scripts/check-(repo|install|forge)\.sh|skills/uplevel/selfcheck\.sh)$'; then
+  echo "  no gate script $what"
 else
   # Count assertions, not just section headings: a check added inside an existing
   # section netted zero, which is how the entry for this very rule came to be
@@ -72,17 +90,17 @@ else
   sig="$(mktemp)"
   grep -vE '^[[:space:]]*(#|$)' scripts/gate-check-signals.txt > "$sig"
   # shellcheck disable=SC2086
-  d=$(git diff --cached -U0 -- $gates)
+  d=$(gdiff -U0 -- $gates)
   add=$(printf '%s\n' "$d" | grep '^+' | grep -v '^+++' | sed 's/^.//' | grep -cEf "$sig")
   del=$(printf '%s\n' "$d" | grep '^-' | grep -v '^---' | sed 's/^.//' | grep -cEf "$sig")
   rm -f "$sig"
   net=$((add - del))
   if [ "$net" -le 0 ]; then
-    echo "  gate script staged, no check added ($add added, $del removed)"
-  elif printf '%s\n' "$staged" | grep -q '^\.claude/guardrails\.yml$'; then
-    echo "  $net new check(s) staged, checklist updated alongside"
+    echo "  gate script $what, no check added ($add added, $del removed)"
+  elif printf '%s\n' "$changed" | grep -q '^\.claude/guardrails\.yml$'; then
+    echo "  $net new check(s) $what, checklist updated alongside"
   else
-    note "$net new check(s) staged without a change to .claude/guardrails.yml — record what it enforces"
+    note "$net new check(s) $what without a change to .claude/guardrails.yml — record what it enforces"
   fi
 fi
 
@@ -115,9 +133,9 @@ try:
 except Exception as exc:
     print("does not parse as YAML: %s" % str(exc).splitlines()[0])
     sys.exit(1)
-audited = doc.get("audited") if isinstance(doc, dict) else None
+audited = doc.get("last_audit") if isinstance(doc, dict) else None
 if not isinstance(audited, datetime.date):
-    print("has no 'audited:' date in YYYY-MM-DD form")
+    print("has no 'last_audit:' date in YYYY-MM-DD form")
     sys.exit(1)
 age = (datetime.date.today() - audited).days
 if age < 0:
@@ -164,7 +182,11 @@ else
   note "CHANGELOG.md has no '## v$cur' entry — write it in the change, not after the tag"
 fi
 
-if [ "$tagn" = "0" ]; then
+if [ "$tagn" = "0" ] && [ -n "${CI:-}" ]; then
+  # A default CI checkout fetches no tags, so every tag check above compared
+  # nothing and this line read as a repository that had never released.
+  note "this checkout has no v* tags, so no tag was checked — fetch tags"
+elif [ "$tagn" = "0" ]; then
   echo "  no v* tags yet; SKILL.md declares $cur"
 elif git rev-parse -q --verify "refs/tags/v$cur" >/dev/null 2>&1; then
   echo "  $tagn $tw checked; SKILL.md declares $cur, which is tagged"

@@ -1,0 +1,14 @@
+# Placeholder spellings that must not appear in a shipped command. gh fills in
+# {owner} and {repo} and sends anything else as typed, so each of these returns
+# a 404 -- which the forge audit reads as a control that is not there. {branch}
+# is the exception that is worse: gh does fill it in, with the branch checked
+# out rather than the default one.
+#
+# Fixed strings, one per line. Blank lines and # comments ignored. Kept in .txt
+# because the scan covers *.md, so this list cannot match itself.
+repos/{o}/
+{r}/
+branches/{default}
+branches/{branch}
+repos/OWNER/
+repos/:owner

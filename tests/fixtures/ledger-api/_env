@@ -1,0 +1,3 @@
+ENVIRONMENT=production
+DATABASE_HOST=db.internal.example
+PAYMENTS_TOKEN=uplevel-canary-4d1e9c7b

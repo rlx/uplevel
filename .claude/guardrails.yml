@@ -6,34 +6,57 @@
 # a project's own gaps is a roadmap for whoever wants to use them.
 #
 # status: present | enforced
-audited: 2026-08-24
+version: 1
+generated_by: uplevel
+last_audit: 2026-10-07
 visibility: public
 last_audit_scope: >
-  Re-audit as a diff. Verified this pass: the rules protecting main, against
-  what this file records; every tag against its release; action pinning and the
-  repository Actions settings; the checklist entries against the scripts that
-  enforce them; and the commit history since the previous pass. One regression,
-  found and closed: nine consecutive tags had shipped with no GitHub release
-  while this file recorded releases as enforced. Both claims that had drifted
-  were about GitHub rather than about the tree, where every claim was already
-  checked by a script, and scripts/check-forge.sh now diffs them too.
+  Full review, not a diff. Read the gate scripts, the workflow and nine of the
+  fourteen references; ran the gate with its tokenizer broken and against a
+  simulated pull request; re-read the rules protecting main, the Actions
+  settings, code scanning and the releases. Three gate checks were found to
+  skip or pass vacuously in CI and now fail instead.
 
 checks:
   - id: gate-runs-on-commit
     status: enforced
-    by: .git/hooks/pre-commit -> scripts/check-repo.sh
+    enforced_by: .git/hooks/pre-commit -> scripts/check-repo.sh
 
   - id: broken-reference-fails-gate
     status: enforced
-    by: skills/uplevel/selfcheck.sh
+    enforced_by: skills/uplevel/selfcheck.sh
 
   - id: shipped-commands-parse
     status: enforced
-    by: selfcheck.sh; bash -n on fenced blocks, plus grep -E pattern validation
+    enforced_by: selfcheck.sh; bash -n on fenced blocks, plus grep -E pattern validation
+
+  - id: shipped-commands-use-placeholders-gh-fills-in
+    status: enforced
+    enforced_by: selfcheck.sh; fixed strings in skills/uplevel/unsubstituted-placeholders.txt
+    note: >-
+      gh substitutes {owner} and {repo} and sends any other placeholder as
+      typed. Four spellings had shipped, two of which return a 404 when pasted
+      and one of which names the checked-out branch where the default was meant.
+
+  - id: load-cost-measured-or-failed
+    status: enforced
+    enforced_by: selfcheck.sh; a tokenizer that is present and produces no figure fails
+    note: >-
+      the tokenizer fetches its encoding on first use, so it can import and
+      still measure nothing. That exited zero with no ceiling asserted.
+
+  - id: commit-time-rules-run-on-pull-requests
+    status: enforced
+    enforced_by: scripts/check-repo.sh in the required job; diffs against the base branch
+    note: >-
+      the version bump and the new-check-recorded rule read the index, so in CI
+      they skipped and bound only a clone with the hook installed. On a pull
+      request they now read the diff against the base, and a checkout with no
+      tags fails the tag check where it used to report nothing to check.
 
   - id: skill-md-within-budget
     status: enforced
-    by: selfcheck.sh; 6000 tokens, printed with the headroom on every run
+    enforced_by: selfcheck.sh; 6000 tokens, printed with the headroom on every run
     note: >-
       raised from 4000 on 2026-08-19. The ceiling exists because this file loads
       on every trigger for every user, so growth is a cost borne by someone else
@@ -43,33 +66,34 @@ checks:
 
   - id: relative-links-resolve
     status: enforced
-    by: scripts/check-repo.sh; tracked files only
+    enforced_by: scripts/check-repo.sh; tracked files only
 
   - id: hook-installed-and-current
     status: enforced
-    by: scripts/check-repo.sh
+    enforced_by: scripts/check-repo.sh
 
   - id: hook-check-skipped-in-ci
     status: enforced
-    by: scripts/check-repo.sh; CI env var guard
+    enforced_by: scripts/check-repo.sh; CI env var guard
 
   - id: ci-on-push
     status: enforced
-    by: .github/workflows/check.yml -> scripts/check-repo.sh
+    enforced_by: .github/workflows/check.yml -> scripts/check-repo.sh
 
   - id: ci-on-pull-request
     status: enforced
-    by: .github/workflows/check.yml -> scripts/check-repo.sh
+    enforced_by: .github/workflows/check.yml -> scripts/check-repo.sh
     note: >-
       verified on a pull request that ran the real checks rather than passing
       vacuously; the CI guard correctly skipped the local hook check.
 
   - id: branch-protection-required-checks
     status: enforced
-    by: ruleset "Protect main", active, no bypass actors
+    enforced_by: ruleset "Protect main", active, no bypass actors
     required_contexts: ["Repo gate", "Analyze (actions)", "CodeQL"]
     required_rules: ["deletion", "non_fast_forward", "pull_request", "required_status_checks"]
     strict_up_to_date: true
+    allowed_merge_methods: ["squash"]
     note: >-
       the three fields above are data rather than prose because prose drifts:
       this entry said "two checks" while three were required, from the hour
@@ -90,7 +114,7 @@ checks:
 
   - id: recorded-protection-matches-the-ruleset
     status: enforced
-    by: scripts/check-forge.sh, a step in the required "Repo gate" job
+    enforced_by: scripts/check-forge.sh, a step in the required "Repo gate" job
     note: >-
       every claim in this file about the tree is checked by a script; every
       claim about GitHub was hand-written, and two of them drifted within four
@@ -104,7 +128,7 @@ checks:
 
   - id: secret-scanning
     status: enforced
-    by: repository security settings; scanning, push protection, non-provider
+    enforced_by: repository security settings; scanning, push protection, non-provider
         patterns and validity checks all enabled
     note: >-
       the last two are settable only in the web UI, under Settings > Advanced
@@ -117,15 +141,15 @@ checks:
 
   - id: dependabot-security-updates
     status: enforced
-    by: vulnerability alerts + automated security fixes
+    enforced_by: vulnerability alerts + automated security fixes
 
   - id: action-update-automation
     status: enforced
-    by: .github/dependabot.yml; github-actions ecosystem, monthly
+    enforced_by: .github/dependabot.yml; github-actions ecosystem, monthly
 
   - id: actions-pinned-to-sha
     status: present
-    by: .github/workflows/check.yml; actions/checkout at a full commit SHA, version in a trailing comment
+    evidence: .github/workflows/check.yml; actions/checkout at a full commit SHA, version in a trailing comment
     note: >-
       one workflow, one third-party action, pinned. Recorded because it was in
       place and unrecorded, so a re-audit re-derived it by hand and nothing
@@ -140,19 +164,19 @@ checks:
 
   - id: security-policy
     status: present
-    by: SECURITY.md
+    evidence: SECURITY.md
 
   - id: license
     status: present
-    by: LICENSE (MIT)
+    evidence: LICENSE (MIT)
 
   - id: code-scanning
     status: enforced
-    by: CodeQL default setup, query suite "default", weekly
+    enforced_by: CodeQL default setup, query suite "default", weekly
 
   - id: code-scanning-languages-recorded
     status: present
-    by: scripts/check-forge.sh, on a maintainer's machine; CI may not read this
+    evidence: scripts/check-forge.sh, on a maintainer's machine; CI may not read this
     languages: ["actions", "python"]
     query_suite: default
     note: >-
@@ -170,7 +194,7 @@ checks:
 
   - id: ai-scan-off
     status: present
-    by: scripts/check-forge.sh, on a maintainer's machine; CI may not read this
+    evidence: scripts/check-forge.sh, on a maintainer's machine; CI may not read this
     pr_scan: disabled
     note: >-
       AI Scan for pull requests is separate from CodeQL default setup and bills
@@ -181,13 +205,44 @@ checks:
       money should not be able to come back on unnoticed. Turning it off does
       not touch default setup, so the required contexts above still report.
 
+  - id: squash-is-the-only-merge-method
+    status: enforced
+    enforced_by: ruleset "Protect main" and the repository merge settings; diffed by scripts/check-forge.sh
+    note: >-
+      the convention that only a pull request title reaches main rested on
+      contributors choosing squash while merge commits and rebase merges were
+      both allowed. The method list is the allowed_merge_methods field on the
+      branch-protection entry above.
+
+  - id: forge-claims-checked-weekly
+    status: enforced
+    enforced_by: .github/workflows/check.yml; schedule trigger
+    note: >-
+      what check-forge.sh compares against changes on GitHub without a commit,
+      and the job ran only when someone pushed.
+
+  - id: ci-tokenizer-pinned
+    status: enforced
+    enforced_by: scripts/requirements.txt; .github/dependabot.yml, pip ecosystem, monthly
+
+  - id: behavior-checked-against-a-fixture
+    status: present
+    evidence: scripts/check-behavior.sh; one fixture under tests/fixtures/, run by hand before a release
+    note: >-
+      every other check reads the skill's text. This one runs the skill
+      headless against a repository with planted conditions and asserts on the
+      report and on what was left untouched. Present rather than enforced: it
+      spends model tokens and its subject varies between runs, so nothing runs
+      it automatically. Its assertions were each shown to fail by replaying a
+      doctored transcript.
+
   - id: branch-deleted-on-merge
     status: enforced
-    by: repository setting delete_branch_on_merge
+    enforced_by: repository setting delete_branch_on_merge
 
   - id: gate-scripts-portable
     status: enforced
-    by: scripts/check-repo.sh against scripts/gnu-only-constructs.txt
+    enforced_by: scripts/check-repo.sh against scripts/gnu-only-constructs.txt
     note: >-
       CI is ubuntu-latest (bash 5, GNU coreutils); a maintainer here runs
       bash 3.2 with ugrep and BSD sed, and the commit hook gates on that one.
@@ -195,7 +250,7 @@ checks:
 
   - id: skill-md-headroom-visible
     status: enforced
-    by: selfcheck.sh prints tokens used, budget, and remainder
+    enforced_by: selfcheck.sh prints tokens used, budget, and remainder
     note: >-
       the gate prints the live figure on every run, so this entry deliberately
       records no number - a pinned one went stale in a single commit. Growth is
@@ -204,7 +259,7 @@ checks:
 
   - id: mode-working-set-visible
     status: enforced
-    by: skills/uplevel/selfcheck.sh; prints tokens per mode on every run
+    enforced_by: skills/uplevel/selfcheck.sh; prints tokens per mode on every run
     note: >-
       SKILL.md's budget is the entry cost, not the cost. A full Mode A audit
       reads most of references/ before touching the user's repository, and
@@ -215,7 +270,7 @@ checks:
 
   - id: load-cost-measured-not-estimated
     status: enforced
-    by: >-
+    enforced_by: >-
       skills/uplevel/selfcheck.sh; counts with tiktoken where it is importable, and asserts the
       ceilings only then. CI installs it
     note: >-
@@ -232,9 +287,9 @@ checks:
 
   - id: mode-working-set-bounded
     status: enforced
-    by: >-
+    enforced_by: >-
       skills/uplevel/selfcheck.sh; fails when the Mode A working set exceeds its ceiling, currently
-      44000
+      46000
     note: >-
       printing the figure made growth visible and did not make it cost anything,
       and every addition lands in references/ where nothing had a ceiling. The
@@ -251,7 +306,7 @@ checks:
 
   - id: every-reference-measured
     status: enforced
-    by: skills/uplevel/selfcheck.sh; fails when a shipped reference is in no mode-cost list
+    enforced_by: skills/uplevel/selfcheck.sh; fails when a shipped reference is in no mode-cost list
     note: >-
       the ceiling only bounds what it counts. remedies.md sat in no list while
       mode-a-investigate.md routed every plan through it, so the advertised Mode A
@@ -261,7 +316,7 @@ checks:
 
   - id: checklist-parses
     status: enforced
-    by: scripts/check-repo.sh; python3 + pyyaml, skipped when absent
+    enforced_by: scripts/check-repo.sh; python3 + pyyaml, skipped when absent
     note: >-
       this file once shipped unparseable, because an unquoted "#" started a YAML
       comment mid-value and truncated the block. Nothing read the file, so
@@ -270,7 +325,7 @@ checks:
 
   - id: checklist-is-current
     status: enforced
-    by: >-
+    enforced_by: >-
       scripts/check-repo.sh; fails when the audited date is missing, in the
       future, or more than 180 days old
     note: >-
@@ -279,7 +334,7 @@ checks:
 
   - id: push-protection-evidence
     status: enforced
-    by: repository security settings, read through the API
+    enforced_by: repository security settings, read through the API
     note: >-
       recorded on a settings read rather than a behavioral test, deliberately.
       A test was attempted once with vendor-published example keys, which
@@ -290,14 +345,14 @@ checks:
 
   - id: private-vulnerability-reporting
     status: enforced
-    by: repository setting; SECURITY.md directs reporters to it
+    enforced_by: repository setting; SECURITY.md directs reporters to it
     note: >-
       the policy previously named a channel that was not enabled, and its own
       fallback sent researchers to a public issue.
 
   - id: invariants-stated-in-skill-md
     status: enforced
-    by: skills/uplevel/selfcheck.sh against skills/uplevel/invariants.txt
+    enforced_by: skills/uplevel/selfcheck.sh against skills/uplevel/invariants.txt
     note: >-
       11 rules that must appear in SKILL.md, which loads on every trigger. An
       invariant surviving only in a reference has been demoted behind a read,
@@ -308,7 +363,7 @@ checks:
 
   - id: leakage-scan-by-shape
     status: enforced
-    by: skills/uplevel/selfcheck.sh against skills/uplevel/leak-patterns.txt
+    enforced_by: skills/uplevel/selfcheck.sh against skills/uplevel/leak-patterns.txt
     note: >-
       scans *.md and *.sh for machine- and project-specific shapes. Patterns
       are held in a data file so they cannot match themselves. Verified
@@ -316,7 +371,7 @@ checks:
 
   - id: versioned-releases
     status: enforced
-    by: git tag; version bump already gated at commit time
+    enforced_by: git tag; version bump already gated at commit time
     note: >-
       the version in SKILL.md frontmatter and the tag carry the same number, so
       an installed copy can be identified. Verified by cloning the public
@@ -327,7 +382,7 @@ checks:
 
   - id: release-follows-the-tag
     status: enforced
-    by: scripts/check-forge.sh, a step in the required "Repo gate" job
+    enforced_by: scripts/check-forge.sh, a step in the required "Repo gate" job
     note: >-
       this entry once read "git tag + GitHub release" while nine consecutive
       tags, v0.70.0 through v0.78.0, had no release and the Releases page named
@@ -346,7 +401,7 @@ checks:
 
   - id: repository-description-and-topics
     status: enforced
-    by: scripts/check-forge.sh; diffed against the repository's own settings
+    enforced_by: scripts/check-forge.sh; diffed against the repository's own settings
     description: >-
       A Claude Code skill that finds the engineering controls your repository
       does not have — CI that never runs on pull requests, a check target that
@@ -378,7 +433,7 @@ checks:
 
   - id: installable-as-a-plugin
     status: present
-    by: .claude-plugin/plugin.json and .claude-plugin/marketplace.json; the repository is its own marketplace
+    evidence: .claude-plugin/plugin.json and .claude-plugin/marketplace.json; the repository is its own marketplace
     note: >-
       the plugin root is the repository root, so skills/uplevel is already where
       a plugin's skills belong and nothing moved. Verified by hand against a
@@ -400,7 +455,7 @@ checks:
 
   - id: plugin-manifests-agree-with-the-skill
     status: enforced
-    by: scripts/check-repo.sh; plugin.json's version against SKILL.md's, and the marketplace entry against both
+    enforced_by: scripts/check-repo.sh; plugin.json's version against SKILL.md's, and the marketplace entry against both
     note: >-
       a second version marker in the tree, and the one a consumer installs by.
       A version marker that disagrees with what shipped is a defect this skill
@@ -411,14 +466,14 @@ checks:
 
   - id: tag-matches-declared-version
     status: enforced
-    by: scripts/check-repo.sh; every v* tag's commit must declare that version
+    enforced_by: scripts/check-repo.sh; every v* tag's commit must declare that version
     note: >-
       the bump was gated and the tag was not, so main carried a version that
       had never been released and nothing noticed. Verified red-then-green.
 
   - id: prose-is-en-us
     status: enforced
-    by: scripts/check-repo.sh against scripts/en-gb-spellings.txt
+    enforced_by: scripts/check-repo.sh against scripts/en-gb-spellings.txt
     note: >-
       47 spellings across tracked markdown and YAML, in one grep rather than one
       per pattern per file - the readable nested loop cost 3.3s of a 4.5s gate,
@@ -426,7 +481,7 @@ checks:
 
   - id: prose-wrap-ceiling
     status: enforced
-    by: scripts/check-repo.sh; 105 characters, python3, skipped when absent
+    enforced_by: scripts/check-repo.sh; 105 characters, python3, skipped when absent
     note: >-
       counted in characters, not bytes: an em dash is three bytes, and a byte
       count flags correctly-wrapped prose. The ceiling is 105 rather than 100
@@ -436,7 +491,7 @@ checks:
 
   - id: documented-install-runs
     status: enforced
-    by: scripts/check-install.sh, a step in the required "Repo gate" job
+    enforced_by: scripts/check-install.sh, a step in the required "Repo gate" job
     note: >-
       extracts the install commands from README.md and skills/uplevel/README.md
       rather than restating them, and runs both against a clean HOME, each twice,
@@ -445,7 +500,7 @@ checks:
 
   - id: new-check-recorded-in-checklist
     status: enforced
-    by: >-
+    enforced_by: >-
       scripts/check-repo.sh; commit time, against check-repo.sh, check-install.sh
       and selfcheck.sh
     note: >-
@@ -461,11 +516,11 @@ checks:
 
   - id: changelog
     status: present
-    by: CHANGELOG.md, linked from README.md
+    evidence: CHANGELOG.md, linked from README.md
 
   - id: changelog-documents-declared-version
     status: enforced
-    by: scripts/check-repo.sh; main's SKILL.md version must have a CHANGELOG entry
+    enforced_by: scripts/check-repo.sh; main's SKILL.md version must have a CHANGELOG entry
     note: >-
       v0.40.0 was tagged and released while its changelog PR was still open, so
       the tagged commit documents every version except the one it released. The
@@ -476,7 +531,7 @@ checks:
 
   - id: pull-request-template
     status: present
-    by: .github/pull_request_template.md
+    evidence: .github/pull_request_template.md
     note: >-
       prompts for what CONTRIBUTING.md requires and the gate cannot check: that a
       new check was watched failing on the case that motivated it, that its skip
@@ -486,7 +541,7 @@ checks:
 
   - id: contributing-guide
     status: present
-    by: CONTRIBUTING.md
+    evidence: CONTRIBUTING.md
     note: >-
       names the gate, the rules it enforces, the one rule it cannot enforce
       (every shipped command must have been run), and the red-then-green plus

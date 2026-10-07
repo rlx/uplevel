@@ -5,6 +5,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    # What check-forge.sh compares against lives on GitHub and moves without a
+    # commit, so a run that only follows pushes finds drift when someone next
+    # happens to push. Weekly, Monday 06:17 UTC.
+    - cron: "17 6 * * 1"
 
 permissions: {}
 
@@ -27,13 +32,16 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history and tags: the gate diffs a pull request against its
+          # base and checks every tag, and a depth-1 checkout has neither.
+          fetch-depth: 0
       - name: install tiktoken
         # The load-cost ceilings are only asserted when a real tokenizer is
         # present; a word count reads 3-9% low on this content. The commit hook
         # degrades to the estimate, so this step is what keeps main guarded.
         run: |
-          python3 -m pip install --quiet tiktoken \
-            || python3 -m pip install --quiet --break-system-packages tiktoken
+          python3 -m pip install --quiet -r scripts/requirements.txt \
+            || python3 -m pip install --quiet --break-system-packages -r scripts/requirements.txt
       - name: scripts/check-repo.sh
         run: ./scripts/check-repo.sh
       - name: scripts/check-install.sh
@@ -47,8 +55,9 @@ jobs:
         # authenticated gh, which a commit hook should not. The token reads the
         # rules protecting main, the release list and the repository settings;
         # contents: read covers those, and the job holds nothing else. The code
-        # scanning setup needs admin-level access this token is not given, so
-        # that one claim reports itself unchecked here rather than passing.
+        # scanning setup and the AI Scan setting need admin-level access this
+        # token is not given, so those two claims report themselves unchecked
+        # here rather than passing.
         env:
           GH_TOKEN: ${{ github.token }}
         run: ./scripts/check-forge.sh

@@ -30,19 +30,26 @@ command -v gh                                  # absent? see the first row of th
 git remote -v                                  # is there a remote at all?
 gh auth status                                 # authenticated? which host? which scopes?
 gh repo view --json viewerPermission,isPrivate,visibility,defaultBranchRef
+default=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)
 gh api repos/{owner}/{repo}/actions/permissions          # 403 here means unknown, not disabled
 gh api repos/{owner}/{repo}/rulesets                     # readable at READ — start here
-gh api repos/{owner}/{repo}/branches/{default}/protection # admin-only; 404 is ambiguous
+gh api "repos/{owner}/{repo}/branches/$default/protection"  # admin-only; 404 is ambiguous
 ```
 
-**Resolve the default branch first** — `defaultBranchRef.name`. Querying `main` on a repo whose default
-is `master` returns a 404 that looks exactly like "unprotected", and you will report a control missing
-on a branch that does not exist.
+**Resolve the default branch first** — `defaultBranchRef.name`, into `$default` above. Querying `main`
+on a repo whose default is `master` returns a 404 that looks exactly like "unprotected", and you will
+report a control missing on a branch that does not exist.
+
+**`gh` fills in `{owner}` and `{repo}`, and nothing else you would guess.** A shortened `{o}/{r}` is
+sent literally and returns 404. `{branch}` *is* filled in — with the branch checked out, not the
+default one — so from a feature branch it asks about a branch the forge may never have seen. Use the
+two long names and a shell variable for the branch; every 404 from a mistyped placeholder reads as a
+missing control.
 
 **Query rulesets before branch protection.** Rulesets are the current mechanism and, unlike the legacy
-protection endpoint, `GET /repos/{o}/{r}/rulesets` and the per-ruleset detail are **readable with plain
-READ access** — often converting the audit's most consequential line from *unknown* to a verified
-answer. Then check two things beyond existence:
+protection endpoint, `GET /repos/{owner}/{repo}/rulesets` and the per-ruleset detail are **readable
+with plain READ access** — often converting the audit's most consequential line from *unknown* to a
+verified answer. Then check two things beyond existence:
 
 - **`enforcement`** — `active` or `disabled`. A ruleset with `enforcement: disabled` is a control that
   looks real in the settings UI and stops nothing — a finding, and invisible if you only check whether
@@ -183,7 +190,7 @@ them to a public issue — publishing the vulnerability, which is the single out
 prevent. Check it rather than reading it:
 
 ```sh
-gh api repos/OWNER/REPO/private-vulnerability-reporting --jq '.enabled'
+gh api repos/{owner}/{repo}/private-vulnerability-reporting --jq '.enabled'
 ```
 
 `true` or `false`, and a repo with no `SECURITY.md` at all is a smaller problem than one with a policy
@@ -220,7 +227,8 @@ propose the substitute that does work: a pre-push hook where there are no requir
 
 ## 0b. Which of the sections below actually apply
 
-**The seed is universal; the weighting is not.** Establish the repository kind first
+**The seed is universal; the weighting is not.** §4 and §5 are in `release-gates.md`, so skipping
+them is a file you do not read. Establish the repository kind first
 (`mode-a-investigate.md`), then spend the audit where that kind can be hurt. Auditing a library's
 deploy gates finds nothing because there are none, and reports diligence rather than the release path
 that is actually exposed.
@@ -233,7 +241,7 @@ that is actually exposed.
 | **tooling or config** | §2 in full — its output becomes other repositories' CI | §4–§5 unless it deploys itself |
 | **application others run** | §4 release gates, upgrade and migration safety | §5; you do not operate it |
 
-**Two checks that only exist for a published package**, and that the rest of this file does not cover:
+**Three checks that only exist for a published package**, and that the rest of this file does not cover:
 
 - **Provenance and attestation.** npm provenance, PyPI attestations, sigstore signing. Absent on most
   packages; cheap to add; the only thing that ties a published artifact to the commit it came from.
@@ -292,7 +300,7 @@ Failure modes to check for by name, each of which produces a green repo that val
   completes. One audited repo finished 3 of 60 runs this way.
   ```sh
   grep -A2 '^concurrency:' .github/workflows/*.y*ml        # is the key constant for push events?
-  gh run list --branch <default> --limit 60 --json conclusion \
+  gh run list --branch "$default" --limit 60 --json conclusion \
     --jq '[.[].conclusion]|group_by(.)|map("\(.[0])=\(length)")|join(" ")'
   ```
   **A high `canceled` count on the default branch is the symptom**, and it reads as green in any
@@ -358,14 +366,14 @@ write-scoped default token, or accept any action from anywhere. These are separa
 file-only audit never sees them.
 
 ```sh
-gh api repos/{o}/{r}/actions/permissions           # enabled, allowed_actions
-gh api repos/{o}/{r}/actions/permissions/workflow  # default token scope, PR-approval ability
-gh api repos/{o}/{r}/actions/permissions/fork-pr-contributor-approval
-gh api repos/{o}/{r}/actions/runners               # self-hosted?
-gh api repos/{o}/{r}/actions/secrets               # how much is there to steal
-gh api repos/{o}/{r}/code-scanning/default-setup
-gh api repos/{o}/{r}/code-scanning/ai-scan         # pr_scan: enabled | disabled
-gh api repos/{o}/{r} --jq '{delete_branch_on_merge, allow_auto_merge}'
+gh api repos/{owner}/{repo}/actions/permissions           # enabled, allowed_actions
+gh api repos/{owner}/{repo}/actions/permissions/workflow  # default token scope, PR-approval ability
+gh api repos/{owner}/{repo}/actions/permissions/fork-pr-contributor-approval
+gh api repos/{owner}/{repo}/actions/runners               # self-hosted?
+gh api repos/{owner}/{repo}/actions/secrets               # how much is there to steal
+gh api repos/{owner}/{repo}/code-scanning/default-setup
+gh api repos/{owner}/{repo}/code-scanning/ai-scan         # pr_scan: enabled | disabled
+gh api repos/{owner}/{repo} --jq '{delete_branch_on_merge, allow_auto_merge}'
 ```
 
 | setting | what to look for |
@@ -376,7 +384,7 @@ gh api repos/{o}/{r} --jq '{delete_branch_on_merge, allow_auto_merge}'
 | fork-PR approval policy | on a public repo anyone can open a PR that runs CI. Confirm the policy is at least `first_time_contributors` |
 | self-hosted runners + secret count | **these set the blast radius of a fork PR.** Zero runners and zero secrets means the worst case is stolen compute; a self-hosted runner with secrets means something else entirely |
 | `code-scanning/default-setup` | free on public repositories, and it lints workflows themselves. `not-configured` on a public repo is a cheap gap |
-| `code-scanning/ai-scan` | AI Scan for pull requests — a separate control from default setup, and not free: it draws AI credits each time it runs. **Off is the default to recommend.** Report `enabled` as a cost someone should have chosen, and never propose turning it on as a cheap gap. Turning it off leaves default setup and its checks alone |
+| `code-scanning/ai-scan` | AI Scan for pull requests — a separate control from default setup, and not free: it draws AI credits each time it runs. **Off is the default to recommend.** Report `enabled` as a cost someone should have chosen, and never propose turning it on as a cheap gap. Turning it off leaves default setup and its checks alone. The read it would have done is yours: `code-scan.md` |
 | `delete_branch_on_merge` | off means merged branches accumulate and someone tidies them by hand forever |
 
 **Judge a fork PR by what it can reach, not by whether it runs your code.** Any repository whose CI
@@ -485,7 +493,7 @@ Read the protection on the default branch — this API needs admin rights and ma
 say it is unknown rather than assuming:
 
 ```sh
-gh api repos/{owner}/{repo}/branches/{branch}/protection 2>/dev/null
+gh api "repos/{owner}/{repo}/branches/$default/protection" 2>/dev/null
 gh api repos/{owner}/{repo}/rulesets 2>/dev/null
 ```
 
@@ -505,94 +513,19 @@ Evidence beats opinion here — measure their own history rather than asserting 
 
 ```sh
 gh pr list --state merged --limit 50 --json number,reviews,mergedAt,additions
-gh run list --branch main --limit 50 --json conclusion,name,createdAt
-git log --oneline --first-parent main -50        # merges vs direct commits
+gh run list --branch "$default" --limit 50 --json conclusion,name,createdAt
+git log --oneline --first-parent "$default" -50  # merges vs direct commits
 ```
 
 From that you can state, factually: how many merges reached `main` with no pull request, how many PRs
 merged with zero approvals, how often `main`'s own CI is red and for how long, and how often changes
 are reverted. **A team that argues with a recommendation rarely argues with its own numbers.**
 
-## 4. Release and production gates
+## 4 and 5. Release, deploy, and deploy-time risk
 
-- **Is the deployed commit knowable?** If nobody can say which SHA is in production, nothing else in
-  this section can be verified. Fix that first.
-- **Deploy approval**: GitHub Environments support required reviewers, wait timers, and restricted
-  branches. If deploys run straight off a merge with no gate, say so — that is a choice worth making
-  deliberately rather than by default.
-- **No rollback, or an untested one.** Ask when it was last exercised. A rollback path that has never
-  been run is a belief.
-- **Migrations ordered against deploys** (see `production.md` §4). Ask which runs first and whether
-  anything enforces it.
-- **No smoke test after deploy** — a pipeline that reports success when the process started, not when
-  the change works.
-- **Nothing orders the deploy after the gate.** Two workflows on the same trigger are concurrent, not
-  sequential, and the deploy is usually the shorter one — so the change is live before the suite that
-  validates it has finished. Measured on two repositories: one published a median twenty-two seconds
-  ahead of its own CI across every commit that ran both, the other about twenty-five. Neither is a
-  race that *sometimes* loses; the ordering is structural. `needs:` in one workflow, or a deploy that
-  is a job rather than a second trigger, is the fix — and *"CI runs on every push"* is not the answer
-  to *"what runs before users see it?"*
-- **The publish never asks whether the commit it is shipping is green.** Distinct from the bullet
-  above: there the deploy races the gate, here the gate has already finished and *failed*, and
-  nothing reads the result. It appears wherever the tests live in a different workflow from the
-  release, because then the release job's `needs:` covers only its own build steps and a red commit
-  publishes normally. Four measured in one round: a WebSocket service whose production build fires on
-  `push: main` with no reference to its test workflow, whose own `Tests` on `main` ran 14 failure to
-  9 success while 12 of 30 merged pull requests carried a failing check; a library shipping wheels to
-  a registry on every tag while its default branch had been red for weeks; an image published from a
-  failed-CI commit six times in sixty pushes; and a plugin whose release workflow reads no status at
-  all. **`needs:` cannot fix this** when the gate is a separate workflow — query the commit's
-  check-runs before publishing, or make the check required so the red commit never reaches the branch
-  you release from.
-- **A publish step that tolerates a version already in the registry.** `--skip-duplicate`,
-  `skip-existing: true` and their equivalents turn "this version is already published" from an error
-  into a success, so a release where somebody forgot the version bump is a green run that shipped
-  nothing, and nobody finds out until a user asks why the fix is missing. Measured on two registries:
-  one repository sat six commits past its last tag with its version constant still naming that tag;
-  another takes the published version from a literal in the workflow, and a tag with **zero check
-  runs** had already diverged from it. The flag exists to make a re-run idempotent, which is worth
-  keeping — pair it with an assertion that the version being published is the one the tag names.
-- **No tag, release, or changelog**, so "what shipped" is reconstructed from memory during an incident.
-- **A tag that exists and does not identify what shipped.** Absence is the easy case; the tag that is
-  present and wrong is the one an audit calls fine. Four ways it lies, each measured on a real
-  repository: a **version published with no tag at all** — ten of forty-one releases on one registry,
-  so the code for those versions is not in the history; **two tags per release** (`1.2.3` and `v1.2.3`)
-  that silently diverged, leaving consumers of one pinned to a commit **reachable from no branch**;
-  **tags the registry ignores** because they are not valid semver, so "latest" is not the newest tag;
-  and a **floating major tag force-pushed before the release is known good**, handing consumers new
-  code against an old artifact. Compare the registry's version list against `git tag`, in both
-  directions — neither is authoritative alone.
-- **A version marker in the tree that disagrees with what shipped.** A tag misidentifies a release
-  from outside; this one is read by the software itself, so being wrong changes what users get. Check
-  the `VERSION` file, the version constant and the manifest field against the newest tag *and* the
-  registry — all three, because the build often takes its version from a fourth place. Measured: a
-  constant three releases stale, because the packaging step derived the version from `git describe`
-  and ignored the constant it required; and a `VERSION` file containing the literal string `dev`,
-  which the project's own installer reads — so every user of the documented one-command install got
-  the untagged tip of the default branch, and the upgrade check, guarded by `if VERSION != "dev"`,
-  never fired for anyone for twenty-seven months.
-- **Release built from a dirty or unpinned toolchain**, so the artifact cannot be reproduced.
-- **No freeze or ownership convention** for risky periods, if the team wants one.
-
-## 5. Deploy-time risk — what is true *right now*
-
-Distinct from everything above: those ask whether the pipeline is sound, these ask whether **this
-change, at this moment** should go out. Cheap to check, and the ecosystem's incident tooling covers
-them precisely because they keep causing outages.
-
-- **Is an incident open on this service?** Shipping during an ongoing incident adds a variable to a
-  system somebody is already debugging, and muddles the timeline they will use to diagnose it.
-- **Is anyone watching?** An on-call handoff minutes away, or a gap in the rotation, means the change
-  lands with nobody who knows about it looking. Deploying into that is a choice, not a default.
-- **Has this code hurt before?** The revert and hotfix history already tells you which files are
-  incident-prone; a change touching them deserves more care than its diff size suggests. This is the
-  highest-value warning available from data every repo already has.
-- **Can you see it work?** Not "is there a dashboard" — is there a signal that would *change* if this
-  specific thing broke, and does anyone know where it is? Watching after a deploy is worthless if
-  nothing observable moves.
-- **Does the service shed load and drain gracefully?** Requests dropped mid-deploy are invisible,
-  constant, and fixable — and almost nobody checks until a customer reports it.
+**These two sections live in `release-gates.md`.** Read it when the kind you established ships
+something — a service, a library, an application others run, or a teaching repository with a live
+artifact. Where nothing is published or deployed, skip it and say in the report that you did.
 
 ## 6. Tests, and what they are actually measuring
 

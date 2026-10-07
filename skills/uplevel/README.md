@@ -96,7 +96,11 @@ broke last quarter, who may deploy) are worth correcting before you choose.
 | [`references/mode-c-enforce.md`](references/mode-c-enforce.md) | check-in, shipping, hazards, incidents, claims |
 | [`references/discovery.md`](references/discovery.md) | finding the real gate; toolchain preflight; cleanup |
 | [`references/production.md`](references/production.md) | environments, secrets, deploys, migrations, incidents |
-| [`references/forge-hygiene.md`](references/forge-hygiene.md) | CI triggers, Actions security, protection, releases |
+| [`references/forge-hygiene.md`](references/forge-hygiene.md) | CI triggers, Actions security, protection, basics |
+| [`references/release-gates.md`](references/release-gates.md) | release, deploy and deploy-time checks |
+| [`references/code-scan.md`](references/code-scan.md) | the security read of a change, done by the agent |
+| [`references/remedies.md`](references/remedies.md) | what each finding turns into as a plan item |
+| [`references/commit-hygiene.md`](references/commit-hygiene.md) | commit messages, PR bodies and release notes |
 | [`references/checklist.md`](references/checklist.md) | the per-repo checklist and how it re-audits as a diff |
 | [`references/destructive-ops.md`](references/destructive-ops.md) | the stop list, and how to derive a repo's own |
 | [`references/automation.md`](references/automation.md) | the enforcement ladder — turning rules into checks |
@@ -110,6 +114,8 @@ broke last quarter, who may deploy) are worth correcting before you choose.
 - **Settings-derived findings depend on your access.** Branch protection and org policy need
   permissions an auditor may not have. Reported as unknown, never as absent.
 - **It does not measure its own effect.** Nothing re-checks incident rate after a plan is applied.
+- **The deploy, migration and incident guidance has not been run against a live service.** Every
+  repository it was validated on was source only. Treat that half as reasoned, not tested.
 - **Plans assume a primary gate.** A repository with several independent pipelines gets a plan
   weighted toward one of them.
 - **The forge audit is GitHub-first.** CI triggers, Actions supply chain, rulesets, repository
