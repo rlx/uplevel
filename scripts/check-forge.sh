@@ -190,8 +190,8 @@ echo "== AI Scan is set the way the checklist records =="
 # AI Scan for pull requests is a different control from CodeQL default setup, on
 # a different endpoint, and it draws AI credits when it runs. Nothing in the tree
 # says which way it points, so the recorded value is diffed like the languages
-# above. Whether the gate job's token may read this endpoint is untested, so a
-# forbidden response is the same announced skip; any other failure still fails.
+# above. The gate job's token may not read this endpoint either, so a forbidden
+# response is the same announced skip; any other failure still fails.
 live="$(mktemp)"; err="$(mktemp)"
 want="$(python3 - <<'WANTED'
 import sys, yaml

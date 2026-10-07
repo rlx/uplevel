@@ -170,7 +170,7 @@ checks:
 
   - id: ai-scan-off
     status: present
-    by: scripts/check-forge.sh, on a maintainer's machine; CI's read of this endpoint is untested
+    by: scripts/check-forge.sh, on a maintainer's machine; CI may not read this
     pr_scan: disabled
     note: >-
       AI Scan for pull requests is separate from CodeQL default setup and bills
