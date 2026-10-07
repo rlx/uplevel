@@ -77,6 +77,9 @@ Field rules:
 - **`retired` rather than deleted.** Keep the entry with a reason. A check that was removed because it
   became irrelevant reads very differently from one removed because it was annoying, and only the file
   can tell you which happened.
+- **An `enforced` entry in the committed half of a split file needs only `id`, `status` and
+  `enforced_by`.** The enforcer is the evidence, and a control that is in force has nothing left to
+  rank. `present` entries carry `evidence` instead.
 - **`unknown` is a real status**, not a synonym for absent. Branch-protection APIs need admin rights;
   record that you could not see, and say so in the report.
 

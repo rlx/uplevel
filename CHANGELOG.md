@@ -2,6 +2,33 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.82.0 — 2026-10-07
+
+- New reference `code-scan.md`: the security read of a change is the agent's to do — before check-in,
+  and as a bounded pass in a full audit — where no model reads pull requests for it. Mode A, Mode C
+  and the AI Scan row in `forge-hygiene.md` point at it.
+- `forge-hygiene.md` §4 and §5, the release and deploy checks, moved to a new `release-gates.md`, so
+  an audit of a repository that publishes and deploys nothing does not load them.
+- Shipped `gh` commands use `{owner}/{repo}` and a `$default` variable throughout. `{o}/{r}`,
+  `{default}`, `OWNER/REPO` and `:owner/:repo` returned a 404 when pasted, and `{branch}` named the
+  checked-out branch. `selfcheck.sh` rejects those spellings.
+- `remedies.md` proposes `permissions: {}` as the workflow floor, matching `forge-hygiene.md`, and
+  uses only the four `affects` values the plan rules allow.
+- `checklist.md`: an `enforced` entry in the committed half of a split file needs only `id`, `status`
+  and `enforced_by`. `.claude/guardrails.yml` now uses the field names that file specifies.
+- `selfcheck.sh` fails when the tokenizer is installed and produces no figure. It exited zero with
+  no ceiling asserted.
+- `check-repo.sh` runs the version-bump and new-check-recorded rules against a pull request's base
+  in CI, where they used to skip, and fails in CI when the checkout has no tags to check.
+- `check-forge.sh` diffs the allowed merge methods, now squash only, and treats a forbidden response
+  as a failure for a token that administers the repository. CI runs the job weekly as well.
+- `scripts/check-behavior.sh` runs the skill headless against a fixture repository and asserts on
+  what it reported and what it left alone. Run by hand before a release.
+- The Mode A ceiling is 46000, raised from 44000, for `code-scan.md`. The measured cost is 45023.
+- CI installs a pinned `tiktoken`, tracked by Dependabot.
+- Both READMEs say the deploy, migration and incident guidance has not been run against a live
+  service. `CONTRIBUTING.md` and `SECURITY.md` corrected where they had gone stale.
+
 ## v0.81.0 — 2026-10-07
 
 - `forge-hygiene.md` reads the AI Scan setting, `code-scanning/ai-scan`, alongside default setup, and

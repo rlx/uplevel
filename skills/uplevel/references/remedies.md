@@ -50,7 +50,7 @@ effort: 1 h for a repository's worth · affects: everyone who merges · undo: `g
 *Rank by blast radius, not count: start with the jobs holding write permissions or registry
 credentials. A SHA can still be an impostor commit — necessary, not sufficient.*
 
-**Set `permissions: contents: read` at workflow level, widen per job.**
+**Set `permissions: {}` at workflow level, widen per job to exactly what it needs.**
 prevents: every action in every job holding repository write
 effort: 30 min · affects: everyone who merges · undo: `git revert`
 
@@ -77,12 +77,12 @@ effort: 2 h · affects: everyone who merges · undo: revert to the secret
 
 **Turn on provenance or attestation for the published artifact.**
 prevents: no way to tie a published version to the commit it came from
-effort: 1 h · affects: consumers · undo: remove the flag
+effort: 1 h · affects: everyone who merges · undo: remove the flag
 *npm provenance, PyPI attestations, sigstore. Absent on most packages; cheap.*
 
 **Tag releases, and write the changelog entry in the same change.**
 prevents: "what shipped" being reconstructed from memory during an incident
-effort: 1 h · affects: anyone installing · undo: delete the tag
+effort: 1 h · affects: everyone who merges · undo: delete the tag
 *A tag published before its changelog entry documents every version except the one it released
 — observed here.*
 
@@ -113,5 +113,5 @@ effort: 5 min, in the browser · affects: everyone who commits · undo: same tog
 
 **Add a `SECURITY.md` naming a channel that actually notifies someone.**
 prevents: a vulnerability report arriving somewhere nobody reads
-effort: 30 min · affects: reporters · undo: delete the file
+effort: 30 min · affects: everyone who merges · undo: delete the file
 *Do not promise a response time the project cannot keep.*

@@ -34,6 +34,21 @@ elif ! python3 -c 'import yaml' >/dev/null 2>&1; then
   exit 0
 fi
 
+# Two endpoints below want admin-level access. A forbidden response from them is
+# a skip for a token that lacks it and a failure for one that has it: to an
+# administrator a 403 or 404 means the endpoint moved or the control is gone,
+# and printing "this token may not read" there would be a skip nobody earned.
+ADMIN="$(gh api "repos/{owner}/{repo}" --jq '.permissions.admin // false' 2>/dev/null)"
+forbidden() {  # $1 = stderr file, $2 = what could not be read
+  if ! grep -qE 'HTTP 40[34]' "$1"; then
+    note "could not read $2 — gh is authenticated, so this is a real failure, not an absent control"
+  elif [ "$ADMIN" = "true" ]; then
+    note "could not read $2, with a token that administers this repository — the endpoint or the control is gone"
+  else
+    echo "  this token may not read $2 — unchecked here; a maintainer's gh gates it"
+  fi
+}
+
 echo "== main is protected by the rules the checklist records =="
 # The checklist records these as data rather than prose so they can be diffed.
 # The prose note beside them is still prose, and still hand-maintained.
@@ -45,12 +60,13 @@ entry = None
 for c in doc.get("checks", []):
     if c.get("id") == "branch-protection-required-checks":
         entry = c
-for key in ("required_contexts", "required_rules"):
+for key in ("required_contexts", "required_rules", "allowed_merge_methods"):
     if entry is None or not entry.get(key):
         sys.exit("the checklist entry records no %s" % key)
 lines = ["context: %s" % c for c in entry["required_contexts"]]
 lines += ["rule: %s" % r for r in entry["required_rules"]]
 lines += ["strict: %s" % str(bool(entry.get("strict_up_to_date"))).lower()]
+lines += ["merge method: %s" % m for m in entry.get("allowed_merge_methods", [])]
 print("\n".join(sorted(lines)))
 WANTED
 if [ $? -ne 0 ]; then
@@ -63,6 +79,9 @@ import json, sys
 rules = json.load(open(sys.argv[1]))
 lines = ["rule: %s" % r["type"] for r in rules]
 for r in rules:
+    if r["type"] == "pull_request":
+        methods = (r.get("parameters") or {}).get("allowed_merge_methods", [])
+        lines += ["merge method: %s" % m for m in methods]
     if r["type"] != "required_status_checks":
         continue
     p = r.get("parameters", {})
@@ -71,7 +90,7 @@ for r in rules:
 print("\n".join(sorted(lines)))
 ACTUAL
   if diff -u "$want" "$got" > /dev/null 2>&1; then
-    echo "  $(grep -c 'context: ' "$want") required checks and $(grep -c 'rule: ' "$want") rules, as recorded"
+    echo "  $(grep -c 'context: ' "$want") required checks, $(grep -c 'rule: ' "$want") rules and $(grep -c 'merge method: ' "$want") merge method, as recorded"
   else
     note "the checklist and the ruleset disagree about what protects $BRANCH:"
     diff -u "$want" "$got" | grep -E '^[-+][^-+]' | while IFS= read -r d; do
@@ -159,11 +178,7 @@ WANTED
 if [ $? -ne 0 ]; then
   note "could not read the recorded code scanning setup out of .claude/guardrails.yml"
 elif ! gh api "repos/{owner}/{repo}/code-scanning/default-setup" > "$live" 2>"$err"; then
-  if grep -qE 'HTTP 40[34]' "$err"; then
-    echo "  this token may not read the code scanning setup — unchecked here; a maintainer's gh gates it"
-  else
-    note "could not read the code scanning setup — gh is authenticated, so this is a real failure, not an absent control"
-  fi
+  forbidden "$err" "the code scanning setup"
 else
   python3 - "$live" > "$got" <<'ACTUAL'
 import json, sys
@@ -191,7 +206,7 @@ echo "== AI Scan is set the way the checklist records =="
 # a different endpoint, and it draws AI credits when it runs. Nothing in the tree
 # says which way it points, so the recorded value is diffed like the languages
 # above. The gate job's token may not read this endpoint either, so a forbidden
-# response is the same announced skip; any other failure still fails.
+# response there is the same announced skip.
 live="$(mktemp)"; err="$(mktemp)"
 want="$(python3 - <<'WANTED'
 import sys, yaml
@@ -207,11 +222,7 @@ WANTED
 if [ $? -ne 0 ]; then
   note "could not read the recorded AI Scan setting out of .claude/guardrails.yml"
 elif ! gh api "repos/{owner}/{repo}/code-scanning/ai-scan" --jq .pr_scan > "$live" 2>"$err"; then
-  if grep -qE 'HTTP 40[34]' "$err"; then
-    echo "  this token may not read the AI Scan setting — unchecked here; a maintainer's gh gates it"
-  else
-    note "could not read the AI Scan setting — gh is authenticated, so this is a real failure, not an absent control"
-  fi
+  forbidden "$err" "the AI Scan setting"
 elif [ "$(cat "$live")" = "$want" ]; then
   echo "  AI Scan for pull requests is $want, as recorded"
 else

@@ -74,9 +74,10 @@ Full worked example: [`references/example-output.md`](skills/uplevel/references/
 - **It branches before its first write**, so anything it does build is one `git switch -` from undone.
 - **It runs commands it has read and judged safe** — the candidate gate commands — and reports the
   literal output. Anything it did not run is marked unverified rather than assumed.
-- **About 43,000 tokens of skill text** load for a full audit, under a 44,000 ceiling this repository
-  enforces on itself. That is context competing with your repository, so it is measured with a real
-  tokenizer on every change rather than estimated.
+- **About 45,000 tokens of skill text** load for a full audit, under a 46,000 ceiling this repository
+  enforces on itself. That is context competing with your repository, so it is counted with a
+  tokenizer on every change. The tokenizer is `tiktoken`'s, not Claude's, so read the figure as a
+  close estimate of what Claude loads.
 
 ## What it covers
 
@@ -91,6 +92,9 @@ Full detail in [`skills/uplevel/README.md`](skills/uplevel/README.md), which shi
 - **Settings-derived findings depend on your access.** Branch protection and org policy need
   permissions an auditor may not have. Reported as unknown, never as absent.
 - **It does not measure its own effect.** Nothing re-checks incident rate after a plan is applied.
+- **The deploy, migration and incident guidance has not been run against a live service.** Every
+  repository it was validated on was source only. Treat that half as reasoned, not tested;
+  [issue #21](https://github.com/rlx/uplevel/issues/21) tracks it.
 - **The forge audit is GitHub-first.** On GitLab, Bitbucket, Forgejo or Gitea it will name those
   checks rather than run them.
 - **Absent domains**: disaster recovery and restore testing, API and client backwards compatibility,
@@ -106,8 +110,8 @@ A tool that audits engineering process is worth exactly as much as its own. Ever
 clean `HOME` rather than trusting the README; and
 [`.claude/guardrails.yml`](.claude/guardrails.yml) is the per-repo checklist this skill produces,
 kept as data rather than prose so [`scripts/check-forge.sh`](scripts/check-forge.sh) can diff it
-against the rules actually protecting `main`. Both claims that ever drifted were about GitHub, and
-both were caught by a script rather than by good intentions.
+against the rules actually protecting `main`. Both claims that ever drifted were about GitHub, both
+were found by hand, and a script checks them now.
 
 ## Install
 

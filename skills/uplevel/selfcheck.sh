@@ -73,31 +73,33 @@ mode_cost() {
 seen=""
 mode_cost "SKILL.md" SKILL.md
 mode_cost "Mode A, full audit" SKILL.md references/mode-a-investigate.md references/discovery.md \
-  references/forge-hygiene.md references/checklist.md references/example-output.md \
-  references/destructive-ops.md references/production.md references/automation.md \
-  references/evidence.md references/remedies.md
+  references/forge-hygiene.md references/release-gates.md references/checklist.md \
+  references/example-output.md references/destructive-ops.md references/production.md \
+  references/automation.md references/evidence.md references/remedies.md references/code-scan.md
 mode_cost "Mode A + write the doc" SKILL.md references/mode-a-investigate.md references/discovery.md \
-  references/forge-hygiene.md references/checklist.md references/example-output.md \
-  references/destructive-ops.md references/production.md references/automation.md \
-  references/evidence.md references/remedies.md references/claude-md-template.md
+  references/forge-hygiene.md references/release-gates.md references/checklist.md \
+  references/example-output.md references/destructive-ops.md references/production.md \
+  references/automation.md references/evidence.md references/remedies.md references/code-scan.md references/claude-md-template.md
 # The scoped Mode A entry points. Printed next to the full audit because the
 # table in mode-a-investigate.md makes a claim about what a scope costs, and a
 # claim about cost should be the measurement rather than a number someone typed.
 mode_cost "  scope: forge" SKILL.md references/mode-a-investigate.md references/forge-hygiene.md
+mode_cost "  scope: forge + release" SKILL.md references/mode-a-investigate.md \
+  references/forge-hygiene.md references/release-gates.md
 mode_cost "  scope: gate" SKILL.md references/mode-a-investigate.md references/discovery.md \
   references/evidence.md
 mode_cost "  scope: hazards" SKILL.md references/mode-a-investigate.md \
   references/destructive-ops.md references/production.md references/long-runs.md
 mode_cost "Mode B" SKILL.md references/automation.md
 mode_cost "Mode C, check-in" SKILL.md references/mode-c-enforce.md references/evidence.md \
-  references/commit-hygiene.md references/long-runs.md
+  references/commit-hygiene.md references/long-runs.md references/code-scan.md
 
 # The entry cost is bounded by BUDGET above; the Mode A figure is the one that is
 # actually spent, and the number that competes with the user's repository for
 # context. Raise it in the same change that needs the room, and say why. It is a
 # visibility mechanism, not a quality cap: hitting it is a prompt to look at what
 # grew, never a reason to cut something worth saying.
-MODE_A_BUDGET=44000
+MODE_A_BUDGET=46000
 if [ -n "$EXACT" ]; then
   python3 - "$lists" <<'PY' > "$costs"
 import sys, tiktoken
@@ -107,6 +109,10 @@ for line in open(sys.argv[1], encoding="utf-8"):
     text = "".join(open(f, encoding="utf-8").read() for f in files.split())
     print("%s\t%d" % (label, len(enc.encode(text))))
 PY
+  # The tokenizer imports and then fetches its encoding on first use, so it can
+  # be present and still produce nothing. That printed a traceback, asserted no
+  # ceiling and exited zero -- unmeasured is not passing.
+  [ $? -eq 0 ] || note "the tokenizer is installed and failed to measure — the ceilings were not asserted"
 else
   while IFS="$(printf '\t')" read -r label files; do
     printf '%s\t%s\n' "$label" "$(cat $files | wc -w | awk '{print int($1 * 4 / 3)}')"
@@ -129,6 +135,8 @@ while IFS="$(printf '\t')" read -r label total; do
     *) printf '  %-28s ≈ %6d tokens\n' "$label" "$total" ;;
   esac
 done < "$costs"
+[ "$(grep -c . "$costs")" = "$(grep -c . "$lists")" ] \
+  || note "load cost was measured for $(grep -c . "$costs") of $(grep -c . "$lists") lists"
 rm -f "$lists" "$costs"
 
 for f in references/*.md; do
@@ -177,6 +185,18 @@ for b in "$tmp"/*.sh; do
 done
 rm -rf "$tmp"
 echo "  $blocks shell blocks, $pats extended regexes checked"
+# A command can parse and still be unrunnable as printed: gh fills in {owner}
+# and {repo} and sends every other placeholder literally, which returns the 404
+# an audit reads as a missing control. Four spellings shipped side by side.
+ph=0
+while IFS= read -r p; do
+  case "$p" in ''|'#'*) continue;; esac
+  ph=$((ph+1))
+  if grep -nF -- "$p" SKILL.md references/*.md; then
+    note "a shipped command uses a placeholder gh does not fill in as intended: $p"
+  fi
+done < unsubstituted-placeholders.txt
+echo "  $ph placeholder spellings checked for"
 
 echo "== no machine- or project-specific leakage =="
 # Shapes, not known names: a denylist of names you already found catches only

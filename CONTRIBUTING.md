@@ -13,17 +13,20 @@ in the same way a wrong line of code is. Most of what follows exists to keep tha
 ```
 
 `check-install.sh` extracts the install commands from `README.md` and runs them against a clean
-`HOME`. It clones this repository four times, so it runs about five seconds — CI runs it on every
+`HOME`. It clones this repository four times, so it runs about eleven seconds — CI runs it on every
 change and the commit hook does not.
 
-`check-forge.sh` diffs what the checklist records about GitHub — the rules protecting `main`, whether
-the declared version was released, the repository's description and topics, and the languages code
-scanning analyzes — against GitHub itself. CI's token may not read the last of those, so it prints
-that the claim is unchecked there; run this yourself after changing it. It needs the network and an
-authenticated `gh`, so it skips on a machine without them and CI is what gates it.
+`check-forge.sh` diffs what the checklist records about GitHub — the rules protecting `main` and the
+merge methods they allow, whether the declared version was released, the repository's description and
+topics, the languages code scanning analyzes, and whether AI Scan is on — against GitHub itself.
+CI's token may not read the last two, so it prints that those claims are unchecked there; run this
+yourself after changing them. It needs the network, an authenticated `gh` and `pyyaml`, so it skips
+on a machine without them. CI also runs it weekly, since what it compares against moves without a
+commit.
 
-The gate runs in about a second. If it fails it names what to fix. Bypass it with
-`git commit --no-verify` only when you know why, and say so in the pull request.
+The gate runs in two to three seconds with `tiktoken` installed, and about one without, where it
+prints the load cost as an estimate and asserts no ceiling. If it fails it names what to fix. Bypass
+it with `git commit --no-verify` only when you know why, and say so in the pull request.
 
 ## The rules the gate enforces
 
@@ -32,7 +35,8 @@ The gate runs in about a second. If it fails it names what to fix. Bypass it wit
   mechanism, not a quality cap.** If something genuinely belongs in the always-loaded file, put it
   there and raise the number in the same change, saying why. Never cut something worth saying to fit
   a figure.
-- **Bump `version:` in `SKILL.md`** in the same commit as any change to `SKILL.md` or `references/`.
+- **Bump `version:` in `SKILL.md`** in the same change as anything under `skills/uplevel/`. The hook
+  checks the commit and CI checks the pull request against its base.
   **And `version` in `.claude-plugin/plugin.json` with it** — that is the number a plugin install
   reports, and the gate fails while the two disagree.
 - **Write the `CHANGELOG.md` entry in the same change**, not in a follow-up. A release was published
@@ -43,12 +47,15 @@ The gate runs in about a second. If it fails it names what to fix. Bypass it wit
 - **No GNU-only constructs in gate scripts.** CI is ubuntu-latest; a maintainer may be on bash 3.2
   with BSD tools. The list is `scripts/gnu-only-constructs.txt` — add to it rather than working
   around it.
+- **Shipped `gh` commands use `{owner}/{repo}` and a shell variable for the branch.** `gh` fills in
+  nothing else as intended. The rejected spellings are in
+  `skills/uplevel/unsubstituted-placeholders.txt`.
 - **No machine- or project-specific strings.** Patterns in `skills/uplevel/leak-patterns.txt`.
 - **Every invariant is stated in `SKILL.md`.** List in `skills/uplevel/invariants.txt`. Adding one
   means adding it to both — a rule that lives only in a reference has been demoted behind a read.
 
-Two rules the gate does not yet enforce: prose is **en-US** (behavior, license, judgment, labeled),
-and nothing absent or unverified about this repository's own posture goes in a tracked file — that
+Prose is **en-US** (behavior, license, judgment, labeled), and the gate enforces it. One rule it does
+not: nothing absent or unverified about this repository's own posture goes in a tracked file — that
 belongs in the untracked `.claude/improvement-plan.md`.
 
 ## The rule the gate cannot enforce
@@ -94,7 +101,8 @@ Never include how you found it: which command surfaced the bug, which API return
 commit got wrong, how a check was proven able to fail. That is working-notes material, and this
 repository is public.
 
-Squash merge writes only the pull request title into `main`. Pull request bodies follow the same rule
+Squash is the only merge method the repository allows, and it writes only the pull request title
+into `main`. Pull request bodies follow the same rule
 and can be edited after merge; a commit message cannot.
 
 ## Does the skill say what this repository does?

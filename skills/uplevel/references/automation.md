@@ -155,7 +155,7 @@ Read before adding — most repos have more than they use:
 ls .github/workflows .gitlab-ci.yml .circleci Jenkinsfile 2>/dev/null
 cat .pre-commit-config.yaml lefthook.yml 2>/dev/null
 find .husky -maxdepth 1 -type f -exec cat {} + 2>/dev/null
-gh api repos/:owner/:repo/rulesets --jq '.[]|{name,enforcement}'  # rulesets first: readable at READ
+gh api repos/{owner}/{repo}/rulesets --jq '.[]|{name,enforcement}'  # rulesets first: readable at READ
 gh run list --limit 20                                            # what actually passes, and how often
 ```
 

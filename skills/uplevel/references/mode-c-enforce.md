@@ -90,6 +90,9 @@ Run the project's gate — the discovered one, or `CLAUDE.md`'s if written. Then
 - Confirm you are still on the working branch, not the default one — before committing, not after.
 - Match the log's commit style. Commit only when asked; never push, tag, force, amend a pushed commit,
   or rewrite history unprompted.
+- **Read the change for security problems yourself** — `code-scan.md`. No scanner reads this diff for
+  logic that is wrong for this codebase, and a forge that offers to bills for each run. Say what you
+  read and what you did not.
 - If the gate does not pass, say so with the output, not a summary of it.
 - **If the gate cannot run at all** — no toolchain, no `node_modules`, no compiler — that is the
   common case, not a failure of yours. Say what is missing, never quote a neighboring command's pass

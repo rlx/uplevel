@@ -12,7 +12,7 @@ description: >
   project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
   Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
   changes, and it executes only the items the user picks.
-version: 0.81.0
+version: 0.82.0
 ---
 
 # uplevel
@@ -194,7 +194,8 @@ the document grows while the enforcement does, and the two drift.
 
 **Read `references/mode-c-enforce.md`** before a check-in, a deploy, a migration, a long or
 irreversible run, or during an incident. It carries the environment rules, the pre-check-in list, the
-shipping questions, the destructive-operation catalog, and how to word a completion claim. Before
+shipping questions, the destructive-operation catalog, and how to word a completion claim. Where the
+change touches code, `references/code-scan.md` is the security read to do before check-in. Before
 writing the commit message or PR body itself, read `references/commit-hygiene.md`: **say what was
 done, and treat anything beyond that as context the author has to approve.**
 
@@ -262,7 +263,9 @@ of *their* code, not less of this. Read the mode file and what it names, not eve
 | `references/discovery.md` | finding the real gate — toolchain preflight, reading a command before running it, cleaning up after |
 | `references/production.md` | environments, deploys, migrations, incidents |
 | `references/destructive-ops.md` | before any irreversible command; deriving a repo's hazard list |
-| `references/forge-hygiene.md` | the universal seed checklist: CI triggers, Actions security, protection, releases |
+| `references/forge-hygiene.md` | the universal seed checklist: CI triggers, Actions security, protection, basics |
+| `references/release-gates.md` | the release and deploy half of that seed — only where something is published or deployed |
+| `references/code-scan.md` | the security read of a change, which is yours to do — before check-in, and in a full audit |
 | `references/checklist.md` | the per-repo living checklist — growth triggers, re-audit as a diff |
 | `references/automation.md` | what to propose, in what order, and whose decision each check is |
 | `references/claude-md-template.md` | only once the user picks the document off the plan |

@@ -72,12 +72,12 @@ Ask what they want to know, and read only what answers it. `selfcheck.sh` prints
 
 | scope | when | read, beyond this file |
 |---|---|---|
-| **forge** | "is our CI sound?", "are we exposed through Actions?" | `forge-hygiene.md` |
+| **forge** | "is our CI sound?", "are we exposed through Actions?" | `forge-hygiene.md`; `release-gates.md` if it publishes or deploys |
 | **gate** | "what actually validates a change?", "why did this reach main?" | `discovery.md`, `evidence.md` |
-| **hazards** | before a migration or a deploy; "what here is irreversible?" | `destructive-ops.md`, `production.md` |
+| **hazards** | before a migration or a deploy; "what here is irreversible?" | `destructive-ops.md`, `production.md`, `long-runs.md` |
 | **full** | an audit, a bootstrap, "set up guardrails here" | everything below |
 
-A scope costs between two-fifths and just over half of the full audit — `selfcheck.sh` prints the
+A scope costs from just over a third to about half of the full audit — `selfcheck.sh` prints the
 figures, which is where that range comes from. Take one when the question is narrow, and **offer the
 rest**:
 "I looked at the forge; the gate and the hazards are unexamined, and either is another pass."
@@ -233,7 +233,8 @@ wrong tree instead of failing.
    finding.
 6. **Audit what is already automated**, and what is defined but not enforced — a job that never blocks
    a merge, and one that is permanently red, are both worse than nothing.
-   See `automation.md`.
+   See `automation.md`. Where nothing reads pull requests for security problems, do the bounded read
+   in `code-scan.md` yourself and report its scope.
 7. **Run the absence audit.** Discovery describes what exists; this step names what is **missing**,
    which in a repo with recurring incidents is usually where the value is. The seed list, the
    environment-capability check that must precede it, and how to report each item live in

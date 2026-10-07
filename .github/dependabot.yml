@@ -7,3 +7,10 @@ updates:
     commit-message:
       prefix: "chore"
     labels: []
+  - package-ecosystem: pip
+    directory: /scripts
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "chore"
+    labels: []

@@ -17,11 +17,14 @@ comment on the advisory is a reasonable nudge.
 
 ## Scope
 
-This repository contains a Claude Code skill: markdown instructions plus four executable scripts.
+This repository contains a Claude Code skill: markdown instructions plus seven executable scripts.
 
 | script | what it does |
 |---|---|
 | `scripts/check-repo.sh` | this repository's gate; runs the checks below |
+| `scripts/check-install.sh` | runs the documented install commands against a temporary `HOME` |
+| `scripts/check-forge.sh` | reads this repository's GitHub settings through `gh`; writes nothing |
+| `scripts/check-behavior.sh` | runs the skill headless against fixture repositories in a temporary directory |
 | `scripts/install-hooks.sh` | **writes to `.git/hooks/`** — the only script that modifies your clone |
 | `scripts/hooks/pre-commit` | the tracked source the installer copies into place |
 | `skills/uplevel/selfcheck.sh` | structural checks on the skill itself |
