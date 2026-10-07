@@ -2,6 +2,17 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.83.0 — 2026-10-07
+
+- `mode-a-investigate.md`: the plan's field names are printed exactly as shown, lowercase at the
+  start of a line.
+- `code-scan.md` says in its opening that it has not been validated the way the other references were.
+- `scripts/check-behavior.sh` has four fixtures: a library with a publish job, a healthy repository
+  as the false-alarm case, and a pending destructive migration pointed at production, alongside the
+  original. It also asserts the plan's field format.
+- `CLAUDE.md` names `git clean -fdx` as a hazard for this repository's untracked plans.
+- A version no longer has to be released: bump on every change, tag the one you release.
+
 ## v0.82.0 — 2026-10-07
 
 - New reference `code-scan.md`: the security read of a change is the agent's to do — before check-in,

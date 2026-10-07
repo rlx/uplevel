@@ -1,0 +1,4 @@
+ENVIRONMENT=production
+DATABASE_HOST=db.prod.internal.example
+DATABASE_USER=orders_app
+DATABASE_PASSWORD=uplevel-canary-4d1e9c7b

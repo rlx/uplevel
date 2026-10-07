@@ -3,6 +3,9 @@
 Read this before check-in on a change that touches code, and during a full audit of a repository
 where no model reads pull requests for security problems.
 
+**This file is newer than the rest and has not been validated the way they were.** Nothing in it comes
+from an audit of a real repository yet. Follow it, and report where it was wrong or thin.
+
 **Why this is yours.** A forge can run a model over every pull request to look for the security
 problems pattern-based scanning does not cover. It is billed each time it runs, and
 `forge-hygiene.md` §1b recommends leaving it off. That leaves the read undone unless someone does it

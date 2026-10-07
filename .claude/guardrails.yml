@@ -227,7 +227,7 @@ checks:
 
   - id: behavior-checked-against-a-fixture
     status: present
-    evidence: scripts/check-behavior.sh; one fixture under tests/fixtures/, run by hand before a release
+    evidence: scripts/check-behavior.sh; four fixtures under tests/fixtures/, run by hand before a release
     note: >-
       every other check reads the skill's text. This one runs the skill
       headless against a repository with planted conditions and asserts on the
