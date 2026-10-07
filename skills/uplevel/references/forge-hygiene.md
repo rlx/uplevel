@@ -364,6 +364,7 @@ gh api repos/{o}/{r}/actions/permissions/fork-pr-contributor-approval
 gh api repos/{o}/{r}/actions/runners               # self-hosted?
 gh api repos/{o}/{r}/actions/secrets               # how much is there to steal
 gh api repos/{o}/{r}/code-scanning/default-setup
+gh api repos/{o}/{r}/code-scanning/ai-scan         # pr_scan: enabled | disabled
 gh api repos/{o}/{r} --jq '{delete_branch_on_merge, allow_auto_merge}'
 ```
 
@@ -375,6 +376,7 @@ gh api repos/{o}/{r} --jq '{delete_branch_on_merge, allow_auto_merge}'
 | fork-PR approval policy | on a public repo anyone can open a PR that runs CI. Confirm the policy is at least `first_time_contributors` |
 | self-hosted runners + secret count | **these set the blast radius of a fork PR.** Zero runners and zero secrets means the worst case is stolen compute; a self-hosted runner with secrets means something else entirely |
 | `code-scanning/default-setup` | free on public repositories, and it lints workflows themselves. `not-configured` on a public repo is a cheap gap |
+| `code-scanning/ai-scan` | AI Scan for pull requests — a separate control from default setup, and not free: it draws AI credits each time it runs. **Off is the default to recommend.** Report `enabled` as a cost someone should have chosen, and never propose turning it on as a cheap gap. Turning it off leaves default setup and its checks alone |
 | `delete_branch_on_merge` | off means merged branches accumulate and someone tidies them by hand forever |
 
 **Judge a fork PR by what it can reach, not by whether it runs your code.** Any repository whose CI
