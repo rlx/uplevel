@@ -380,6 +380,10 @@ effort: <maintainer-hours, including review and consent> · affects: <one of the
 undo: <the exact command, or "not reversible"> · needs: <other item numbers, or "—">
 ```
 
+**Print the field names exactly as shown** — lowercase, at the start of a line, no bullet and no
+bold. A reader scans for `prevents:` and a script can check for it; `- **Prevents:**` carries the same
+words in a shape neither finds.
+
 `affects` takes exactly one of: **this repo's agents** / **everyone who commits** / **everyone who
 merges** / **production**. Do not invent a fifth; the value is what makes the list sortable and
 skimmable, and a phrase like "nobody's correctness" tells the reader nothing about who to consult.

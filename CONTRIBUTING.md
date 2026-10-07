@@ -10,6 +10,7 @@ in the same way a wrong line of code is. Most of what follows exists to keep tha
 ./scripts/check-repo.sh      # the gate; runs on every commit and in CI
 ./scripts/check-install.sh   # only if you touched README.md's install section
 ./scripts/check-forge.sh     # only if you touched what .claude/guardrails.yml says about GitHub
+./scripts/check-behavior.sh  # only if you touched SKILL.md or a mode file; minutes, and model tokens
 ```
 
 `check-install.sh` extracts the install commands from `README.md` and runs them against a clean
@@ -23,6 +24,12 @@ CI's token may not read the last two, so it prints that those claims are uncheck
 yourself after changing them. It needs the network, an authenticated `gh` and `pyyaml`, so it skips
 on a machine without them. CI also runs it weekly, since what it compares against moves without a
 commit.
+
+`check-behavior.sh` runs the skill headless against the fixture repositories in `tests/fixtures/` and
+asserts on what it reported and what it left alone. It is the only check that reads what the skill
+does instead of what it says. A model's output varies, so a failure means read the kept transcript.
+It lets an agent run `make` and `python3` on fixture content, so review a change to the fixtures as
+you would a script.
 
 The gate runs in two to three seconds with `tiktoken` installed, and about one without, where it
 prints the load cost as an estimate and asserts no ceiling. If it fails it names what to fix. Bypass
@@ -39,6 +46,8 @@ it with `git commit --no-verify` only when you know why, and say so in the pull 
   checks the commit and CI checks the pull request against its base.
   **And `version` in `.claude-plugin/plugin.json` with it** — that is the number a plugin install
   reports, and the gate fails while the two disagree.
+- **Not every version is released.** Bump on every change; tag and release when a set of changes is
+  worth announcing. A tag must have a release, and the gate checks that.
 - **Write the `CHANGELOG.md` entry in the same change**, not in a follow-up. A release was published
   once from a commit that documented every version except the one it released.
 - **Every reference must be linked from `SKILL.md`, and every link must resolve.** Both directions.

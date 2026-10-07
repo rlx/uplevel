@@ -32,7 +32,9 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
   time, and again in CI against the pull request's base. Tagging is not: the gate prints when the
   declared version has no tag, and does not fail.
   Failing at commit time would fail the commit that does the bump, and failing in CI would leave
-  `main` red between merge and tag. Tag after merge — and cut the GitHub release in the same sitting.
+  `main` red between merge and tag. A version does not have to be released: bump on every change, and
+  tag the version you choose to release, so a one-line fix costs a bump and a changelog line and not
+  a release. When you do tag, cut the GitHub release in the same sitting.
   `scripts/check-forge.sh` fails once a declared version is tagged with no release, which is how nine
   consecutive tags stopped being possible; before it existed, nothing looked.
 - What `.claude/guardrails.yml` says about GitHub — the required checks, the rules protecting `main`,
@@ -51,6 +53,12 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
   `skills/uplevel/references/commit-hygiene.md`.
 - Prose is **en-US** throughout — behavior, license, judgment, labeled. The repository is public and
   the skill ships as text; mixed spelling reads as two authors who never compared notes.
+- **`git clean -fdx` deletes this project's working record, and nothing can rebuild it.**
+  `.claude/improvement-plan.md`, `.claude/plans/` and `.claude/discovery-baseline/` are gitignored, so
+  `clean -x` removes them without a word and `git status` never showed them. The baseline is GitHub
+  traffic data, which GitHub keeps for fourteen days. Never run `clean` with `-x` or `-X` here; use
+  `git clean -fd`, or name the path. This is the stop-and-ask case: ordinary command, silent
+  failure, input nobody can regenerate.
 - Plan files live in `.claude/plans/`, untracked. Plan mode writes to `~/.claude/plans/`, a flat
   directory every project on this machine shares, under a random slug that does not name the repo it
   belongs to — so a plan left there is both invisible to this project and in reach of another one's

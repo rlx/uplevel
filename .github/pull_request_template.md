@@ -16,6 +16,7 @@
 - [ ] `version:` bumped in `SKILL.md`
 - [ ] `CHANGELOG.md` entry written in this change, not a follow-up
 - [ ] Every command it ships was run here and observed to work
+- [ ] If it touches `SKILL.md` or a mode file: ran `./scripts/check-behavior.sh`, and read any failure
 
 ## Anything else
 

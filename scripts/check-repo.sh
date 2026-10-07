@@ -191,7 +191,7 @@ elif [ "$tagn" = "0" ]; then
 elif git rev-parse -q --verify "refs/tags/v$cur" >/dev/null 2>&1; then
   echo "  $tagn $tw checked; SKILL.md declares $cur, which is tagged"
 else
-  echo "  $tagn $tw checked; SKILL.md declares $cur, not yet tagged - tag it when it reaches main"
+  echo "  $tagn $tw checked; SKILL.md declares $cur, not tagged - tag it when you release it"
 fi
 
 echo "== the plugin manifests agree with the skill =="
