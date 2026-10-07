@@ -168,6 +168,19 @@ checks:
       unchecked there and a maintainer's run is what gates it. A forbidden
       response skips; any other failure still fails.
 
+  - id: ai-scan-off
+    status: present
+    by: scripts/check-forge.sh, on a maintainer's machine; CI's read of this endpoint is untested
+    pr_scan: disabled
+    note: >-
+      AI Scan for pull requests is separate from CodeQL default setup and bills
+      separately - it draws AI credits when it runs, where CodeQL on a public
+      repository costs nothing. It was on here and is turned off, through
+      repos/{owner}/{repo}/code-scanning/ai-scan. Recorded as data because
+      nothing in the tree says which way the setting points, and one that spends
+      money should not be able to come back on unnoticed. Turning it off does
+      not touch default setup, so the required contexts above still report.
+
   - id: branch-deleted-on-merge
     status: enforced
     by: repository setting delete_branch_on_merge

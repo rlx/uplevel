@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Checks .claude/guardrails.yml against the forge it describes: the rules that
-# actually protect main, whether the version main declares was released, and the
-# description and topics a stranger finds the repository by.
+# actually protect main, what code scanning analyzes and whether AI Scan is on,
+# whether the version main declares was released, and the description and topics
+# a stranger finds the repository by.
 #   ./scripts/check-forge.sh
 #
 # Everything in check-repo.sh reads the tree, so the commit hook can run it
@@ -184,6 +185,39 @@ ACTUAL
   fi
 fi
 rm -f "$want" "$got" "$live" "$err"
+
+echo "== AI Scan is set the way the checklist records =="
+# AI Scan for pull requests is a different control from CodeQL default setup, on
+# a different endpoint, and it draws AI credits when it runs. Nothing in the tree
+# says which way it points, so the recorded value is diffed like the languages
+# above. Whether the gate job's token may read this endpoint is untested, so a
+# forbidden response is the same announced skip; any other failure still fails.
+live="$(mktemp)"; err="$(mktemp)"
+want="$(python3 - <<'WANTED'
+import sys, yaml
+doc = yaml.safe_load(open(".claude/guardrails.yml"))
+for c in doc.get("checks", []):
+    if c.get("id") == "ai-scan-off" and c.get("pr_scan"):
+        print(c["pr_scan"])
+        break
+else:
+    sys.exit(1)
+WANTED
+)"
+if [ $? -ne 0 ]; then
+  note "could not read the recorded AI Scan setting out of .claude/guardrails.yml"
+elif ! gh api "repos/{owner}/{repo}/code-scanning/ai-scan" --jq .pr_scan > "$live" 2>"$err"; then
+  if grep -qE 'HTTP 40[34]' "$err"; then
+    echo "  this token may not read the AI Scan setting — unchecked here; a maintainer's gh gates it"
+  else
+    note "could not read the AI Scan setting — gh is authenticated, so this is a real failure, not an absent control"
+  fi
+elif [ "$(cat "$live")" = "$want" ]; then
+  echo "  AI Scan for pull requests is $want, as recorded"
+else
+  note "AI Scan for pull requests is $(cat "$live"); the checklist records $want"
+fi
+rm -f "$live" "$err"
 
 echo "== the version main declares has been released =="
 # The checklist recorded "git tag + GitHub release" while nine consecutive tags

@@ -2,6 +2,14 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.81.0 — 2026-10-07
+
+- `forge-hygiene.md` reads the AI Scan setting, `code-scanning/ai-scan`, alongside default setup, and
+  treats it as off by default: it draws AI credits when it runs, so an audit reports `enabled` as a
+  cost and does not propose enabling it.
+- `scripts/check-forge.sh` diffs the AI Scan setting against `.claude/guardrails.yml`, which records
+  it as disabled for this repository.
+
 ## v0.80.0 — 2026-08-25
 
 - README.md leads with what the skill finds rather than with how to install it. The plugin install,
