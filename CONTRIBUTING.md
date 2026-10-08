@@ -44,8 +44,8 @@ it with `git commit --no-verify` only when you know why, and say so in the pull 
   a figure.
 - **Bump `version:` in `SKILL.md`** in the same change as anything under `skills/uplevel/`. The hook
   checks the commit and CI checks the pull request against its base.
-  **And `version` in `.claude-plugin/plugin.json` with it** — that is the number a plugin install
-  reports, and the gate fails while the two disagree.
+  **And `version` in `.claude-plugin/marketplace.json` with it** — `claude plugin update` compares that
+  number and delivers nothing while it stands still. The gate fails while the two disagree.
 - **Not every version is released.** Bump on every change; tag and release when a set of changes is
   worth announcing. A tag must have a release, and the gate checks that.
 - **Write the `CHANGELOG.md` entry in the same change**, not in a follow-up. A release was published

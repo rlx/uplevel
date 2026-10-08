@@ -433,10 +433,15 @@ checks:
 
   - id: installable-as-a-plugin
     status: present
-    evidence: .claude-plugin/plugin.json and .claude-plugin/marketplace.json; the repository is its own marketplace
+    evidence: .claude-plugin/marketplace.json; the repository is its own marketplace, and the plugin is skills/uplevel alone
     note: >-
-      the plugin root is the repository root, so skills/uplevel is already where
-      a plugin's skills belong and nothing moved. Verified by hand against a
+      the marketplace entry is the whole plugin definition, with strict set to
+      false and skills/uplevel as its source, so an install carries the skill
+      and nothing else. It carried the whole repository while the source was
+      the root. Re-verified by hand on 2026-10-07 in throwaway config
+      directories: a fresh install, an update from the older layout, and that
+      an update delivers nothing until the version moves. What follows is the
+      record of the first layout. Verified by hand against a
       throwaway HOME: adding this tree as a marketplace, installing the plugin
       from it, and reading back "Skills (1) uplevel" at version 0.78.0. Not in
       the gate - check-install.sh runs the documented shell install against a
@@ -455,7 +460,7 @@ checks:
 
   - id: plugin-manifests-agree-with-the-skill
     status: enforced
-    enforced_by: scripts/check-repo.sh; plugin.json's version against SKILL.md's, and the marketplace entry against both
+    enforced_by: scripts/check-repo.sh; the marketplace entry's version against SKILL.md's, its source, and that no plugin.json exists
     note: >-
       a second version marker in the tree, and the one a consumer installs by.
       A version marker that disagrees with what shipped is a defect this skill

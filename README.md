@@ -14,9 +14,9 @@ claude plugin install uplevel@uplevel     # plugin@marketplace — both are name
 ```
 
 Restart Claude Code, then run `/uplevel` in any repository. `claude plugin update uplevel@uplevel`
-moves it to the next release. This repository is its own marketplace: the manifests are in
-`.claude-plugin/`, the plugin they serve is this tree, so the version you install is the one
-`SKILL.md` declares. [Other ways to install](#install), including a symlinked clone that updates with
+moves it to the next version. This repository is its own marketplace: `.claude-plugin/marketplace.json`
+defines the plugin as the `skills/uplevel` directory and nothing else, at the version `SKILL.md`
+declares. [Other ways to install](#install), including a symlinked clone that updates with
 `git pull`.
 
 ## Why absence is the finding
