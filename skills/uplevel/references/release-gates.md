@@ -45,6 +45,15 @@ and a proposal to change**, the same as there.
   another takes the published version from a literal in the workflow, and a tag with **zero check
   runs** had already diverged from it. The flag exists to make a re-run idempotent, which is worth
   keeping — pair it with an assertion that the version being published is the one the tag names.
+- **An image or archive that carries more than the source.** `COPY . .` under a `.dockerignore` that
+  names only `node_modules`, or a final stage copied whole from the builder, ships whatever was in
+  the build context: the `.git` directory, with the checkout's credential in its config unless
+  `persist-credentials: false` was set; a `.env` written for the build; a gitignored folder on the
+  maintainer's disk. Three seen, each by reading the build files rather than by opening the artifact:
+  a public image built after a full-history checkout that kept its credential, a final stage that
+  copies the directory a build secret was written into, and an archive assembled from a gitignored
+  path. Read the ignore file and every `COPY` into the final stage, and say that listing the
+  artifact's contents is what would settle it.
 - **No tag, release, or changelog**, so "what shipped" is reconstructed from memory during an incident.
 - **A tag that exists and does not identify what shipped.** Absence is the easy case; the tag that is
   present and wrong is the one an audit calls fine. Four ways it lies, each measured on a real

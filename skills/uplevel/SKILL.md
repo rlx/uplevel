@@ -1,18 +1,20 @@
 ---
 name: uplevel
 description: >
-  Establish, automate, and enforce a project's engineering process — the gate that runs before every
-  commit, the checks that replace it with automation, the environment and deploy discipline that keeps
-  production safe, and the irreversible operations that need explicit sign-off. Use when the user asks
-  to "uplevel this repo", "audit our engineering process", "write a CLAUDE.md for this repo", "document
-  our process", "add a pre-commit gate", "we keep breaking production", "stop shipping bugs", or when
-  starting substantial work in a repo whose gate, environments, and destructive operations are not yet
-  written down. Also applies when work is about to touch a deployed environment or production data,
-  run a migration or backfill, or change what CI enforces. Day-to-day commit discipline belongs in the
-  project's own CLAUDE.md, which this skill produces — do not load this skill for an ordinary commit.
-  Advisory by default: its deliverable is a report of what it found plus a numbered plan of proposed
-  changes, and it executes only the items the user picks.
-version: 0.85.0
+  Load this BEFORE running a database migration or backfill, deploying, or running any command that
+  reads credentials or touches a deployed environment or production data — it carries the checks to
+  make first: which environment you are pointed at, what is irreversible, and what must never be read.
+  Also establishes, automates, and enforces a project's engineering process: the gate that runs before
+  every commit, the checks that replace it with automation, and the irreversible operations that need
+  explicit sign-off. Use when the user asks to "uplevel this repo", "audit our engineering process",
+  "write a CLAUDE.md for this repo", "document our process", "add a pre-commit gate", "we keep breaking
+  production", "stop shipping bugs", or when starting substantial work in a repo whose gate,
+  environments, and destructive operations are not yet written down, or when changing what CI
+  enforces. Day-to-day commit discipline belongs in the project's own CLAUDE.md, which this skill
+  produces — do not load this skill for an ordinary commit. Advisory by default: an audit's
+  deliverable is a report of what it found plus a numbered plan of proposed changes, and it executes
+  only the items the user picks.
+version: 0.86.0
 ---
 
 # uplevel
