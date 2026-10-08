@@ -53,12 +53,10 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
   `skills/uplevel/references/commit-hygiene.md`.
 - Prose is **en-US** throughout — behavior, license, judgment, labeled. The repository is public and
   the skill ships as text; mixed spelling reads as two authors who never compared notes.
-- **`git clean -fdx` deletes this project's working record, and nothing can rebuild it.**
-  `.claude/improvement-plan.md`, `.claude/plans/` and `.claude/discovery-baseline/` are gitignored, so
-  `clean -x` removes them without a word and `git status` never showed them. The baseline is GitHub
-  traffic data, which GitHub keeps for fourteen days. Never run `clean` with `-x` or `-X` here; use
-  `git clean -fd`, or name the path. This is the stop-and-ask case: ordinary command, silent
-  failure, input nobody can regenerate.
+- `git clean -fdx` removes the untracked working files — `.claude/improvement-plan.md`,
+  `.claude/plans/` and `.claude/discovery-baseline/` — because they are gitignored. They are working
+  notes that can be recreated, so this is a heads-up and not a stop: prefer `git clean -fd`, or name
+  the path, when you only mean to clear build residue.
 - Plan files live in `.claude/plans/`, untracked. Plan mode writes to `~/.claude/plans/`, a flat
   directory every project on this machine shares, under a random slug that does not name the repo it
   belongs to — so a plan left there is both invisible to this project and in reach of another one's
@@ -74,6 +72,5 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
   rounds of ten previously-unseen repositories, audited against the current version, every finding
   reproduced against the repository before it ships. That tree is deliberately unpublished — it
   names third-party projects and their unfixed findings — and deliberately not a git repository,
-  which also leaves it **unbacked, local to one machine, and the only record of which repositories
-  have already been used**. Losing it costs the program, not the skill: nothing here builds,
-  tests, or gates against it.
+  so it lives on one machine with no backup. That is an accepted risk: it is working material that
+  can be recreated, and nothing here builds, tests, or gates against it.

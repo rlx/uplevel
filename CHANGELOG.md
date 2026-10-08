@@ -2,6 +2,12 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.84.0 — 2026-10-07
+
+- `CLAUDE.md` describes the untracked plans and the validation tree as working files that can be
+  recreated, where it had called them unrecoverable.
+- The skill's own text is unchanged from v0.83.0.
+
 ## v0.83.0 — 2026-10-07
 
 - `mode-a-investigate.md`: the plan's field names are printed exactly as shown, lowercase at the
