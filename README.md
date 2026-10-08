@@ -15,8 +15,8 @@ claude plugin install uplevel@uplevel     # plugin@marketplace — both are name
 
 Restart Claude Code, then run `/uplevel` in any repository. `claude plugin update uplevel@uplevel`
 moves it to the next version. This repository is its own marketplace: `.claude-plugin/marketplace.json`
-defines the plugin as the `skills/uplevel` directory and nothing else, at the version `SKILL.md`
-declares. [Other ways to install](#install), including a symlinked clone that updates with
+points at the `plugin/` folder, which holds the manifest, the skill and nothing else, at the version
+`SKILL.md` declares. [Other ways to install](#install), including a symlinked clone that updates with
 `git pull`.
 
 ## Why absence is the finding
@@ -65,7 +65,8 @@ Reply with the numbers you want — `1, 3, 5` is enough. `if skipped` is there s
 item on purpose rather than by omission, and `needs` is there so picking `1, 3` never leaves you
 half-applied.
 
-Full worked example: [`references/example-output.md`](skills/uplevel/references/example-output.md).
+Full worked example:
+[`references/example-output.md`](plugin/skills/uplevel/references/example-output.md).
 
 ## What it costs, and what it touches
 
@@ -85,7 +86,7 @@ The gate and what it fails to cover, CI trigger correctness, Actions supply chai
 branch protection, release and deploy gates, destructive operations, migrations and backfills, and
 how completion is claimed.
 
-Full detail in [`skills/uplevel/README.md`](skills/uplevel/README.md), which ships with the skill.
+Full detail in [`plugin/README.md`](plugin/README.md), which ships with the plugin.
 
 ## What it will not do
 
@@ -100,7 +101,7 @@ Full detail in [`skills/uplevel/README.md`](skills/uplevel/README.md), which shi
 - **Absent domains**: disaster recovery and restore testing, API and client backwards compatibility,
   feature-flag lifecycle, runtime cost regressions, clock and timezone failures.
 
-The full list is in [the shipped README](skills/uplevel/README.md#limitations). If a finding is wrong,
+The full list is in [the shipped README](plugin/README.md#limitations). If a finding is wrong,
 that is the most useful thing you can report — [open an issue](https://github.com/rlx/uplevel/issues).
 
 ## It holds itself to the same checks
@@ -122,7 +123,7 @@ no plugin machinery and the working tree *as* the install:
 git clone https://github.com/rlx/uplevel.git
 cd uplevel
 mkdir -p ~/.claude/skills
-ln -sfn "$PWD/skills/uplevel" ~/.claude/skills/uplevel
+ln -sfn "$PWD/plugin/skills/uplevel" ~/.claude/skills/uplevel
 ```
 
 Restart Claude Code. The skill is then available as `/uplevel`.
@@ -133,7 +134,7 @@ so the install survives deleting the clone:
 ```sh
 mkdir -p ~/.claude/skills
 rm -rf ~/.claude/skills/uplevel
-cp -R skills/uplevel ~/.claude/skills/uplevel
+cp -R plugin/skills/uplevel ~/.claude/skills/uplevel
 ```
 
 To uninstall: `rm -rf ~/.claude/skills/uplevel` — it removes the link or the copy, never the clone.
@@ -146,8 +147,8 @@ inside the clone.
 
 `rm -rf` before the copy: `cp -R` into a path that already exists copies *into* it, so re-running
 without the removal nests a copy inside the install. Naming the destination explicitly does not
-prevent this — `cp -R skills/uplevel ~/.claude/skills/` nests on the second run too. Updating a copy
-install means running the block again, so this is the second run, every time.
+prevent this — `cp -R plugin/skills/uplevel ~/.claude/skills/` nests on the second run too. Updating
+a copy install means running the block again, so this is the second run, every time.
 
 For a single project rather than every project, use `.claude/skills/uplevel` in that repo and commit
 it. Both commands are run against a clean `HOME` in CI, so this section is executed rather than

@@ -14,7 +14,7 @@ description: >
   produces — do not load this skill for an ordinary commit. Advisory by default: an audit's
   deliverable is a report of what it found plus a numbered plan of proposed changes, and it executes
   only the items the user picks.
-version: 0.86.0
+version: 0.87.0
 ---
 
 # uplevel

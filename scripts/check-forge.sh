@@ -241,7 +241,7 @@ echo "== the version main declares has been released =="
 # so rev-parse failed on the runner, every version read as "not tagged yet", and
 # the check reported OK having compared nothing. It was green on the first run
 # after being written, on the one repository whose release it was watching.
-cur="$(awk -F'[ \t]*:[ \t]*' '/^version:/ { print $2; exit }' skills/uplevel/SKILL.md)"
+cur="$(awk -F'[ \t]*:[ \t]*' '/^version:/ { print $2; exit }' plugin/skills/uplevel/SKILL.md)"
 if ! gh api "repos/{owner}/{repo}/git/ref/tags/v$cur" >/dev/null 2>&1; then
   echo "  $cur is not tagged on the forge yet; the release is due when the tag is"
 elif gh release view "v$cur" >/dev/null 2>&1; then

@@ -28,7 +28,7 @@ are the project's own; two belong to test fixtures.
 | `scripts/check-behavior.sh` | copies fixture repositories to a temporary directory and runs the skill against them through the `claude` CLI, which calls a model and may run `make` and `python3` there |
 | `scripts/install-hooks.sh` | **writes to `.git/hooks/`** — the only one of the project's own scripts that modifies your clone |
 | `scripts/hooks/pre-commit` | the tracked source the installer copies into place |
-| `skills/uplevel/selfcheck.sh` | structural checks on the skill itself |
+| `plugin/skills/uplevel/selfcheck.sh` | structural checks on the skill itself |
 | `tests/fixtures/ledger-api/scripts/fmt.sh` | fixture: rewrites the fixture's Python files in place when run |
 | `tests/fixtures/orders-db/scripts/migrate.sh` | fixture: writes `applied.log`; applies nothing, and there is no database |
 

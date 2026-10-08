@@ -11,7 +11,7 @@
 - [ ] If it loosens an existing check: re-proved the original failure still fires
 - [ ] Timed the whole gate before and after, and updated `CONTRIBUTING.md` if the figure moved
 
-## If it changes anything under `skills/uplevel/`
+## If it changes anything under `plugin/skills/uplevel/`
 
 - [ ] `version:` bumped in `SKILL.md`
 - [ ] `CHANGELOG.md` entry written in this change, not a follow-up

@@ -2,6 +2,16 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.87.0 — 2026-10-07
+
+- The plugin is the `plugin/` folder: `plugin/.claude-plugin/plugin.json`, `plugin/README.md` and the
+  skill at `plugin/skills/uplevel/`. That is the layout Anthropic's directory validates, and an
+  install still carries nothing but the plugin. The skill was at `skills/uplevel/`, with the plugin
+  defined only in `marketplace.json`.
+- A link or copy install now takes `plugin/skills/uplevel`. An existing link to the old path has to
+  be made again.
+- The skill's own text is unchanged from v0.86.0.
+
 ## v0.86.0 — 2026-10-07
 
 - The skill's description leads with when to load it before a migration, a backfill, a deploy, or a
