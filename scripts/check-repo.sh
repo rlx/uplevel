@@ -194,43 +194,45 @@ else
   echo "  $tagn $tw checked; SKILL.md declares $cur, not tagged - tag it when you release it"
 fi
 
-echo "== the plugin manifests agree with the skill =="
-# The repository is its own marketplace, so .claude-plugin/plugin.json carries a
-# version a consumer installs by. That is a second version marker in the tree,
-# and a version marker that disagrees with what shipped is a defect this skill
-# ships a warning about -- so it is checked rather than trusted. The manifests
-# are also what the plugin tooling parses; a JSON error there is invisible until
-# someone tries to install.
+echo "== the marketplace entry agrees with the skill, and ships only the skill =="
+# The repository is its own marketplace, and the entry in marketplace.json is the
+# whole plugin definition: its version is what "claude plugin update" compares,
+# so a change that does not move it never reaches an installed copy, and its
+# source is the directory an install copies. That source was the repository
+# root once, which shipped the gate scripts, the fixtures and this checklist
+# into every user's plugin cache.
+#
+# There is deliberately no plugin.json. Inside skills/uplevel/ it would turn a
+# linked or copied skill into a skills-directory plugin, which was observed to
+# report zero skills; at the root it is a second version marker with nothing
+# left to describe.
 if ! command -v python3 >/dev/null 2>&1; then
   echo "  no python3, skipping"
-elif [ ! -f .claude-plugin/plugin.json ]; then
-  echo "  no plugin manifest, skipping"
 else
   msg=$(python3 - "$cur" <<'MANIFESTS'
-import json, sys
+import json, os, sys
 declared = sys.argv[1]
 try:
-    plugin = json.load(open(".claude-plugin/plugin.json"))
-except Exception as exc:
-    print(".claude-plugin/plugin.json does not parse: %s" % exc); sys.exit(1)
-try:
     market = json.load(open(".claude-plugin/marketplace.json"))
-except FileNotFoundError:
-    market = None
 except Exception as exc:
     print(".claude-plugin/marketplace.json does not parse: %s" % exc); sys.exit(1)
-if plugin.get("version") != declared:
-    print("plugin.json declares version %r, SKILL.md declares %r - bump both in the same change"
-          % (plugin.get("version"), declared)); sys.exit(1)
-if market is not None:
-    entries = [p for p in market.get("plugins", []) if p.get("name") == plugin.get("name")]
-    if not entries:
-        print("marketplace.json lists no plugin named %r" % plugin.get("name")); sys.exit(1)
-    for e in entries:
-        if "version" in e and e["version"] != declared:
-            print("the marketplace entry declares version %r, SKILL.md declares %r"
-                  % (e["version"], declared)); sys.exit(1)
-print("plugin.json and marketplace.json agree, both at %s" % declared)
+entries = [p for p in market.get("plugins", []) if p.get("name") == "uplevel"]
+if len(entries) != 1:
+    print("marketplace.json lists %d plugins named 'uplevel', expected one" % len(entries)); sys.exit(1)
+e = entries[0]
+if e.get("version") != declared:
+    print("the marketplace entry declares version %r, SKILL.md declares %r - bump both in the same change"
+          % (e.get("version"), declared)); sys.exit(1)
+if e.get("source") != "./skills/uplevel":
+    print("the marketplace entry's source is %r - an install copies that directory, so it must be ./skills/uplevel"
+          % e.get("source")); sys.exit(1)
+if e.get("strict") is not False:
+    print("the marketplace entry must set strict to false, because no plugin.json describes the plugin"); sys.exit(1)
+for stray in (".claude-plugin/plugin.json", "skills/uplevel/.claude-plugin"):
+    if os.path.exists(stray):
+        print("%s exists - the marketplace entry is the plugin definition, and this one changes how the skill loads" % stray)
+        sys.exit(1)
+print("version %s, source ./skills/uplevel, no plugin.json" % declared)
 MANIFESTS
   )
   if [ $? -eq 0 ]; then echo "  $msg"; else note "$msg"; fi

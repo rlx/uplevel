@@ -2,6 +2,14 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.85.0 — 2026-10-07
+
+- A plugin install carries only `skills/uplevel/`. It carried the whole repository — gate scripts,
+  fixtures, workflow — because the plugin's source was the repository root.
+- The plugin is defined by its entry in `.claude-plugin/marketplace.json`; `plugin.json` is gone, and
+  the version `claude plugin update` compares lives in that entry.
+- The skill's own text is unchanged from v0.84.0.
+
 ## v0.84.0 — 2026-10-07
 
 - `CLAUDE.md` describes the untracked plans and the validation tree as working files that can be
