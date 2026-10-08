@@ -2,6 +2,19 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.86.0 — 2026-10-07
+
+- The skill's description leads with when to load it before a migration, a backfill, a deploy, or a
+  command against a deployed environment. Asked in plain words to run a pending migration, a session
+  did not load the skill under the previous description.
+- `skills/uplevel/LICENSE`: an installed copy carries the license text. The gate keeps it identical
+  to the one at the root.
+- `scripts/check-behavior.sh` has a fifth case that asks for a migration without naming the skill.
+- `release-gates.md`: an image or archive that carries more than the source — the `.git` directory
+  and its credential, a build-time `.env`, a gitignored folder.
+- `code-scan.md` no longer says it is unvalidated.
+- `SECURITY.md` lists all nine executable files, including the two fixture scripts.
+
 ## v0.85.0 — 2026-10-07
 
 - A plugin install carries only `skills/uplevel/`. It carried the whole repository — gate scripts,

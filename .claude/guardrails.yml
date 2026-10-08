@@ -227,7 +227,7 @@ checks:
 
   - id: behavior-checked-against-a-fixture
     status: present
-    evidence: scripts/check-behavior.sh; four fixtures under tests/fixtures/, run by hand before a release
+    evidence: scripts/check-behavior.sh; five cases over four fixtures under tests/fixtures/, run by hand before a release
     note: >-
       every other check reads the skill's text. This one runs the skill
       headless against a repository with planted conditions and asserts on the
@@ -235,6 +235,13 @@ checks:
       spends model tokens and its subject varies between runs, so nothing runs
       it automatically. Its assertions were each shown to fail by replaying a
       doctored transcript.
+
+  - id: shipped-skill-carries-the-license
+    status: enforced
+    enforced_by: scripts/check-repo.sh; skills/uplevel/LICENSE compared with LICENSE
+    note: >-
+      an install copies skills/uplevel/ alone, so the license at the root never
+      reached one.
 
   - id: branch-deleted-on-merge
     status: enforced

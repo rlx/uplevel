@@ -238,6 +238,16 @@ MANIFESTS
   if [ $? -eq 0 ]; then echo "  $msg"; else note "$msg"; fi
 fi
 
+echo "== the shipped skill carries the license =="
+# An install copies skills/uplevel/ and nothing above it, so the license at the
+# repository root never reached one. The copy inside the skill is the one that
+# travels, and two copies of anything drift.
+if cmp -s LICENSE skills/uplevel/LICENSE; then
+  echo "  skills/uplevel/LICENSE matches LICENSE"
+else
+  note "skills/uplevel/LICENSE is missing or differs from LICENSE — an installed copy ships without the license text"
+fi
+
 echo "== gate scripts stay portable =="
 # CI runs ubuntu-latest (bash 5, GNU coreutils). A maintainer's macOS runs bash 3.2
 # with BSD or ugrep tools, and the commit hook gates on that one. A GNU-only flag
