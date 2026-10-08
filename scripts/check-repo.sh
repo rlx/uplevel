@@ -57,14 +57,14 @@ echo "== skill version bumped with skill changes =="
 # The rule lives in references/mode-c-enforce.md: bump the version marker in the
 # same commit as the change it invalidates. Enforced at commit time, which is the
 # only point where "same commit" is a question that can be answered.
-# Everything under skills/uplevel/ ships, not only SKILL.md and references/ --
+# Everything under plugin/ ships, not only SKILL.md and references/ --
 # the shipped README, the selfcheck and its data files reach an installed copy
 # too, and a version that does not move cannot identify what someone installed.
 if [ -z "$changed" ]; then
   echo "  nothing staged and not a pull request, skipping"
-elif ! printf '%s\n' "$changed" | grep -qE '^skills/uplevel/'; then
+elif ! printf '%s\n' "$changed" | grep -qE '^plugin/'; then
   echo "  no skill content $what"
-elif gdiff -U0 -- skills/uplevel/SKILL.md | grep -q '^+version:'; then
+elif gdiff -U0 -- plugin/skills/uplevel/SKILL.md | grep -q '^+version:'; then
   echo "  skill content changed, version bumped"
 else
   note "skill content is $what without a version: bump in SKILL.md"
@@ -77,10 +77,10 @@ echo "== a new check is recorded in the checklist =="
 # this fires. Renames net to zero, so only genuinely new headings ask for an
 # entry. Commit time only, for the same reason the version rule is: "in the same
 # commit" is a question only answerable here.
-gates="scripts/check-repo.sh scripts/check-install.sh scripts/check-forge.sh skills/uplevel/selfcheck.sh"
+gates="scripts/check-repo.sh scripts/check-install.sh scripts/check-forge.sh plugin/skills/uplevel/selfcheck.sh"
 if [ -z "$changed" ]; then
   echo "  nothing staged and not a pull request, skipping"
-elif ! printf '%s\n' "$changed" | grep -qE '^(scripts/check-(repo|install|forge)\.sh|skills/uplevel/selfcheck\.sh)$'; then
+elif ! printf '%s\n' "$changed" | grep -qE '^(scripts/check-(repo|install|forge)\.sh|plugin/skills/uplevel/selfcheck\.sh)$'; then
   echo "  no gate script $what"
 else
   # Count assertions, not just section headings: a check added inside an existing
@@ -164,11 +164,13 @@ tagn=0
 while IFS= read -r t; do
   [ -z "$t" ] && continue
   tagn=$((tagn+1))
-  tv="$(git show "$t:skills/uplevel/SKILL.md" 2>/dev/null \
+  # The skill moved into plugin/ at v0.87.0; older tags carry it at the old path.
+  tv="$( { git show "$t:plugin/skills/uplevel/SKILL.md" 2>/dev/null \
+           || git show "$t:skills/uplevel/SKILL.md" 2>/dev/null; } \
         | awk -F"$VERSION_FS" '/^version:/ { print $2; exit }')"
   [ "$tv" = "${t#v}" ] || note "$t points at a commit declaring version '${tv:-none}'"
 done < <(git tag -l 'v*' 2>/dev/null)
-cur="$(awk -F"$VERSION_FS" '/^version:/ { print $2; exit }' skills/uplevel/SKILL.md)"
+cur="$(awk -F"$VERSION_FS" '/^version:/ { print $2; exit }' plugin/skills/uplevel/SKILL.md)"
 if [ "$tagn" = "1" ]; then tw="tag"; else tw="tags"; fi
 # A tag was published whose own commit did not document the version it released:
 # the changelog PR was open, and the release went out first. Checked forward on
@@ -194,58 +196,73 @@ else
   echo "  $tagn $tw checked; SKILL.md declares $cur, not tagged - tag it when you release it"
 fi
 
-echo "== the marketplace entry agrees with the skill, and ships only the skill =="
-# The repository is its own marketplace, and the entry in marketplace.json is the
-# whole plugin definition: its version is what "claude plugin update" compares,
-# so a change that does not move it never reaches an installed copy, and its
-# source is the directory an install copies. That source was the repository
-# root once, which shipped the gate scripts, the fixtures and this checklist
-# into every user's plugin cache.
+echo "== the plugin folder is what the directory and the marketplace expect =="
+# plugin/ is the whole plugin: its manifest, its README and the skill. That is
+# the shape Anthropic's directory validates -- a folder holding
+# .claude-plugin/plugin.json, a README and a license -- and the folder an install
+# copies, so the gate scripts and fixtures beside it never reach a user.
 #
-# There is deliberately no plugin.json. Inside skills/uplevel/ it would turn a
-# linked or copied skill into a skills-directory plugin, which was observed to
-# report zero skills; at the root it is a second version marker with nothing
-# left to describe.
+# The manifest's version is what "claude plugin update" compares: a change that
+# does not move it never reaches an installed copy. The manifest must not sit
+# inside skills/uplevel/ itself: a linked or copied skill folder carrying one is
+# loaded as a skills-directory plugin, which was observed to report zero skills.
 if ! command -v python3 >/dev/null 2>&1; then
   echo "  no python3, skipping"
 else
   msg=$(python3 - "$cur" <<'MANIFESTS'
-import json, os, sys
+import json, os, re, sys
 declared = sys.argv[1]
-try:
-    market = json.load(open(".claude-plugin/marketplace.json"))
-except Exception as exc:
-    print(".claude-plugin/marketplace.json does not parse: %s" % exc); sys.exit(1)
+def load(path):
+    try:
+        return json.load(open(path))
+    except Exception as exc:
+        print("%s does not parse: %s" % (path, exc)); sys.exit(1)
+plugin = load("plugin/.claude-plugin/plugin.json")
+market = load(".claude-plugin/marketplace.json")
+if plugin.get("name") != "uplevel":
+    print("plugin.json names the plugin %r; an installed copy is recorded under 'uplevel'" % plugin.get("name")); sys.exit(1)
+if plugin.get("version") != declared:
+    print("plugin.json declares version %r, SKILL.md declares %r - bump both in the same change"
+          % (plugin.get("version"), declared)); sys.exit(1)
+for field in ("description", "author", "license"):
+    if not plugin.get(field):
+        print("plugin.json sets no %s, which the directory asks for" % field); sys.exit(1)
 entries = [p for p in market.get("plugins", []) if p.get("name") == "uplevel"]
 if len(entries) != 1:
     print("marketplace.json lists %d plugins named 'uplevel', expected one" % len(entries)); sys.exit(1)
 e = entries[0]
-if e.get("version") != declared:
-    print("the marketplace entry declares version %r, SKILL.md declares %r - bump both in the same change"
-          % (e.get("version"), declared)); sys.exit(1)
-if e.get("source") != "./skills/uplevel":
-    print("the marketplace entry's source is %r - an install copies that directory, so it must be ./skills/uplevel"
+if e.get("source") != "./plugin":
+    print("the marketplace entry's source is %r - an install copies that directory, so it must be ./plugin"
           % e.get("source")); sys.exit(1)
-if e.get("strict") is not False:
-    print("the marketplace entry must set strict to false, because no plugin.json describes the plugin"); sys.exit(1)
-for stray in (".claude-plugin/plugin.json", "skills/uplevel/.claude-plugin"):
+if "version" in e and e["version"] != declared:
+    print("the marketplace entry declares version %r, SKILL.md declares %r" % (e["version"], declared)); sys.exit(1)
+for stray in (".claude-plugin/plugin.json", "plugin/skills/uplevel/.claude-plugin"):
     if os.path.exists(stray):
-        print("%s exists - the marketplace entry is the plugin definition, and this one changes how the skill loads" % stray)
-        sys.exit(1)
-print("version %s, source ./skills/uplevel, no plugin.json" % declared)
+        print("%s exists - the manifest belongs in plugin/.claude-plugin/ and nowhere else" % stray); sys.exit(1)
+try:
+    readme = open("plugin/README.md", encoding="utf-8").read()
+except OSError:
+    print("plugin/README.md is missing - the directory lists a plugin by its README"); sys.exit(1)
+words = len(re.sub(r"```.*?```", " ", readme, flags=re.S).split())
+if words < 40:
+    print("plugin/README.md has %d words outside code blocks; the directory wants 40" % words); sys.exit(1)
+extra = sorted(set(os.listdir("plugin")) - {".claude-plugin", "README.md", "skills"})
+if extra:
+    print("plugin/ holds %s - everything in that folder ships to every install" % ", ".join(extra)); sys.exit(1)
+print("plugin.json at %s, source ./plugin, README %d words, nothing else in the folder" % (declared, words))
 MANIFESTS
   )
   if [ $? -eq 0 ]; then echo "  $msg"; else note "$msg"; fi
 fi
 
 echo "== the shipped skill carries the license =="
-# An install copies skills/uplevel/ and nothing above it, so the license at the
+# An install copies plugin/skills/uplevel/ and nothing above it, so the license at the
 # repository root never reached one. The copy inside the skill is the one that
 # travels, and two copies of anything drift.
-if cmp -s LICENSE skills/uplevel/LICENSE; then
-  echo "  skills/uplevel/LICENSE matches LICENSE"
+if cmp -s LICENSE plugin/skills/uplevel/LICENSE; then
+  echo "  plugin/skills/uplevel/LICENSE matches LICENSE"
 else
-  note "skills/uplevel/LICENSE is missing or differs from LICENSE — an installed copy ships without the license text"
+  note "plugin/skills/uplevel/LICENSE is missing or differs from LICENSE — an installed copy ships without the license text"
 fi
 
 echo "== gate scripts stay portable =="
@@ -256,7 +273,7 @@ gnuisms=0; checked=0
 while read -r p; do
   case "$p" in ''|'#'*) continue;; esac
   checked=$((checked+1))
-  if grep -rnF -- "$p" scripts/*.sh skills/uplevel/*.sh 2>/dev/null; then
+  if grep -rnF -- "$p" scripts/*.sh plugin/skills/uplevel/*.sh 2>/dev/null; then
     note "GNU-only construct in a gate script: $p"; gnuisms=$((gnuisms+1))
   fi
 done < scripts/gnu-only-constructs.txt
@@ -320,6 +337,6 @@ print("\n".join(bad))
 fi
 
 echo "== the skill's own gate =="
-skills/uplevel/selfcheck.sh | sed 's/^/  /' || fail=1
+plugin/skills/uplevel/selfcheck.sh | sed 's/^/  /' || fail=1
 
 [ "$fail" = "0" ] && echo "REPO OK" || { echo "REPO FAILED"; exit 1; }

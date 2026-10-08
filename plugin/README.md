@@ -54,7 +54,7 @@ Personal — available in every project:
 ```sh
 mkdir -p ~/.claude/skills
 rm -rf ~/.claude/skills/uplevel
-cp -R skills/uplevel ~/.claude/skills/uplevel
+cp -R plugin/skills/uplevel ~/.claude/skills/uplevel
 ```
 
 Project — checked in, shared with the team:
@@ -62,7 +62,7 @@ Project — checked in, shared with the team:
 ```sh
 mkdir -p .claude/skills
 rm -rf .claude/skills/uplevel
-cp -R skills/uplevel .claude/skills/uplevel
+cp -R plugin/skills/uplevel .claude/skills/uplevel
 ```
 
 The `rm -rf` is what makes both repeatable, and updating a copy install means running the block
@@ -91,23 +91,23 @@ broke last quarter, who may deploy) are worth correcting before you choose.
 
 | file | what it carries |
 |---|---|
-| [`SKILL.md`](SKILL.md) | the three modes, branching, and the invariants |
-| [`references/mode-a-investigate.md`](references/mode-a-investigate.md) | the audit procedure, report shape and plan rules |
-| [`references/mode-c-enforce.md`](references/mode-c-enforce.md) | check-in, shipping, hazards, incidents, claims |
-| [`references/discovery.md`](references/discovery.md) | finding the real gate; toolchain preflight; cleanup |
-| [`references/production.md`](references/production.md) | environments, secrets, deploys, migrations, incidents |
-| [`references/forge-hygiene.md`](references/forge-hygiene.md) | CI triggers, Actions security, protection, basics |
-| [`references/release-gates.md`](references/release-gates.md) | release, deploy and deploy-time checks |
-| [`references/code-scan.md`](references/code-scan.md) | the security read of a change, done by the agent |
-| [`references/remedies.md`](references/remedies.md) | what each finding turns into as a plan item |
-| [`references/commit-hygiene.md`](references/commit-hygiene.md) | commit messages, PR bodies and release notes |
-| [`references/checklist.md`](references/checklist.md) | the per-repo checklist and how it re-audits as a diff |
-| [`references/destructive-ops.md`](references/destructive-ops.md) | the stop list, and how to derive a repo's own |
-| [`references/automation.md`](references/automation.md) | the enforcement ladder — turning rules into checks |
-| [`references/claude-md-template.md`](references/claude-md-template.md) | the template the bootstrap fills in |
-| [`references/long-runs.md`](references/long-runs.md) | migrations, backfills, anything measured |
-| [`references/evidence.md`](references/evidence.md) | wording a completion claim to match the evidence |
-| [`references/example-output.md`](references/example-output.md) | one worked report and plan |
+| [`SKILL.md`](skills/uplevel/SKILL.md) | the three modes, branching, and the invariants |
+| [`references/mode-a-investigate.md`](skills/uplevel/references/mode-a-investigate.md) | the audit procedure, report shape and plan rules |
+| [`references/mode-c-enforce.md`](skills/uplevel/references/mode-c-enforce.md) | check-in, shipping, hazards, incidents, claims |
+| [`references/discovery.md`](skills/uplevel/references/discovery.md) | finding the real gate; toolchain preflight; cleanup |
+| [`references/production.md`](skills/uplevel/references/production.md) | environments, secrets, deploys, migrations, incidents |
+| [`references/forge-hygiene.md`](skills/uplevel/references/forge-hygiene.md) | CI triggers, Actions security, protection, basics |
+| [`references/release-gates.md`](skills/uplevel/references/release-gates.md) | release, deploy and deploy-time checks |
+| [`references/code-scan.md`](skills/uplevel/references/code-scan.md) | the security read of a change, done by the agent |
+| [`references/remedies.md`](skills/uplevel/references/remedies.md) | what each finding turns into as a plan item |
+| [`references/commit-hygiene.md`](skills/uplevel/references/commit-hygiene.md) | commit messages, PR bodies and release notes |
+| [`references/checklist.md`](skills/uplevel/references/checklist.md) | the per-repo checklist and how it re-audits as a diff |
+| [`references/destructive-ops.md`](skills/uplevel/references/destructive-ops.md) | the stop list, and how to derive a repo's own |
+| [`references/automation.md`](skills/uplevel/references/automation.md) | the enforcement ladder — turning rules into checks |
+| [`references/claude-md-template.md`](skills/uplevel/references/claude-md-template.md) | the template the bootstrap fills in |
+| [`references/long-runs.md`](skills/uplevel/references/long-runs.md) | migrations, backfills, anything measured |
+| [`references/evidence.md`](skills/uplevel/references/evidence.md) | wording a completion claim to match the evidence |
+| [`references/example-output.md`](skills/uplevel/references/example-output.md) | one worked report and plan |
 
 ## Limitations
 
@@ -125,7 +125,7 @@ broke last quarter, who may deploy) are worth correcting before you choose.
 - **Absent domains**: disaster recovery and restore testing, API and client backwards compatibility,
   feature-flag lifecycle, runtime cost regressions, clock and timezone failures.
 
-Run `selfcheck.sh` for the structural checks it enforces on itself.
+Run `skills/uplevel/selfcheck.sh` for the structural checks it enforces on itself.
 
 ## Scope
 

@@ -42,10 +42,10 @@ it with `git commit --no-verify` only when you know why, and say so in the pull 
   mechanism, not a quality cap.** If something genuinely belongs in the always-loaded file, put it
   there and raise the number in the same change, saying why. Never cut something worth saying to fit
   a figure.
-- **Bump `version:` in `SKILL.md`** in the same change as anything under `skills/uplevel/`. The hook
+- **Bump `version:` in `SKILL.md`** in the same change as anything under `plugin/`. The hook
   checks the commit and CI checks the pull request against its base.
-  **And `version` in `.claude-plugin/marketplace.json` with it** — `claude plugin update` compares that
-  number and delivers nothing while it stands still. The gate fails while the two disagree.
+  **And `version` in `plugin/.claude-plugin/plugin.json` with it** — `claude plugin update` compares
+  that number and delivers nothing while it stands still. The gate fails while the two disagree.
 - **Not every version is released.** Bump on every change; tag and release when a set of changes is
   worth announcing. A tag must have a release, and the gate checks that.
 - **Write the `CHANGELOG.md` entry in the same change**, not in a follow-up. A release was published
@@ -58,9 +58,9 @@ it with `git commit --no-verify` only when you know why, and say so in the pull 
   around it.
 - **Shipped `gh` commands use `{owner}/{repo}` and a shell variable for the branch.** `gh` fills in
   nothing else as intended. The rejected spellings are in
-  `skills/uplevel/unsubstituted-placeholders.txt`.
-- **No machine- or project-specific strings.** Patterns in `skills/uplevel/leak-patterns.txt`.
-- **Every invariant is stated in `SKILL.md`.** List in `skills/uplevel/invariants.txt`. Adding one
+  `plugin/skills/uplevel/unsubstituted-placeholders.txt`.
+- **No machine- or project-specific strings.** Patterns in `plugin/skills/uplevel/leak-patterns.txt`.
+- **Every invariant is stated in `SKILL.md`.** List in `plugin/skills/uplevel/invariants.txt`. Adding one
   means adding it to both — a rule that lives only in a reference has been demoted behind a read.
 
 Prose is **en-US** (behavior, license, judgment, labeled), and the gate enforces it. One rule it does
@@ -122,7 +122,7 @@ ships. The shallow-clone trap sat in the validation notes for the length of the 
 skill said it; a later sweep found five more practices followed here and taught nowhere.
 
 The pass is cheap: list what this repository *does* — its workflow settings, its gate's guards, the
-conventions in this file — and for each, grep `skills/uplevel/` for whether it is taught. Anything
+conventions in this file — and for each, grep `plugin/skills/uplevel/` for whether it is taught. Anything
 followed here and absent there is either a lesson worth shipping or a habit worth dropping, and both
 answers are useful.
 

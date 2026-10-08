@@ -15,8 +15,8 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
 
 ## Constraints
 
-- `skills/uplevel/` is symlinked into `~/.claude/skills/`. The working tree is the installed skill;
-  an edit takes effect in the next session.
+- `plugin/skills/uplevel/` is symlinked into `~/.claude/skills/`. The working tree is the installed
+  skill; an edit takes effect in the next session.
 - Load cost is measured with a real tokenizer when `tiktoken` is importable, and falls back to a word
   count that reads 3-9% low, in which case the gate prints the figures and asserts no ceiling. CI
   installs it, so `main` is always measured exactly. The Mode A working set has a ceiling, currently
@@ -28,7 +28,7 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
 - Every command in the skill should have been run and observed to work before it is written down.
   This is a discipline, not an enforced rule: the gate parses fenced blocks and validates `grep -E`
   patterns, which proves they are well-formed, not that they do what the text claims.
-- Bumping `version:` in `SKILL.md` alongside any change under `skills/uplevel/` is enforced at commit
+- Bumping `version:` in `SKILL.md` alongside any change under `plugin/` is enforced at commit
   time, and again in CI against the pull request's base. Tagging is not: the gate prints when the
   declared version has no tag, and does not fail.
   Failing at commit time would fail the commit that does the bump, and failing in CI would leave
@@ -50,7 +50,7 @@ Runs on every commit via `.git/hooks/pre-commit`, and in CI. The hook source is 
 - Commit messages and PR bodies say what was done — concise, accurate, simple — and never how it was
   found. Anything beyond what was done is context: ask before adding it. Detail lives in the
   untracked plan, not in public history. The shipped guidance is
-  `skills/uplevel/references/commit-hygiene.md`.
+  `plugin/skills/uplevel/references/commit-hygiene.md`.
 - Prose is **en-US** throughout — behavior, license, judgment, labeled. The repository is public and
   the skill ships as text; mixed spelling reads as two authors who never compared notes.
 - `git clean -fdx` removes the untracked working files — `.claude/improvement-plan.md`,

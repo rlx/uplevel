@@ -38,7 +38,7 @@ if [ "${1:-}" = "--replay" ]; then
 elif ! command -v claude >/dev/null 2>&1; then
   echo "no claude CLI here — the skill's behavior is unchecked on this machine"
   exit 0
-elif [ ! "$HOME/.claude/skills/uplevel/SKILL.md" -ef "skills/uplevel/SKILL.md" ]; then
+elif [ ! "$HOME/.claude/skills/uplevel/SKILL.md" -ef "plugin/skills/uplevel/SKILL.md" ]; then
   # A run loads the installed skill. If that is not this tree, the run would
   # test some other version and report it under this one's name.
   echo "the installed skill is not this working tree — behavior unchecked; link it per README.md and re-run"

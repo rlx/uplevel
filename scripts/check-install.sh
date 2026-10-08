@@ -19,7 +19,7 @@ trap 'rm -rf "$WORK"' EXIT
 # --- extract ------------------------------------------------------------------
 # Fenced sh blocks under "## Install", up to the next second-level heading.
 # Inline-backtick commands are deliberately NOT extracted: the section quotes
-# `cp -R skills/uplevel ~/.claude/skills/` as the mistake to avoid, and running
+# `cp -R plugin/skills/uplevel ~/.claude/skills/` as the mistake to avoid, and running
 # the anti-pattern would be a check that asserts the bug.
 extract() {
   src="$1"; dest="$2"
@@ -57,11 +57,11 @@ shape_ok() {
 }
 
 extract README.md "$WORK/blocks"
-extract skills/uplevel/README.md "$WORK/blocks-shipped"
+extract plugin/README.md "$WORK/blocks-shipped"
 
 echo "== both install sections still have the shape this check knows =="
 shape_ok "README.md" "$WORK/blocks" 2 "link, then copy" || { echo "INSTALL FAILED"; exit 1; }
-shape_ok "skills/uplevel/README.md" "$WORK/blocks-shipped" 3 "clone, then personal, then project" \
+shape_ok "plugin/README.md" "$WORK/blocks-shipped" 3 "clone, then personal, then project" \
   || { echo "INSTALL FAILED"; exit 1; }
 
 # The uninstall command is prose, in backticks, so it is pulled by shape.
@@ -161,7 +161,7 @@ else
   note "could not clone this checkout to test the copy install"
 fi
 
-# --- the shipped README, which ships inside the skill --------------------------
+# --- the plugin's README, which ships with the plugin --------------------------
 echo "== the shipped README's installs, from a clone, each run twice =="
 # Its blocks are sequential, not alternatives: block 1 clones, blocks 2 and 3
 # install personally and project-scoped from inside that clone. It also ships to
@@ -192,7 +192,7 @@ if [ -n "$uninstall" ] && [ -d "$WORK/home-link/.claude/skills" ]; then
   HOME="$WORK/home-link" bash -e -c "$uninstall" >/dev/null 2>&1
   [ -e "$WORK/home-link/.claude/skills/uplevel" ] \
     && note "uninstall left something at ~/.claude/skills/uplevel"
-  [ -f "$WORK/link-2/uplevel/skills/uplevel/SKILL.md" ] \
+  [ -f "$WORK/link-2/uplevel/plugin/skills/uplevel/SKILL.md" ] \
     || note "uninstall removed the clone, which the README says it never does"
   [ "$fail" = "0" ] && echo "  install gone, clone intact"
 else

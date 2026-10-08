@@ -24,7 +24,7 @@ checks:
 
   - id: broken-reference-fails-gate
     status: enforced
-    enforced_by: skills/uplevel/selfcheck.sh
+    enforced_by: plugin/skills/uplevel/selfcheck.sh
 
   - id: shipped-commands-parse
     status: enforced
@@ -32,7 +32,7 @@ checks:
 
   - id: shipped-commands-use-placeholders-gh-fills-in
     status: enforced
-    enforced_by: selfcheck.sh; fixed strings in skills/uplevel/unsubstituted-placeholders.txt
+    enforced_by: selfcheck.sh; fixed strings in plugin/skills/uplevel/unsubstituted-placeholders.txt
     note: >-
       gh substitutes {owner} and {repo} and sends any other placeholder as
       typed. Four spellings had shipped, two of which return a 404 when pasted
@@ -238,9 +238,9 @@ checks:
 
   - id: shipped-skill-carries-the-license
     status: enforced
-    enforced_by: scripts/check-repo.sh; skills/uplevel/LICENSE compared with LICENSE
+    enforced_by: scripts/check-repo.sh; plugin/skills/uplevel/LICENSE compared with LICENSE
     note: >-
-      an install copies skills/uplevel/ alone, so the license at the root never
+      an install copies plugin/skills/uplevel/ alone, so the license at the root never
       reached one.
 
   - id: branch-deleted-on-merge
@@ -266,7 +266,7 @@ checks:
 
   - id: mode-working-set-visible
     status: enforced
-    enforced_by: skills/uplevel/selfcheck.sh; prints tokens per mode on every run
+    enforced_by: plugin/skills/uplevel/selfcheck.sh; prints tokens per mode on every run
     note: >-
       SKILL.md's budget is the entry cost, not the cost. A full Mode A audit
       reads most of references/ before touching the user's repository, and
@@ -278,7 +278,7 @@ checks:
   - id: load-cost-measured-not-estimated
     status: enforced
     enforced_by: >-
-      skills/uplevel/selfcheck.sh; counts with tiktoken where it is importable, and asserts the
+      plugin/skills/uplevel/selfcheck.sh; counts with tiktoken where it is importable, and asserts the
       ceilings only then. CI installs it
     note: >-
       a word count reads 3-9 percent low on this content - backticks, em-dashes,
@@ -295,7 +295,7 @@ checks:
   - id: mode-working-set-bounded
     status: enforced
     enforced_by: >-
-      skills/uplevel/selfcheck.sh; fails when the Mode A working set exceeds its ceiling, currently
+      plugin/skills/uplevel/selfcheck.sh; fails when the Mode A working set exceeds its ceiling, currently
       46000
     note: >-
       printing the figure made growth visible and did not make it cost anything,
@@ -313,7 +313,7 @@ checks:
 
   - id: every-reference-measured
     status: enforced
-    enforced_by: skills/uplevel/selfcheck.sh; fails when a shipped reference is in no mode-cost list
+    enforced_by: plugin/skills/uplevel/selfcheck.sh; fails when a shipped reference is in no mode-cost list
     note: >-
       the ceiling only bounds what it counts. remedies.md sat in no list while
       mode-a-investigate.md routed every plan through it, so the advertised Mode A
@@ -359,7 +359,7 @@ checks:
 
   - id: invariants-stated-in-skill-md
     status: enforced
-    enforced_by: skills/uplevel/selfcheck.sh against skills/uplevel/invariants.txt
+    enforced_by: plugin/skills/uplevel/selfcheck.sh against plugin/skills/uplevel/invariants.txt
     note: >-
       11 rules that must appear in SKILL.md, which loads on every trigger. An
       invariant surviving only in a reference has been demoted behind a read,
@@ -370,7 +370,7 @@ checks:
 
   - id: leakage-scan-by-shape
     status: enforced
-    enforced_by: skills/uplevel/selfcheck.sh against skills/uplevel/leak-patterns.txt
+    enforced_by: plugin/skills/uplevel/selfcheck.sh against plugin/skills/uplevel/leak-patterns.txt
     note: >-
       scans *.md and *.sh for machine- and project-specific shapes. Patterns
       are held in a data file so they cannot match themselves. Verified
@@ -440,41 +440,29 @@ checks:
 
   - id: installable-as-a-plugin
     status: present
-    evidence: .claude-plugin/marketplace.json; the repository is its own marketplace, and the plugin is skills/uplevel alone
+    evidence: plugin/.claude-plugin/plugin.json and .claude-plugin/marketplace.json; the repository is its own marketplace, and the plugin is the plugin/ folder
     note: >-
-      the marketplace entry is the whole plugin definition, with strict set to
-      false and skills/uplevel as its source, so an install carries the skill
-      and nothing else. It carried the whole repository while the source was
-      the root. Re-verified by hand on 2026-10-07 in throwaway config
-      directories: a fresh install, an update from the older layout, and that
-      an update delivers nothing until the version moves. What follows is the
-      record of the first layout. Verified by hand against a
-      throwaway HOME: adding this tree as a marketplace, installing the plugin
-      from it, and reading back "Skills (1) uplevel" at version 0.78.0. Not in
-      the gate - check-install.sh runs the documented shell install against a
-      clean HOME, and this path needs the claude CLI, which CI does not have.
-      Re-verified from the GitHub shorthand once the manifests reached main:
-      marketplace added, plugin installed, "Version: 0.78.0", and the shipped
-      selfcheck run against the installed copy. That pass is also what caught
-      the update command README.md printed, which named the plugin bare and
-      failed - "update" wants the marketplace-qualified form that "install"
-      takes, while "uninstall" accepts the bare name. The gate cannot see these
-      commands - they sit outside the "## Install" heading check-install.sh
-      extracts from - so every one of them is verified by hand or not at all.
-      "claude plugin validate --strict" passes on this tree, which is the check
-      the community-marketplace submission pipeline runs; it reads the manifests
-      and does not exercise an install.
+      plugin/ holds the manifest, the README and the skill, which is the folder
+      shape Anthropic's directory validates and the folder an install copies.
+      Two earlier layouts are why it looks like this. With the repository root
+      as the source, an install carried the gate scripts and fixtures. With the
+      skill folder as the source and no manifest, the directory's checklist
+      refused it. A manifest inside the skill folder itself is not an option:
+      a linked or copied skill folder carrying one loads as a skills-directory
+      plugin reporting zero skills. Verified by hand in throwaway config
+      directories on 2026-10-07: a fresh install, an update from the previous
+      layout, and that an update delivers nothing until the version moves.
+      "claude plugin validate --strict" passes on plugin/ and on the root. Not
+      in the gate, because the claude CLI is not in CI.
 
   - id: plugin-manifests-agree-with-the-skill
     status: enforced
-    enforced_by: scripts/check-repo.sh; the marketplace entry's version against SKILL.md's, its source, and that no plugin.json exists
+    enforced_by: scripts/check-repo.sh; plugin.json's version against SKILL.md's, the marketplace source, where the manifest may live, the README's length, and that plugin/ holds nothing else
     note: >-
-      a second version marker in the tree, and the one a consumer installs by.
-      A version marker that disagrees with what shipped is a defect this skill
-      ships a warning about, so it is checked rather than trusted. Also parses
-      both manifests: a JSON error there is invisible until someone tries to
-      install. Skips where python3 or the manifest is absent. Verified
-      red-then-green on a version disagreement and on malformed JSON.
+      the version in plugin.json is the one a consumer installs by, and a
+      version marker that disagrees with what shipped is a defect this skill
+      ships a warning about. The rest are what the directory's validation
+      blocks on, checked here so a change cannot quietly undo them.
 
   - id: tag-matches-declared-version
     status: enforced
@@ -505,7 +493,7 @@ checks:
     status: enforced
     enforced_by: scripts/check-install.sh, a step in the required "Repo gate" job
     note: >-
-      extracts the install commands from README.md and skills/uplevel/README.md
+      extracts the install commands from README.md and plugin/skills/uplevel/README.md
       rather than restating them, and runs both against a clean HOME, each twice,
       plus the uninstall. Found two live defects on its first run. Too slow for
       the commit hook at about five seconds, so CI carries it.
