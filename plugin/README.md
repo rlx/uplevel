@@ -1,25 +1,66 @@
 # uplevel
 
-Uplevels a repository's engineering process: finds the process that actually exists, names what is
-missing from it, and returns a ranked plan for raising the floor.
+Finds the engineering controls your repository does not have — CI that never runs on pull requests, a
+`check` target that quietly rewrites files, a migration with nothing in front of it — and hands back
+a numbered plan. It writes nothing until you reply with the numbers you want.
 
-## What it does
+It is also written to load before the risky moments in ordinary work — a migration, a backfill, a
+deploy. Its rules for those are short: say which environment you are pointed at before touching it,
+stop and ask before anything irreversible, and read the names of secrets, never their values.
 
-**Investigate, then propose.** Reads CI config, hooks, task runners, deployment manifests and the
-revert history. Runs the candidate gate commands it has read and judged safe. Maps the environments
-and the path to production. Finds the operations that destroy something irreplaceable. Runs an
-absence audit that names what is missing rather than only what is wrong. It writes nothing, and ends
-in a report plus a numbered plan — each item with what it prevents, what it costs, who it affects,
-and how to undo it.
+## What a run looks like
 
-**Automate, by proposal.** The valuable plan items replace a sentence with a check: CI gates, secret
-scanning, migration safety, config validation, deploy smoke tests. A document is the weakest form of
-enforcement. Anything that could fail a colleague's merge is proposed for a maintainer, never
-applied.
+Findings first, each tied to a file and a line, and each either run or marked unverified. This one is
+from the worked example that ships with the skill:
 
-**Enforce during ordinary work.** Run the gate before check-in, print which environment you are
-pointed at before touching one, stop before irreversible operations, ship with a known rollback,
-keep backfills resumable, and report results honestly.
+```
+**2. The `fmtcheck` target is not a check — it rewrites your working tree.** Line 8 of the script it
+calls invokes the language's format command rather than its check command, and that command writes
+in place. In CI this is harmless on an ephemeral checkout, which is exactly why it has survived.
+Evidence, from reading the file — I did not run it, because it would modify the clone.
+```
+
+Then a plan in which every item carries the same six fields, so you can decide without reading back
+through the report:
+
+```
+**1. Make `make fmtcheck` actually check.**
+prevents: a target named "check" silently rewriting a contributor's working tree · if skipped: item 2
+tells people to run a command that edits their files
+effort: 15 min, incl. review · affects: everyone who commits
+undo: `git revert` — one line · needs: —
+```
+
+Reply with the numbers you want — `1, 3, 5` is enough — and it builds those and nothing adjacent.
+
+## What it looks for
+
+- **What validates a change** before it reaches the default branch, and before it reaches users: the
+  real gate, what it does not cover, and whether anything requires it.
+- **Controls that exist and do nothing**: a required check nobody emits, a ruleset left in evaluate
+  mode, a job that reports green having run nothing.
+- **The release path**: unpinned actions beside a publish credential, a release that never reads the
+  result of its own tests, an image that carries more than the source.
+- **Irreversible operations**: migrations that drop data, commands that default to every environment,
+  state nobody can regenerate.
+- **A security read of the change itself**, for the logic errors a pattern scanner does not catch.
+
+Absences are named, not skipped, and what could not be seen is reported as unknown, never as missing.
+
+## What it runs, reads and sends
+
+The plugin is instructions and one local script. It has no hooks, no MCP server and no background
+process, and it makes no network call of its own.
+
+- **An agent following it runs commands in your repository**: `git`, your own build and test
+  commands once it has read them, and read-only `gh api` calls through the GitHub CLI you already
+  authenticated. It is told never to run anything that writes to shared infrastructure, spends money,
+  or needs credentials it had to go and find.
+- **It reads configuration, including files that hold credentials, for key names only.** The
+  environment check it prints before a deploy masks the credentials in a connection string and asks
+  `kubectl`, `aws` and `gcloud` which account is active. Nothing is sent anywhere but your terminal.
+- **`skills/uplevel/selfcheck.sh`** checks the skill's own files. It is run by hand, by people working
+  on the skill.
 
 ## Rules it holds itself to
 
@@ -80,12 +121,9 @@ then available as `/uplevel`.
 /uplevel
 ```
 
-Or ask: "uplevel this repo", "write a CLAUDE.md documenting our process", "we keep breaking
-production — what should we enforce?"
-
-It returns findings and a numbered plan. Reply with the numbers you want — `1, 3, 5` is enough — and
-it builds those and nothing adjacent. The parts only you know (which data is irreplaceable, what
-broke last quarter, who may deploy) are worth correcting before you choose.
+Or ask in plain language: "uplevel this repo", "audit our engineering process", "we keep breaking
+production — what should we enforce?" The parts only you know — which data is irreplaceable, what
+broke last quarter, who may deploy — are worth correcting before you choose from the plan.
 
 ## Contents
 
