@@ -246,7 +246,11 @@ except OSError:
 words = len(re.sub(r"```.*?```", " ", readme, flags=re.S).split())
 if words < 40:
     print("plugin/README.md has %d words outside code blocks; the directory wants 40" % words); sys.exit(1)
-extra = sorted(set(os.listdir("plugin")) - {".claude-plugin", "README.md", "skills"})
+# Tracked files only: an install copies what git has, and the Finder drops a
+# .DS_Store into any folder someone opens, which is ignored and never ships.
+import subprocess
+tracked = subprocess.check_output(["git", "ls-files", "plugin"], text=True).split("\n")
+extra = sorted({t.split("/")[1] for t in tracked if t} - {".claude-plugin", "README.md", "skills"})
 if extra:
     print("plugin/ holds %s - everything in that folder ships to every install" % ", ".join(extra)); sys.exit(1)
 print("plugin.json at %s, source ./plugin, README %d words, nothing else in the folder" % (declared, words))

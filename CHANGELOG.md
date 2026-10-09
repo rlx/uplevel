@@ -2,6 +2,14 @@
 
 Versions match `version:` in `skills/uplevel/SKILL.md`.
 
+## v0.88.0 — 2026-10-08
+
+- `plugin/.claude-plugin/icon.png`: a square icon for the directory listing, drawn by
+  `assets/plugin-icon.py`.
+- `plugin/README.md` opens with what the skill finds, shows one finding and one plan item, and says
+  what the plugin runs, reads and sends.
+- The skill's own text is unchanged from v0.87.0.
+
 ## v0.87.0 — 2026-10-07
 
 - The plugin is the `plugin/` folder: `plugin/.claude-plugin/plugin.json`, `plugin/README.md` and the
